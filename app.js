@@ -15,7 +15,34 @@ const PREDICTION_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
 // ── Security middleware ───────────────────────────────────────────────────────
 
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'", "'unsafe-inline'",
+        "https://static.sketchfab.com",
+        "https://cdn.jsdelivr.net",
+        "https://www.googletagmanager.com",
+        "https://fonts.googleapis.com",
+      ],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "blob:", "https:", "http:"],
+      mediaSrc: ["'self'", "blob:"],
+      connectSrc: [
+        "'self'",
+        "https://cdn.jsdelivr.net",
+        "https://tfhub.dev",
+        "https://storage.googleapis.com",
+        "https://api.fashn.ai",
+      ],
+      frameSrc: ["'self'", "https://sketchfab.com"],
+      workerSrc: ["'self'", "blob:"],
+      objectSrc: ["'none'"],
+    },
+  },
+}));
 app.use(cors({ origin: ALLOWED_ORIGINS, methods: ['GET', 'POST'] }));
 
 const tryonLimiter = rateLimit({
