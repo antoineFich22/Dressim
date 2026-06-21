@@ -3,718 +3,398 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Élara Studio — Robe midi Madeleine</title>
+  <title>Élara Studio — Boutique démo Dressim</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
-    /* ── Reset & Base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg: #FAFAF8;
-      --fg: #1A1A1A;
-      --muted: #6B6B6B;
-      --border: #E5E5E0;
-      --accent: #2C2C2C;
-      --price-color: #1A1A1A;
-      --btn-bg: #1A1A1A;
-      --btn-fg: #FFFFFF;
-      --dressim-purple: #7C3AED;
-      --dressim-purple-light: #EDE9FE;
-    }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--fg);
-      min-height: 100vh;
+      --accent: #c8a96e;
+      --accent-bg: rgba(200,169,110,.08);
+      --black: #1a1a1a;
+      --gray: #6b7280;
+      --border: #e5e7eb;
+      --bg: #fafaf9;
+      --white: #ffffff;
     }
 
-    /* ── Header boutique ── */
-    .store-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 48px;
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--black); -webkit-font-smoothing: antialiased; }
+
+    /* ── DEMO BANNER ── */
+    .demo-banner {
+      background: var(--black); color: var(--white);
+      text-align: center; padding: .6rem 1rem;
+      font-size: .75rem; letter-spacing: .02em;
+      display: flex; align-items: center; justify-content: center; gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .demo-banner strong { color: var(--accent); }
+    .demo-banner a {
+      color: rgba(255,255,255,.7); text-decoration: none;
+      font-size: .7rem; border: 1px solid rgba(255,255,255,.3);
+      padding: .2rem .7rem; border-radius: 20px; transition: color .2s;
+    }
+    .demo-banner a:hover { color: var(--white); }
+
+    /* ── BOUTIQUE NAV ── */
+    .boutique-nav {
       border-bottom: 1px solid var(--border);
-      background: var(--bg);
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      padding: 1rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--white);
+      position: sticky; top: 36px; z-index: 50;
     }
-    .store-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      font-weight: 600;
-      letter-spacing: -0.01em;
+    .boutique-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 300; letter-spacing: .18em;
     }
-    .store-nav {
-      display: flex;
-      gap: 32px;
-      list-style: none;
-    }
-    .store-nav a {
-      text-decoration: none;
-      color: var(--muted);
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-    .store-nav a:hover { color: var(--fg); }
-    .store-header__right {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-    }
-    .icon-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--fg);
-      font-size: 1.1rem;
-      padding: 4px;
-    }
+    .boutique-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 1.75rem; }
+    .nav-links a { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--gray); text-decoration: none; }
+    .nav-links a:hover { color: var(--black); }
+    .nav-icons { display: flex; gap: 1rem; font-size: 1.1rem; }
 
-    /* ── Breadcrumb ── */
-    .breadcrumb {
-      padding: 14px 48px;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-    .breadcrumb a { color: var(--muted); text-decoration: none; }
-    .breadcrumb span { margin: 0 6px; }
+    /* ── BREADCRUMB ── */
+    .breadcrumb { padding: .65rem 2rem; font-size: .72rem; color: var(--gray); border-bottom: 1px solid var(--border); background: var(--white); }
+    .breadcrumb span { margin: 0 .35rem; }
 
-    /* ── Page produit ── */
-    .product-page {
-      display: grid;
-      grid-template-columns: 1fr 480px;
-      gap: 0;
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 0 48px 80px;
-    }
+    /* ── PRODUCT LAYOUT ── */
+    .product-page { display: grid; grid-template-columns: 1fr 1fr; }
+    @media (max-width: 768px) { .product-page { grid-template-columns: 1fr; } }
 
-    /* ── Galerie images ── */
-    .product-gallery {
-      display: grid;
-      grid-template-columns: 72px 1fr;
-      gap: 12px;
-      padding-right: 48px;
-    }
-    .thumb-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .thumb {
-      width: 72px;
-      height: 90px;
-      border-radius: 6px;
-      border: 2px solid transparent;
-      cursor: pointer;
-      overflow: hidden;
-      transition: border-color 0.2s;
-    }
-    .thumb.active { border-color: var(--fg); }
-    .thumb-img {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-    }
-    /* Couleurs des visuels produit simulés */
-    .thumb:nth-child(1) .thumb-img { background: #F3EDE8; }
-    .thumb:nth-child(2) .thumb-img { background: #E8EEF3; }
-    .thumb:nth-child(3) .thumb-img { background: #F0ECF8; }
-
-    .main-image {
-      border-radius: 12px;
-      background: #F3EDE8;
-      aspect-ratio: 3/4;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .main-image__emoji { font-size: 7rem; }
-    .main-image__label {
-      margin-top: 16px;
-      font-size: 0.8rem;
-      color: var(--muted);
-      font-style: italic;
+    /* GALLERY */
+    .gallery { background: #f3f0eb; }
+    .gallery-main {
+      height: 520px; display: flex; align-items: center; justify-content: center;
+      font-size: 7rem; position: relative;
     }
     .badge-new {
-      position: absolute;
-      top: 16px;
-      left: 16px;
-      background: var(--fg);
-      color: #fff;
-      font-size: 0.7rem;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 4px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      position: absolute; top: 1.25rem; left: 1.25rem;
+      background: var(--black); color: var(--white);
+      font-size: .62rem; letter-spacing: .1em; text-transform: uppercase;
+      padding: .3rem .7rem; border-radius: 2px;
     }
+    .gallery-thumbs { display: flex; gap: .5rem; padding: .75rem 1.25rem; }
+    .thumb {
+      width: 56px; height: 56px; border-radius: 4px;
+      background: rgba(0,0,0,.07); display: flex; align-items: center;
+      justify-content: center; font-size: 1.4rem; cursor: pointer;
+      border: 2px solid transparent; transition: border-color .2s;
+    }
+    .thumb.active { border-color: var(--black); }
 
-    /* ── Infos produit ── */
-    .product-info {
-      padding-top: 8px;
-    }
-    .product-brand {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
+    /* PRODUCT INFO */
+    .product-info { padding: 2.5rem 2rem; background: var(--white); overflow-y: auto; }
+    .product-brand { font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--gray); margin-bottom: .4rem; }
     .product-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      font-weight: 600;
-      line-height: 1.2;
-      margin-bottom: 6px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.9rem; font-weight: 300; line-height: 1.2; margin-bottom: .6rem;
     }
-    .product-ref {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-bottom: 20px;
-    }
-    .product-price {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-    .product-price-sub {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 24px;
-    }
+    .product-rating { display: flex; align-items: center; gap: .5rem; margin-bottom: .85rem; }
+    .stars { color: var(--accent); font-size: .8rem; }
+    .rating-count { font-size: .78rem; color: var(--gray); }
+    .product-price { font-size: 1.5rem; font-weight: 600; margin-bottom: 1.4rem; }
+    .product-price .old { font-size: .95rem; color: var(--gray); text-decoration: line-through; margin-left: .4rem; font-weight: 400; }
 
-    /* Rating */
-    .product-rating {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 24px;
-    }
-    .stars { color: #F59E0B; font-size: 0.9rem; }
-    .rating-count { font-size: 0.8rem; color: var(--muted); }
-    .rating-sep { color: var(--border); }
-
-    /* Séparateur */
-    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
-
-    /* Couleurs */
-    .section-label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-      color: var(--muted);
-    }
-    .color-options {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-    .color-dot {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition: border-color 0.2s;
-    }
-    .color-dot.active { border-color: var(--fg); outline: 2px solid var(--bg); outline-offset: 2px; }
-
-    /* Tailles */
-    .size-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .size-guide { font-size: 0.78rem; color: var(--muted); text-decoration: underline; cursor: pointer; }
-    .size-options {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
+    .field-label { font-size: .7rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .5rem; }
+    .sizes { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
     .size-btn {
-      width: 48px;
-      height: 48px;
-      border-radius: 8px;
-      border: 1.5px solid var(--border);
-      background: var(--bg);
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s;
+      width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 4px;
+      font-size: .78rem; font-weight: 500; cursor: pointer; background: none;
+      transition: all .2s; color: var(--black);
     }
-    .size-btn:hover { border-color: var(--fg); }
-    .size-btn.active { background: var(--fg); color: #fff; border-color: var(--fg); }
-    .size-btn.out { color: var(--border); text-decoration: line-through; cursor: default; }
+    .size-btn:hover { border-color: var(--black); }
+    .size-btn.active { background: var(--black); color: var(--white); border-color: var(--black); }
 
-    /* ── Widget Dressim ── */
-    .dressim-banner {
-      background: var(--dressim-purple-light);
-      border: 1.5px solid #C4B5FD;
-      border-radius: 12px;
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      cursor: pointer;
-      transition: all 0.2s;
+    .colors { display: flex; gap: .5rem; margin-bottom: 1.75rem; }
+    .color-btn {
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 2px solid transparent; cursor: pointer;
+      transition: transform .2s, border-color .2s;
     }
-    .dressim-banner:hover {
-      background: #DDD6FE;
-      border-color: var(--dressim-purple);
-    }
-    .dressim-banner__left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .dressim-banner__icon {
-      width: 36px;
-      height: 36px;
-      background: var(--dressim-purple);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-    }
-    .dressim-banner__text strong {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #4C1D95;
-    }
-    .dressim-banner__text span {
-      font-size: 0.78rem;
-      color: #6D28D9;
-    }
-    .dressim-banner__cta {
-      background: var(--dressim-purple);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 16px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .dressim-banner__cta:hover { background: #6D28D9; }
+    .color-btn.active, .color-btn:hover { transform: scale(1.2); border-color: var(--black); }
 
-    /* CTA buttons */
-    .btn-add-cart {
-      width: 100%;
-      background: var(--btn-bg);
-      color: var(--btn-fg);
-      border: none;
-      border-radius: 10px;
-      padding: 16px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-      margin-bottom: 10px;
+    /* ── DRESSIM WIDGET ── */
+    .dressim-widget {
+      border: 1.5px solid var(--accent);
+      border-radius: 10px; overflow: hidden;
+      margin-bottom: 1.25rem; background: var(--accent-bg);
     }
-    .btn-add-cart:hover { background: #333; }
+    .widget-header {
+      display: flex; align-items: center; gap: .7rem;
+      padding: .85rem 1rem; cursor: pointer; user-select: none;
+    }
+    .widget-icon-wrap {
+      width: 34px; height: 34px; border-radius: 7px;
+      background: var(--accent); color: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .95rem; flex-shrink: 0;
+    }
+    .widget-header-text { flex: 1; }
+    .widget-title { font-size: .86rem; font-weight: 600; }
+    .widget-sub { font-size: .72rem; color: var(--gray); margin-top: .05rem; }
+    .widget-chevron { color: var(--gray); transition: transform .3s; }
+    .widget-chevron.open { transform: rotate(180deg); }
+    .widget-powered { font-size: .6rem; color: var(--gray); padding: 0 1rem .5rem; }
+    .widget-powered strong { color: var(--accent); }
 
-    .btn-wishlist {
-      width: 100%;
-      background: transparent;
-      color: var(--fg);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: border-color 0.2s;
-      margin-bottom: 24px;
-    }
-    .btn-wishlist:hover { border-color: var(--fg); }
+    .widget-body { display: none; padding: 0 1rem 1rem; }
+    .widget-body.open { display: block; }
 
-    /* Livraison */
-    .delivery-info {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 24px;
+    .upload-zone {
+      border: 1.5px dashed rgba(200,169,110,.45);
+      border-radius: 8px; padding: 1.5rem; text-align: center;
+      cursor: pointer; transition: all .2s; position: relative;
     }
-    .delivery-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.82rem;
-      color: var(--muted);
-    }
-    .delivery-row .icon { font-size: 1rem; }
+    .upload-zone:hover { background: rgba(200,169,110,.06); border-color: var(--accent); }
+    .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .upload-icon { font-size: 1.6rem; margin-bottom: .4rem; }
+    .upload-title { font-size: .84rem; font-weight: 600; margin-bottom: .15rem; }
+    .upload-sub { font-size: .72rem; color: var(--gray); }
 
-    /* Description */
-    .product-description {
-      font-size: 0.875rem;
-      line-height: 1.7;
-      color: #444;
-    }
+    .tryon-state { display: none; }
+    .tryon-state.active { display: block; }
 
-    /* ── Overlay Dressim ── */
-    .dressim-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 1000;
-      display: flex;
-      align-items: flex-end;
-      justify-content: flex-end;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.3s;
+    .preview-result {
+      border-radius: 8px; overflow: hidden; background: #f3f0eb;
+      aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center;
     }
-    .dressim-overlay.visible {
-      pointer-events: all;
-      opacity: 1;
+    .preview-result img { width: 100%; height: 100%; object-fit: cover; }
+    .loading-wrap { display: flex; flex-direction: column; align-items: center; gap: .6rem; color: var(--gray); font-size: .82rem; }
+    .spinner {
+      width: 30px; height: 30px; border: 2px solid rgba(200,169,110,.3);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin .8s linear infinite;
     }
-    .dressim-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      cursor: pointer;
-    }
-    .dressim-panel {
-      position: relative;
-      width: 100%;
-      max-width: 480px;
-      height: 92vh;
-      background: #080810;
-      border-radius: 20px 20px 0 0;
-      overflow: hidden;
-      transform: translateY(100%);
-      transition: transform 0.45s cubic-bezier(0.32,0.72,0,1);
-      display: flex;
-      flex-direction: column;
-    }
-    .dressim-overlay.visible .dressim-panel {
-      transform: translateY(0);
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .dressim-panel__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 20px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-      flex-shrink: 0;
+    .result-actions { display: flex; gap: .5rem; margin-top: .65rem; }
+    .btn-result {
+      flex: 1; padding: .55rem; border-radius: 6px;
+      font-size: .78rem; font-weight: 500; cursor: pointer; border: none; transition: all .2s;
     }
-    .dressim-panel__logo {
-      font-family: 'Playfair Display', serif;
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .dressim-panel__logo-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--dressim-purple);
-      border-radius: 50%;
-    }
-    .dressim-panel__context {
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.5);
-      text-align: center;
-    }
-    .dressim-panel__close {
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: #fff;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
-    }
-    .dressim-panel__close:hover { background: rgba(255,255,255,0.2); }
+    .btn-reset { background: none; border: 1px solid var(--border); color: var(--black); }
+    .btn-reset:hover { border-color: var(--black); }
+    .btn-share { background: var(--accent); color: var(--white); }
+    .btn-share:hover { opacity: .9; }
 
-    .dressim-panel__iframe-wrap {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-    }
-    .dressim-panel__iframe-wrap iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
+    .privacy-note { font-size: .68rem; color: var(--gray); margin-top: .55rem; line-height: 1.5; }
 
-    /* ── Badge "Taille recommandée" dans la page produit ── */
-    .size-recommendation {
-      background: #F0FDF4;
-      border: 1.5px solid #86EFAC;
-      border-radius: 10px;
-      padding: 12px 16px;
-      margin-bottom: 16px;
-      display: none;
-      align-items: center;
-      gap: 10px;
+    /* ACTIONS */
+    .btn-cart {
+      width: 100%; padding: .95rem; border-radius: 8px;
+      background: var(--black); color: var(--white);
+      font-size: .92rem; font-weight: 600; border: none;
+      cursor: pointer; margin-bottom: .65rem; transition: opacity .2s;
     }
-    .size-recommendation.visible { display: flex; }
-    .size-recommendation__icon { font-size: 1.2rem; }
-    .size-recommendation__text {
-      font-size: 0.82rem;
-      color: #166534;
+    .btn-cart:hover { opacity: .85; }
+    .btn-wish {
+      width: 100%; padding: .8rem; border-radius: 8px;
+      background: none; border: 1.5px solid var(--border);
+      font-size: .88rem; cursor: pointer; transition: border-color .2s;
     }
-    .size-recommendation__text strong { font-weight: 700; }
+    .btn-wish:hover { border-color: var(--black); }
+
+    .product-desc { margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+    .product-desc h4 { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .6rem; }
+    .product-desc p { font-size: .85rem; color: var(--gray); line-height: 1.7; }
+
+    /* RELATED */
+    .related { padding: 2.5rem 2rem; border-top: 1px solid var(--border); background: var(--white); }
+    .related h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 300; letter-spacing: .1em; text-align: center; margin-bottom: 1.25rem; }
+    .related-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    @media (max-width: 600px) { .related-grid { grid-template-columns: repeat(2, 1fr); } }
+    .card-img { background: #f3f0eb; border-radius: 6px; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: .5rem; transition: transform .3s; }
+    .card-img:hover { transform: scale(1.02); }
+    .card-name { font-size: .82rem; font-weight: 500; }
+    .card-price { font-size: .82rem; color: var(--gray); }
   </style>
 </head>
 <body>
 
-  <!-- ══════════════════════════════════════
-       HEADER BOUTIQUE
-  ══════════════════════════════════════ -->
-  <header class="store-header">
-    <div class="store-logo">Élara Studio</div>
-    <nav>
-      <ul class="store-nav">
-        <li><a href="#">Nouveautés</a></li>
-        <li><a href="#">Robes</a></li>
-        <li><a href="#">Hauts</a></li>
-        <li><a href="#">Pantalons</a></li>
-        <li><a href="#">Accessoires</a></li>
-      </ul>
-    </nav>
-    <div class="store-header__right">
-      <button class="icon-btn">🔍</button>
-      <button class="icon-btn">🤍</button>
-      <button class="icon-btn">🛒</button>
-    </div>
-  </header>
-
-  <!-- Breadcrumb -->
-  <div class="breadcrumb">
-    <a href="#">Accueil</a><span>/</span>
-    <a href="#">Robes</a><span>/</span>
-    Robe midi Madeleine
+  <div class="demo-banner">
+    <span>Démo <strong>Dressim</strong> — simulation d'une boutique avec le widget intégré</span>
+    <a href="/">← Retour à Dressim</a>
   </div>
 
-  <!-- ══════════════════════════════════════
-       PAGE PRODUIT
-  ══════════════════════════════════════ -->
-  <main class="product-page">
+  <nav class="boutique-nav">
+    <div class="boutique-logo">ÉLARA<span>.</span></div>
+    <div class="nav-links">
+      <a href="#">Nouveautés</a>
+      <a href="#">Femme</a>
+      <a href="#">Collections</a>
+      <a href="#">Soldes</a>
+    </div>
+    <div class="nav-icons">
+      <span>🔍</span>
+      <span>♡</span>
+      <span>🛍</span>
+    </div>
+  </nav>
 
-    <!-- Galerie -->
-    <div class="product-gallery">
-      <div class="thumb-list">
-        <div class="thumb active" onclick="switchThumb(this, '#F3EDE8', '👗')">
-          <div class="thumb-img">👗</div>
-        </div>
-        <div class="thumb" onclick="switchThumb(this, '#E8EEF3', '👗')">
-          <div class="thumb-img">👗</div>
-        </div>
-        <div class="thumb" onclick="switchThumb(this, '#F0ECF8', '👗')">
-          <div class="thumb-img">👗</div>
-        </div>
-      </div>
-      <div class="main-image" id="mainImage">
+  <div class="breadcrumb">
+    Accueil <span>›</span> Femme <span>›</span> Robes <span>›</span> Robe Midi Florale
+  </div>
+
+  <div class="product-page">
+
+    <div class="gallery">
+      <div class="gallery-main">
         <div class="badge-new">Nouveau</div>
-        <div class="main-image__emoji">👗</div>
-        <div class="main-image__label">Robe midi Madeleine — Taupe</div>
+        <span id="mainEmoji">🌸</span>
+      </div>
+      <div class="gallery-thumbs">
+        <div class="thumb active" onclick="setEmoji('🌸',this)">🌸</div>
+        <div class="thumb" onclick="setEmoji('👗',this)">👗</div>
+        <div class="thumb" onclick="setEmoji('✨',this)">✨</div>
+        <div class="thumb" onclick="setEmoji('🌿',this)">🌿</div>
       </div>
     </div>
 
-    <!-- Infos produit -->
     <div class="product-info">
-
       <div class="product-brand">Élara Studio</div>
-      <h1 class="product-name">Robe midi Madeleine</h1>
-      <div class="product-ref">Réf. EL-2024-RMM-01 · 4 coloris</div>
-
+      <h1 class="product-name">Robe Midi Florale<br/><em>Édition Été</em></h1>
       <div class="product-rating">
         <span class="stars">★★★★★</span>
-        <span style="font-size:0.85rem;font-weight:600;">4.8</span>
-        <span class="rating-sep">·</span>
-        <span class="rating-count">127 avis</span>
+        <span class="rating-count">4,8 · 127 avis</span>
       </div>
+      <div class="product-price">128,00 € <span class="old">160,00 €</span></div>
 
-      <div class="product-price">89,00 €</div>
-      <div class="product-price-sub">Livraison gratuite dès 60 € · Retours offerts 30 jours</div>
-
-      <hr class="divider" />
-
-      <!-- Couleurs -->
-      <div class="section-label">Couleur — <strong style="color:var(--fg);text-transform:none;letter-spacing:0">Taupe</strong></div>
-      <div class="color-options">
-        <div class="color-dot active" style="background:#C4AFA0;" title="Taupe"></div>
-        <div class="color-dot" style="background:#1E3A5F;" title="Marine"></div>
-        <div class="color-dot" style="background:#E879F9;" title="Lilas"></div>
-        <div class="color-dot" style="background:#1A1A1A;" title="Noir"></div>
-      </div>
-
-      <!-- Tailles -->
-      <div class="size-row">
-        <div class="section-label" style="margin:0">Taille</div>
-        <span class="size-guide">Guide des tailles</span>
-      </div>
-      <div class="size-options">
+      <div class="field-label">Taille</div>
+      <div class="sizes">
         <button class="size-btn">XS</button>
-        <button class="size-btn active" id="selectedSize">S</button>
-        <button class="size-btn">M</button>
+        <button class="size-btn">S</button>
+        <button class="size-btn active">M</button>
         <button class="size-btn">L</button>
-        <button class="size-btn out">XL</button>
+        <button class="size-btn">XL</button>
       </div>
 
-      <!-- Badge recommandation Dressim (affiché après essayage) -->
-      <div class="size-recommendation" id="sizeRecommendation">
-        <div class="size-recommendation__icon">✅</div>
-        <div class="size-recommendation__text">
-          Dressim recommande la taille <strong id="recommendedSizeText">—</strong> pour votre profil.
-        </div>
+      <div class="field-label">Couleur — Ivoire</div>
+      <div class="colors">
+        <div class="color-btn active" style="background:#f5f0e8"></div>
+        <div class="color-btn" style="background:#c8a96e"></div>
+        <div class="color-btn" style="background:#1a1a1a"></div>
+        <div class="color-btn" style="background:#b45309"></div>
       </div>
 
-      <!-- ⭐ Widget Dressim ── POINT D'INTÉGRATION -->
-      <div class="dressim-banner" id="dressimTrigger">
-        <div class="dressim-banner__left">
-          <div class="dressim-banner__icon">🪞</div>
-          <div class="dressim-banner__text">
-            <strong>Essayez sur votre avatar 3D</strong>
-            <span>Créez votre profil en 30 sec, obtenez votre taille exacte</span>
+      <!-- WIDGET DRESSIM -->
+      <div class="dressim-widget">
+        <div class="widget-header" onclick="toggleWidget()">
+          <div class="widget-icon-wrap">👗</div>
+          <div class="widget-header-text">
+            <div class="widget-title">Essayer virtuellement</div>
+            <div class="widget-sub">Voir ce vêtement sur votre photo en 30 secondes</div>
           </div>
+          <span class="widget-chevron" id="chevron">▾</span>
         </div>
-        <button class="dressim-banner__cta">Essayer →</button>
+        <div class="widget-powered">Propulsé par <strong>Dressim</strong></div>
+
+        <div class="widget-body" id="widgetBody">
+
+          <div id="stateUpload">
+            <div class="upload-zone" onclick="simulateTryon()">
+              <input type="file" accept="image/*" />
+              <div class="upload-icon">📸</div>
+              <div class="upload-title">Uploadez votre photo</div>
+              <div class="upload-sub">JPG ou PNG · Max 10 MB · Restez habillé(e)</div>
+            </div>
+            <p class="privacy-note">🔒 Votre photo est traitée en temps réel et supprimée après 15 minutes.</p>
+          </div>
+
+          <div class="tryon-state" id="stateLoading">
+            <div class="preview-result">
+              <div class="loading-wrap">
+                <div class="spinner"></div>
+                <span>IA en cours…</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tryon-state" id="stateResult">
+            <div class="preview-result">
+              <img id="resultImg" src="" alt="Résultat essayage" />
+            </div>
+            <div class="result-actions">
+              <button class="btn-result btn-reset" onclick="resetWidget()">↺ Réessayer</button>
+              <button class="btn-result btn-share">📤 Partager</button>
+            </div>
+          </div>
+
+        </div>
       </div>
 
-      <!-- CTA panier -->
-      <button class="btn-add-cart" id="btnAddCart">Ajouter au panier — 89,00 €</button>
-      <button class="btn-wishlist">♡ Ajouter à ma liste</button>
+      <button class="btn-cart">Ajouter au panier</button>
+      <button class="btn-wish">♡ Ajouter à ma liste</button>
 
-      <!-- Livraison -->
-      <div class="delivery-info">
-        <div class="delivery-row"><span class="icon">🚚</span> Livraison gratuite · Estimée 2-4 jours</div>
-        <div class="delivery-row"><span class="icon">↩️</span> Retours gratuits sous 30 jours</div>
-        <div class="delivery-row"><span class="icon">🔒</span> Paiement 100% sécurisé</div>
+      <div class="product-desc">
+        <h4>Description</h4>
+        <p>Robe midi à imprimé floral délicat, coupe fluide et légère. Tissu viscose premium, respirant pour les journées estivales. Longueur mi-mollet, col V, manches courtes.</p>
       </div>
-
-      <hr class="divider" />
-
-      <!-- Description -->
-      <p class="product-description">
-        La robe midi Madeleine allie élégance intemporelle et confort du quotidien.
-        Taillée dans une viscose douce au toucher, sa coupe ajustée suit les courbes
-        naturellement sans contraindre. Le col rond discret et les manches 3/4 en font
-        une pièce polyvalente, aussi bien en journée qu'en soirée.
-        <br/><br/>
-        Composition : 95% viscose, 5% élasthanne. Entretien : lavage délicat 30°.
-      </p>
-
     </div>
-  </main>
 
-  <!-- ══════════════════════════════════════
-       OVERLAY DRESSIM (widget flottant)
-  ══════════════════════════════════════ -->
-  <div class="dressim-overlay" id="dressimOverlay">
-    <div class="dressim-backdrop" id="dressimBackdrop"></div>
-    <div class="dressim-panel">
-      <div class="dressim-panel__header">
-        <div class="dressim-panel__logo">
-          <div class="dressim-panel__logo-dot"></div>
-          Dressim
-        </div>
-        <div class="dressim-panel__context">Robe midi Madeleine · Élara Studio</div>
-        <button class="dressim-panel__close" id="dressimClose">✕</button>
-      </div>
-      <div class="dressim-panel__iframe-wrap">
-        <iframe id="dressimFrame" src="about:blank" title="Dressim — Essayage virtuel"></iframe>
-      </div>
+  </div>
+
+  <div class="related">
+    <h3>Vous aimerez aussi</h3>
+    <div class="related-grid">
+      <div><div class="card-img">👘</div><div class="card-name">Kimono Lin</div><div class="card-price">89,00 €</div></div>
+      <div><div class="card-img">🧥</div><div class="card-name">Veste Bohème</div><div class="card-price">145,00 €</div></div>
+      <div><div class="card-img">👚</div><div class="card-name">Top Dentelle</div><div class="card-price">62,00 €</div></div>
+      <div><div class="card-img">🩱</div><div class="card-name">Robe Bain</div><div class="card-price">74,00 €</div></div>
     </div>
   </div>
 
   <script>
-    // ── Galerie : changement de photo ──
-    function switchThumb(thumb, bg, emoji) {
+    const RESULTS = [
+      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80',
+      'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&q=80',
+      'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80',
+      'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80',
+    ];
+
+    function toggleWidget() {
+      document.getElementById('widgetBody').classList.toggle('open');
+      document.getElementById('chevron').classList.toggle('open');
+    }
+
+    function simulateTryon() {
+      document.getElementById('stateUpload').style.display = 'none';
+      document.getElementById('stateLoading').classList.add('active');
+      setTimeout(() => {
+        document.getElementById('stateLoading').classList.remove('active');
+        document.getElementById('resultImg').src = RESULTS[Math.floor(Math.random() * RESULTS.length)];
+        document.getElementById('stateResult').classList.add('active');
+      }, 3000);
+    }
+
+    function resetWidget() {
+      document.getElementById('stateUpload').style.display = 'block';
+      document.getElementById('stateLoading').classList.remove('active');
+      document.getElementById('stateResult').classList.remove('active');
+    }
+
+    function setEmoji(e, el) {
+      document.getElementById('mainEmoji').textContent = e;
       document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
-      thumb.classList.add('active');
-      document.getElementById('mainImage').style.background = bg;
+      el.classList.add('active');
     }
 
-    // ── Tailles : sélection ──
-    document.querySelectorAll('.size-btn:not(.out)').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      });
-    });
+    document.querySelectorAll('.size-btn').forEach(b => b.addEventListener('click', () => {
+      document.querySelectorAll('.size-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+    }));
 
-    // ── Couleurs : sélection ──
-    document.querySelectorAll('.color-dot').forEach(dot => {
-      dot.addEventListener('click', () => {
-        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-        dot.classList.add('active');
-      });
-    });
+    document.querySelectorAll('.color-btn').forEach(b => b.addEventListener('click', () => {
+      document.querySelectorAll('.color-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+    }));
 
-    // ── Widget Dressim : ouverture ──
-    const overlay   = document.getElementById('dressimOverlay');
-    const frame     = document.getElementById('dressimFrame');
-    let widgetLoaded = false;
-
-    function openDressim() {
-      overlay.classList.add('visible');
-      document.body.style.overflow = 'hidden';
-
-      // Charger l'iframe au premier clic seulement
-      if (!widgetLoaded) {
-        frame.src = 'landing.html';
-        widgetLoaded = true;
-      }
-    }
-
-    function closeDressim() {
-      overlay.classList.remove('visible');
-      document.body.style.overflow = '';
-    }
-
-    document.getElementById('dressimTrigger').addEventListener('click', openDressim);
-    document.getElementById('dressimClose').addEventListener('click', closeDressim);
-    document.getElementById('dressimBackdrop').addEventListener('click', closeDressim);
-
-    // ── Communication iframe → page boutique ──
-    // Quand Dressim a calculé une recommandation, il peut envoyer un message
-    // à la page parente pour mettre en avant la bonne taille.
-    window.addEventListener('message', (e) => {
-      const trustedOrigin = window.location.origin;
-      if (e.origin !== trustedOrigin && e.origin !== 'http://localhost:3000') return;
-      if (e.data && e.data.type === 'dressim:recommendation') {
-        const { taille } = e.data;
-        // Mettre en surbrillance la taille recommandée
-        document.querySelectorAll('.size-btn').forEach(btn => {
-          btn.classList.remove('active');
-          if (btn.textContent.trim() === taille) btn.classList.add('active');
-        });
-        // Afficher le badge
-        document.getElementById('recommendedSizeText').textContent = taille;
-        document.getElementById('sizeRecommendation').classList.add('visible');
-        // Fermer l'overlay
-        closeDressim();
-      }
-    });
+    setTimeout(() => {
+      document.getElementById('widgetBody').classList.add('open');
+      document.getElementById('chevron').classList.add('open');
+    }, 1200);
   </script>
+
 </body>
 </html>
