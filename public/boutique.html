@@ -346,28 +346,38 @@
 
           <!-- ÉTAPE 2 : Recommandation -->
           <div class="tryon-state" id="stateReco">
-            <div id="recoCard" style="background:var(--white);border:1.5px solid var(--accent);border-radius:8px;padding:1rem;margin-bottom:.75rem;">
-              <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem;">
-                <span style="font-size:1.4rem;">✅</span>
-                <div>
-                  <div style="font-size:.72rem;color:var(--gray);">Taille recommandée</div>
-                  <div id="recoSize" style="font-size:1.4rem;font-weight:800;color:var(--black);letter-spacing:-.02em;"></div>
-                </div>
+
+            <!-- Taille principale -->
+            <div style="background:var(--accent-bg);border:1.5px solid var(--accent);border-radius:10px;padding:1rem;margin-bottom:.75rem;">
+              <div style="font-size:.68rem;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;">Taille recommandée</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <div id="recoSize" style="font-size:2.2rem;font-weight:800;letter-spacing:-.04em;color:var(--black);"></div>
+                <div id="recoConfidence" style="background:var(--accent);color:var(--white);font-size:.68rem;font-weight:700;padding:.25rem .6rem;border-radius:20px;"></div>
               </div>
-              <div id="recoExplain" style="font-size:.78rem;color:var(--gray);line-height:1.6;border-top:1px solid var(--border);padding-top:.6rem;"></div>
             </div>
-            <div style="display:flex;gap:.5rem;margin-bottom:.75rem;">
+
+            <!-- Comparaison tailles adjacentes -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem;margin-bottom:.75rem;" id="sizeCompare"></div>
+
+            <!-- Pourquoi cette taille -->
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:.85rem;margin-bottom:.75rem;">
+              <div style="font-size:.72rem;font-weight:700;color:var(--black);margin-bottom:.6rem;">Pourquoi cette taille ?</div>
+              <div id="recoReasons" style="display:flex;flex-direction:column;gap:.45rem;"></div>
+            </div>
+
+            <!-- Caractéristiques vêtement -->
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:.85rem;margin-bottom:.75rem;">
+              <div style="font-size:.72rem;font-weight:700;color:var(--black);margin-bottom:.6rem;">Ce vêtement</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;">
+                <div style="font-size:.72rem;color:var(--gray);">Coupe</div><div style="font-size:.72rem;font-weight:600;">Ajustée</div>
+                <div style="font-size:.72rem;color:var(--gray);">Matière</div><div style="font-size:.72rem;font-weight:600;">Viscose (non extensible)</div>
+                <div style="font-size:.72rem;color:var(--gray);">Longueur</div><div style="font-size:.72rem;font-weight:600;">Midi</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:.5rem;">
               <button onclick="goToMeasure()" class="btn-result btn-reset" style="flex:1">↺ Modifier</button>
-              <button onclick="selectRecoSize()" class="btn-result btn-share" style="flex:1">Choisir cette taille</button>
-            </div>
-            <div style="border-top:1px solid var(--border);padding-top:.75rem;">
-              <div style="font-size:.75rem;font-weight:600;color:var(--black);margin-bottom:.5rem;">Aller plus loin — essayage photo</div>
-              <div class="upload-zone" onclick="simulateTryon()" style="padding:1rem;">
-                <input type="file" accept="image/*" />
-                <div class="upload-icon" style="font-size:1.3rem;">📸</div>
-                <div class="upload-title" style="font-size:.8rem;">Uploadez votre photo</div>
-                <div class="upload-sub">Voir ce vêtement sur vous</div>
-              </div>
+              <button onclick="selectRecoSize()" class="btn-result btn-share" style="flex:2">✓ Choisir cette taille</button>
             </div>
           </div>
 
@@ -495,7 +505,6 @@
       const w = parseInt(document.getElementById('wSliderPoids').value);
       const m = estimateMeasures(h, w, wGenre, wSil);
 
-      // Match sizing table
       const sizes = ['XS','S','M','L','XL'];
       let idxP = SIZING.findIndex(s => m.bust  >= s.poitrine[0]  && m.bust  <= s.poitrine[1]);
       let idxT = SIZING.findIndex(s => m.waist >= s.tourTaille[0] && m.waist <= s.tourTaille[1]);
@@ -503,19 +512,66 @@
       if (idxT < 0) idxT = m.waist > 88  ? 4 : 0;
       let idxFinal = Math.max(idxP, idxT);
 
-      // Coupe ajustée → monter d'une taille si en limite haute
-      const s = SIZING[idxFinal];
-      if (s && m.bust >= s.poitrine[1] - 1 && idxFinal < 4) idxFinal++;
+      // Coupe ajustée → monter si en limite haute de la plage
+      const sRow = SIZING[idxFinal];
+      const atUpperBust  = sRow && m.bust  >= sRow.poitrine[1]  - 1;
+      const atUpperWaist = sRow && m.waist >= sRow.tourTaille[1] - 1;
+      if ((atUpperBust || atUpperWaist) && idxFinal < 4) idxFinal++;
 
       currentRecoSize = sizes[Math.min(idxFinal, 4)];
 
-      let conseil = `Sur la base de votre profil (${h} cm, ${w} kg, silhouette ${wSil}), vos mensurations estimées sont <strong>${m.bust} cm</strong> de poitrine et <strong>${m.waist} cm</strong> de tour de taille.`;
-      conseil += ` Nous vous recommandons le <strong>${currentRecoSize}</strong>. Cette robe est en coupe <strong>ajustée</strong>, viscose non extensible.`;
-      if (h < 162) conseil += ` La longueur midi tombera élégamment pour votre taille.`;
+      // ── Confidence score ──────────────────────────────
+      // Parfait = mesures au centre de la plage, moins bien = aux bords
+      const rec = SIZING[Math.min(idxFinal, 4)];
+      const bustMid  = (rec.poitrine[0]   + rec.poitrine[1])   / 2;
+      const waistMid = (rec.tourTaille[0] + rec.tourTaille[1]) / 2;
+      const bustRange  = rec.poitrine[1]   - rec.poitrine[0];
+      const waistRange = rec.tourTaille[1] - rec.tourTaille[0];
+      const bustDist   = Math.abs(m.bust  - bustMid)  / (bustRange  / 2);
+      const waistDist  = Math.abs(m.waist - waistMid) / (waistRange / 2);
+      const confidence = Math.round((1 - (bustDist + waistDist) / 2) * 30 + 70);
+      const confLabel  = confidence >= 90 ? 'Très sûr' : confidence >= 80 ? 'Sûr' : 'Probable';
 
-      document.getElementById('recoSize').textContent = currentRecoSize;
-      document.getElementById('recoExplain').innerHTML = conseil;
+      document.getElementById('recoSize').textContent        = currentRecoSize;
+      document.getElementById('recoConfidence').textContent  = `${confLabel} · ${confidence}%`;
       document.getElementById('recoReminderSize').textContent = currentRecoSize;
+
+      // ── Tailles adjacentes ────────────────────────────
+      const compareEl = document.getElementById('sizeCompare');
+      compareEl.innerHTML = '';
+      [-1, 0, 1].forEach(offset => {
+        const i   = Math.min(Math.max(idxFinal + offset, 0), 4);
+        const sz  = sizes[i];
+        const isRec = offset === 0;
+        const label = offset === -1 ? 'Trop petit' : offset === 1 ? 'Trop grand' : '✓ Recommandé';
+        const labelColor = isRec ? 'var(--accent)' : 'var(--gray)';
+        compareEl.innerHTML += `
+          <div style="border:${isRec ? '1.5px solid var(--accent)' : '1px solid var(--border)'};
+            border-radius:8px;padding:.5rem .4rem;text-align:center;
+            background:${isRec ? 'var(--accent-bg)' : 'var(--white)'};">
+            <div style="font-size:1.1rem;font-weight:${isRec ? '800' : '600'};color:${isRec ? 'var(--black)' : 'var(--gray)'};">${sz}</div>
+            <div style="font-size:.6rem;color:${labelColor};margin-top:.15rem;">${label}</div>
+          </div>`;
+      });
+
+      // ── Raisons détaillées ────────────────────────────
+      const reasons = [];
+      reasons.push(`<div style="display:flex;align-items:flex-start;gap:.5rem;font-size:.75rem;">
+        <span style="color:var(--accent);flex-shrink:0;margin-top:.05rem;">●</span>
+        <span>Poitrine estimée <strong>${m.bust} cm</strong> — plage ${currentRecoSize} : ${rec.poitrine[0]}–${rec.poitrine[1]} cm</span></div>`);
+      reasons.push(`<div style="display:flex;align-items:flex-start;gap:.5rem;font-size:.75rem;">
+        <span style="color:var(--accent);flex-shrink:0;margin-top:.05rem;">●</span>
+        <span>Tour de taille estimé <strong>${m.waist} cm</strong> — plage ${currentRecoSize} : ${rec.tourTaille[0]}–${rec.tourTaille[1]} cm</span></div>`);
+      if (atUpperBust || atUpperWaist)
+        reasons.push(`<div style="display:flex;align-items:flex-start;gap:.5rem;font-size:.75rem;">
+          <span style="color:#e67e22;flex-shrink:0;margin-top:.05rem;">▲</span>
+          <span>Coupe ajustée + viscose non extensible → taille au-dessus préférable</span></div>`);
+      if (h < 162)
+        reasons.push(`<div style="display:flex;align-items:flex-start;gap:.5rem;font-size:.75rem;">
+          <span style="color:var(--accent);flex-shrink:0;margin-top:.05rem;">●</span>
+          <span>Longueur midi : tombera plus bas pour votre taille (${h} cm) — effet élégant</span></div>`);
+
+      document.getElementById('recoReasons').innerHTML = reasons.join('');
 
       document.getElementById('stateMeasure').style.display = 'none';
       document.getElementById('stateReco').classList.add('active');
