@@ -184,4 +184,58 @@ app.get('/api/status/:id', async (req, res) => {
   }
 });
 
+// ── Contact / Demo request ────────────────────────────────────────────────────
+
+const contactLimiter = rateLimit({ windowMs: 60 * 1000, max: 5, message: { error: 'Trop de requêtes.' } });
+
+app.post('/api/contact', contactLimiter, async (req, res) => {
+  const { prenom, nom, email, boutique, site, plateforme, message } = req.body || {};
+
+  if (!prenom || !nom || !email || !boutique) {
+    return res.status(400).json({ error: 'Champs requis manquants.' });
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: 'Email invalide.' });
+  }
+
+  const RESEND_API_KEY = process.env.RESEND_API_KEY;
+  const TO_EMAIL = process.env.CONTACT_EMAIL || 'dressim.app@gmail.com';
+
+  if (!RESEND_API_KEY) {
+    console.log(`[CONTACT] ${prenom} ${nom} <${email}> — ${boutique}`);
+    return res.json({ ok: true });
+  }
+
+  try {
+    const { Resend } = require('resend');
+    const resend = new Resend(RESEND_API_KEY);
+
+    await resend.emails.send({
+      from: 'Dressim <onboarding@resend.dev>',
+      to: TO_EMAIL,
+      reply_to: email,
+      subject: `🎯 Nouvelle demande de démo — ${boutique}`,
+      html: `
+        <h2>Nouvelle demande de démo Dressim</h2>
+        <table style="border-collapse:collapse;width:100%;font-family:sans-serif;font-size:14px">
+          <tr><td style="padding:8px;color:#6b7280;width:140px">Prénom</td><td style="padding:8px;font-weight:600">${prenom}</td></tr>
+          <tr><td style="padding:8px;color:#6b7280">Nom</td><td style="padding:8px;font-weight:600">${nom}</td></tr>
+          <tr><td style="padding:8px;color:#6b7280">Email</td><td style="padding:8px"><a href="mailto:${email}">${email}</a></td></tr>
+          <tr><td style="padding:8px;color:#6b7280">Boutique</td><td style="padding:8px;font-weight:600">${boutique}</td></tr>
+          ${site ? `<tr><td style="padding:8px;color:#6b7280">Site</td><td style="padding:8px"><a href="${site}">${site}</a></td></tr>` : ''}
+          ${plateforme ? `<tr><td style="padding:8px;color:#6b7280">Plateforme</td><td style="padding:8px">${plateforme}</td></tr>` : ''}
+          ${message ? `<tr><td style="padding:8px;color:#6b7280">Message</td><td style="padding:8px">${message}</td></tr>` : ''}
+        </table>
+        <p style="margin-top:24px;color:#6b7280;font-size:12px">Envoyé depuis dressim.fr</p>
+      `,
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[CONTACT]', err);
+    res.status(500).json({ error: 'Erreur envoi email.' });
+  }
+});
+
 module.exports = { app, predictions, MOCK_MODE, mockPrediction, MOCK_RESULTS };

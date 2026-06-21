@@ -217,18 +217,38 @@
   </footer>
 
   <script>
-    document.getElementById('contactForm').addEventListener('submit', function(e) {
+    document.getElementById('contactForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const btn = document.getElementById('submitBtn');
       const prenom = document.getElementById('prenom').value;
       btn.disabled = true;
       btn.textContent = 'Envoi en cours…';
-      setTimeout(() => {
+
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prenom,
+            nom: document.getElementById('nom').value,
+            email: document.getElementById('email').value,
+            boutique: document.getElementById('boutique').value,
+            site: document.getElementById('site').value,
+            plateforme: document.getElementById('plateforme').value,
+            message: document.getElementById('message').value,
+          }),
+        });
+
+        if (!res.ok) throw new Error();
+
         document.getElementById('contactForm').style.display = 'none';
-        const s = document.getElementById('successState');
         document.getElementById('successName').textContent = prenom;
-        s.classList.add('active');
-      }, 1200);
+        document.getElementById('successState').classList.add('active');
+      } catch {
+        btn.disabled = false;
+        btn.textContent = 'Demander ma démo gratuite →';
+        alert('Une erreur est survenue. Réessayez ou contactez-nous à dressim.app@gmail.com');
+      }
     });
   </script>
 
