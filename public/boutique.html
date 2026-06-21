@@ -284,10 +284,10 @@
       <!-- WIDGET DRESSIM -->
       <div class="dressim-widget">
         <div class="widget-header" onclick="toggleWidget()">
-          <div class="widget-icon-wrap">👗</div>
+          <div class="widget-icon-wrap">✨</div>
           <div class="widget-header-text">
-            <div class="widget-title">Essayer virtuellement</div>
-            <div class="widget-sub">Voir ce vêtement sur votre photo en 30 secondes</div>
+            <div class="widget-title">Ma taille & essayage virtuel</div>
+            <div class="widget-sub">Taille recommandée + voir sur votre photo</div>
           </div>
           <span class="widget-chevron" id="chevron">▾</span>
         </div>
@@ -295,16 +295,64 @@
 
         <div class="widget-body" id="widgetBody">
 
-          <div id="stateUpload">
-            <div class="upload-zone" onclick="simulateTryon()">
-              <input type="file" accept="image/*" />
-              <div class="upload-icon">📸</div>
-              <div class="upload-title">Uploadez votre photo</div>
-              <div class="upload-sub">JPG ou PNG · Max 10 MB · Restez habillé(e)</div>
+          <!-- ÉTAPE 1 : Mensurations -->
+          <div id="stateMeasure">
+            <div style="font-size:.78rem;font-weight:600;margin-bottom:.75rem;color:var(--black);">Vos mensurations</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.75rem;">
+              <div>
+                <label style="font-size:.68rem;color:var(--gray);display:block;margin-bottom:.25rem;">Taille (cm)</label>
+                <input id="mTaille" type="number" placeholder="168" min="140" max="210"
+                  style="width:100%;padding:.5rem .6rem;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;outline:none;font-family:inherit;" />
+              </div>
+              <div>
+                <label style="font-size:.68rem;color:var(--gray);display:block;margin-bottom:.25rem;">Poids (kg)</label>
+                <input id="mPoids" type="number" placeholder="62" min="40" max="150"
+                  style="width:100%;padding:.5rem .6rem;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;outline:none;font-family:inherit;" />
+              </div>
+              <div>
+                <label style="font-size:.68rem;color:var(--gray);display:block;margin-bottom:.25rem;">Poitrine (cm)</label>
+                <input id="mPoitrine" type="number" placeholder="90" min="60" max="140"
+                  style="width:100%;padding:.5rem .6rem;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;outline:none;font-family:inherit;" />
+              </div>
+              <div>
+                <label style="font-size:.68rem;color:var(--gray);display:block;margin-bottom:.25rem;">Tour de taille (cm)</label>
+                <input id="mTourTaille" type="number" placeholder="70" min="50" max="130"
+                  style="width:100%;padding:.5rem .6rem;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;outline:none;font-family:inherit;" />
+              </div>
             </div>
-            <p class="privacy-note">🔒 Votre photo est traitée en temps réel et supprimée après 15 minutes.</p>
+            <button onclick="analyzeSize()" class="btn-result btn-share" style="width:100%;padding:.65rem;">
+              Trouver ma taille →
+            </button>
           </div>
 
+          <!-- ÉTAPE 2 : Recommandation -->
+          <div class="tryon-state" id="stateReco">
+            <div id="recoCard" style="background:var(--white);border:1.5px solid var(--accent);border-radius:8px;padding:1rem;margin-bottom:.75rem;">
+              <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem;">
+                <span style="font-size:1.4rem;">✅</span>
+                <div>
+                  <div style="font-size:.72rem;color:var(--gray);">Taille recommandée</div>
+                  <div id="recoSize" style="font-size:1.4rem;font-weight:800;color:var(--black);letter-spacing:-.02em;"></div>
+                </div>
+              </div>
+              <div id="recoExplain" style="font-size:.78rem;color:var(--gray);line-height:1.6;border-top:1px solid var(--border);padding-top:.6rem;"></div>
+            </div>
+            <div style="display:flex;gap:.5rem;margin-bottom:.75rem;">
+              <button onclick="goToMeasure()" class="btn-result btn-reset" style="flex:1">↺ Modifier</button>
+              <button onclick="selectRecoSize()" class="btn-result btn-share" style="flex:1">Choisir cette taille</button>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:.75rem;">
+              <div style="font-size:.75rem;font-weight:600;color:var(--black);margin-bottom:.5rem;">Aller plus loin — essayage photo</div>
+              <div class="upload-zone" onclick="simulateTryon()" style="padding:1rem;">
+                <input type="file" accept="image/*" />
+                <div class="upload-icon" style="font-size:1.3rem;">📸</div>
+                <div class="upload-title" style="font-size:.8rem;">Uploadez votre photo</div>
+                <div class="upload-sub">Voir ce vêtement sur vous</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ÉTAPE 3 : Loading -->
           <div class="tryon-state" id="stateLoading">
             <div class="preview-result">
               <div class="loading-wrap">
@@ -314,12 +362,16 @@
             </div>
           </div>
 
+          <!-- ÉTAPE 4 : Résultat photo -->
           <div class="tryon-state" id="stateResult">
+            <div id="recoReminder" style="background:var(--accent-bg);border-radius:6px;padding:.5rem .75rem;font-size:.75rem;color:var(--black);margin-bottom:.65rem;display:flex;align-items:center;gap:.4rem;">
+              <span>✅</span> <span>Taille recommandée : <strong id="recoReminderSize"></strong></span>
+            </div>
             <div class="preview-result">
               <img id="resultImg" src="" alt="Résultat essayage" />
             </div>
             <div class="result-actions">
-              <button class="btn-result btn-reset" onclick="resetWidget()">↺ Réessayer</button>
+              <button class="btn-result btn-reset" onclick="resetWidget()">↺ Recommencer</button>
               <button class="btn-result btn-share">📤 Partager</button>
             </div>
           </div>
@@ -356,13 +408,86 @@
       'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80',
     ];
 
+    // Tableau des tailles de la robe (poitrine / tour de taille)
+    const SIZING = [
+      { size: 'XS', poitrine: [78, 83], tourTaille: [58, 63] },
+      { size: 'S',  poitrine: [84, 89], tourTaille: [64, 69] },
+      { size: 'M',  poitrine: [90, 95], tourTaille: [70, 75] },
+      { size: 'L',  poitrine: [96,101], tourTaille: [76, 81] },
+      { size: 'XL', poitrine:[102,108], tourTaille: [82, 88] },
+    ];
+
+    // Caractéristiques du vêtement (coupe ajustée = prendre la taille au-dessus si entre deux)
+    const GARMENT = { coupe: 'ajustée', matiere: 'viscose (non extensible)', longueur: 'midi' };
+
+    let currentRecoSize = '';
+
+    function analyzeSize() {
+      const taille    = parseInt(document.getElementById('mTaille').value);
+      const poids     = parseInt(document.getElementById('mPoids').value);
+      const poitrine  = parseInt(document.getElementById('mPoitrine').value);
+      const tourTaille= parseInt(document.getElementById('mTourTaille').value);
+
+      if (!poitrine || !tourTaille) {
+        alert('Veuillez entrer au minimum votre tour de poitrine et votre tour de taille.');
+        return;
+      }
+
+      // Trouver la taille selon poitrine
+      let matchPoitrine = SIZING.find(s => poitrine >= s.poitrine[0] && poitrine <= s.poitrine[1]);
+      let matchTaille   = SIZING.find(s => tourTaille >= s.tourTaille[0] && tourTaille <= s.tourTaille[1]);
+
+      // Prendre la plus grande des deux (coupe ajustée)
+      const sizes = ['XS','S','M','L','XL'];
+      let idxP = matchPoitrine ? sizes.indexOf(matchPoitrine.size) : -1;
+      let idxT = matchTaille   ? sizes.indexOf(matchTaille.size)   : -1;
+
+      let idxFinal = Math.max(idxP, idxT);
+      if (idxFinal === -1) idxFinal = poitrine > 108 ? 4 : 0;
+
+      // Coupe ajustée → taille au-dessus si aux limites hautes
+      const s = SIZING[idxFinal];
+      if (s && poitrine >= s.poitrine[1] - 1 && idxFinal < 4) idxFinal++;
+
+      currentRecoSize = sizes[idxFinal];
+
+      // Construire l'explication
+      const explications = [];
+      if (poitrine) explications.push(`tour de poitrine ${poitrine} cm → zone ${matchPoitrine ? matchPoitrine.size : 'XL+'}`);
+      if (tourTaille) explications.push(`tour de taille ${tourTaille} cm → zone ${matchTaille ? matchTaille.size : 'XL+'}`);
+
+      let conseil = `Sur la base de vos mensurations (${explications.join(', ')}), nous vous recommandons le <strong>${currentRecoSize}</strong>.`;
+      if (GARMENT.coupe === 'ajustée') conseil += ` Cette robe est en coupe <strong>ajustée</strong> et en <strong>${GARMENT.matiere}</strong> — nous avons pris en compte le manque d'extensibilité du tissu.`;
+      if (taille && taille < 162) conseil += ` Pour votre taille (${taille} cm), la longueur midi tombera légèrement plus bas que prévu — parfait pour un effet élégant.`;
+
+      document.getElementById('recoSize').textContent = currentRecoSize;
+      document.getElementById('recoExplain').innerHTML = conseil;
+      document.getElementById('recoReminderSize').textContent = currentRecoSize;
+
+      document.getElementById('stateMeasure').style.display = 'none';
+      document.getElementById('stateReco').classList.add('active');
+    }
+
+    function selectRecoSize() {
+      document.querySelectorAll('.size-btn').forEach(b => {
+        b.classList.toggle('active', b.textContent.trim() === currentRecoSize);
+      });
+      document.getElementById('widgetBody').classList.remove('open');
+      document.getElementById('chevron').classList.remove('open');
+    }
+
+    function goToMeasure() {
+      document.getElementById('stateMeasure').style.display = 'block';
+      document.getElementById('stateReco').classList.remove('active');
+    }
+
     function toggleWidget() {
       document.getElementById('widgetBody').classList.toggle('open');
       document.getElementById('chevron').classList.toggle('open');
     }
 
     function simulateTryon() {
-      document.getElementById('stateUpload').style.display = 'none';
+      document.getElementById('stateReco').classList.remove('active');
       document.getElementById('stateLoading').classList.add('active');
       setTimeout(() => {
         document.getElementById('stateLoading').classList.remove('active');
@@ -372,7 +497,8 @@
     }
 
     function resetWidget() {
-      document.getElementById('stateUpload').style.display = 'block';
+      document.getElementById('stateMeasure').style.display = 'block';
+      document.getElementById('stateReco').classList.remove('active');
       document.getElementById('stateLoading').classList.remove('active');
       document.getElementById('stateResult').classList.remove('active');
     }
