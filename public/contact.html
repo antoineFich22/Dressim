@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dressim — Demander une démo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0f0f0f;
+      --gray: #6b7280;
+      --border: #e5e7eb;
+      --bg: #fafaf9;
+      --white: #ffffff;
+      --warm: #c8a96e;
+      --warm-l: #f5f0e8;
+      --error: #dc2626;
+      --success: #16a34a;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--black); -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: .9rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(250,250,249,.92); backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.2rem; font-weight: 700; letter-spacing: -.02em; color: var(--black); text-decoration: none; }
+    .logo span { color: var(--warm); }
+    .back-link { font-size: .82rem; color: var(--gray); text-decoration: none; display: flex; align-items: center; gap: .3rem; }
+    .back-link:hover { color: var(--black); }
+
+    /* MAIN */
+    main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; max-width: 1000px; margin: 0 auto; width: 100%; padding: 4rem 1.5rem; gap: 4rem; align-items: start; }
+    @media (max-width: 720px) { main { grid-template-columns: 1fr; gap: 2.5rem; padding: 2.5rem 1.25rem; } }
+
+    /* LEFT */
+    .left-col { position: sticky; top: 5rem; }
+    .eyebrow { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--warm); margin-bottom: .75rem; }
+    h1 { font-size: 2rem; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; margin-bottom: 1rem; }
+    .lead { font-size: .95rem; color: var(--gray); line-height: 1.7; margin-bottom: 2rem; }
+
+    .perks { display: flex; flex-direction: column; gap: .85rem; }
+    .perk { display: flex; align-items: flex-start; gap: .75rem; }
+    .perk-icon { width: 32px; height: 32px; border-radius: 7px; background: var(--warm-l); display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; margin-top: .05rem; }
+    .perk-text strong { font-size: .88rem; font-weight: 600; display: block; margin-bottom: .1rem; }
+    .perk-text span { font-size: .82rem; color: var(--gray); }
+
+    /* FORM */
+    .form-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 2rem; }
+    .form-title { font-size: 1.05rem; font-weight: 700; margin-bottom: .25rem; }
+    .form-sub { font-size: .82rem; color: var(--gray); margin-bottom: 1.75rem; }
+
+    .field { margin-bottom: 1.1rem; }
+    .field label { display: block; font-size: .75rem; font-weight: 600; letter-spacing: .04em; color: var(--black); margin-bottom: .4rem; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: .7rem .9rem;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: .88rem; color: var(--black);
+      background: var(--bg); outline: none; transition: border-color .2s;
+      appearance: none;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--warm); background: var(--white); }
+    .field textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+    .field select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .9rem center; padding-right: 2rem; }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+    @media (max-width: 480px) { .row-2 { grid-template-columns: 1fr; } }
+
+    .btn-submit {
+      width: 100%; padding: .9rem; border-radius: 8px;
+      background: var(--black); color: var(--white);
+      font-size: .95rem; font-weight: 600; border: none;
+      cursor: pointer; transition: opacity .2s; margin-top: .5rem;
+    }
+    .btn-submit:hover { opacity: .85; }
+    .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+    .privacy { font-size: .72rem; color: var(--gray); margin-top: .75rem; text-align: center; line-height: 1.5; }
+
+    /* SUCCESS STATE */
+    .success-state { display: none; text-align: center; padding: 2rem 1rem; }
+    .success-state.active { display: block; }
+    .success-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .success-state h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: .5rem; }
+    .success-state p { font-size: .88rem; color: var(--gray); margin-bottom: 1.5rem; line-height: 1.6; }
+    .btn-back { display: inline-block; padding: .7rem 1.5rem; border-radius: 8px; background: var(--warm-l); color: var(--warm); font-size: .88rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(200,169,110,.3); transition: opacity .2s; }
+    .btn-back:hover { opacity: .85; }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 1.5rem; text-align: center; font-size: .78rem; color: var(--gray); }
+    footer a { color: var(--gray); text-decoration: none; }
+    footer a:hover { color: var(--black); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="logo">Dress<span>im</span></a>
+    <a href="/" class="back-link">← Retour à l'accueil</a>
+  </nav>
+
+  <main>
+
+    <!-- LEFT : Avantages -->
+    <div class="left-col">
+      <div class="eyebrow">Demander une démo</div>
+      <h1>Prêt à booster vos ventes ?</h1>
+      <p class="lead">Réservez une démo de 30 minutes. On vous montre comment intégrer Dressim dans votre boutique et on répond à toutes vos questions.</p>
+
+      <div class="perks">
+        <div class="perk">
+          <div class="perk-icon">⚡</div>
+          <div class="perk-text">
+            <strong>Réponse en moins de 24h</strong>
+            <span>On revient vers vous rapidement pour fixer un créneau.</span>
+          </div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">🎁</div>
+          <div class="perk-text">
+            <strong>14 jours d'essai gratuit</strong>
+            <span>Sans carte bancaire. Annulable à tout moment.</span>
+          </div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">🔧</div>
+          <div class="perk-text">
+            <strong>Intégration accompagnée</strong>
+            <span>Notre équipe vous aide à intégrer Dressim sur votre site.</span>
+          </div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">📊</div>
+          <div class="perk-text">
+            <strong>Résultats mesurables</strong>
+            <span>Dashboard analytics inclus dès le premier jour.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT : Form -->
+    <div>
+      <div class="form-card">
+        <div class="form-title">Remplissez ce formulaire</div>
+        <div class="form-sub">Moins de 2 minutes — on s'occupe du reste.</div>
+
+        <form id="contactForm">
+          <div class="row-2">
+            <div class="field">
+              <label for="prenom">Prénom *</label>
+              <input type="text" id="prenom" placeholder="Sophie" required />
+            </div>
+            <div class="field">
+              <label for="nom">Nom *</label>
+              <input type="text" id="nom" placeholder="Martin" required />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="email">Email professionnel *</label>
+            <input type="email" id="email" placeholder="sophie@maboutique.fr" required />
+          </div>
+
+          <div class="field">
+            <label for="boutique">Nom de votre boutique *</label>
+            <input type="text" id="boutique" placeholder="Élara Studio" required />
+          </div>
+
+          <div class="field">
+            <label for="site">URL de votre site</label>
+            <input type="url" id="site" placeholder="https://maboutique.fr" />
+          </div>
+
+          <div class="field">
+            <label for="plateforme">Plateforme e-commerce</label>
+            <select id="plateforme">
+              <option value="">— Sélectionner —</option>
+              <option>Shopify</option>
+              <option>WooCommerce</option>
+              <option>PrestaShop</option>
+              <option>Site custom</option>
+              <option>Autre</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="message">Votre besoin (optionnel)</label>
+            <textarea id="message" placeholder="Ex : je vends des robes femme et j'ai beaucoup de retours liés aux tailles…"></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">Demander ma démo gratuite →</button>
+          <p class="privacy">🔒 Vos données ne sont jamais partagées à des tiers.</p>
+        </form>
+
+        <div class="success-state" id="successState">
+          <div class="success-icon">✅</div>
+          <h3>Demande envoyée !</h3>
+          <p>Merci <strong id="successName"></strong>. On revient vers vous sous 24h pour fixer votre démo.</p>
+          <a href="/" class="btn-back">← Retour à l'accueil</a>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <a href="/">Dressim</a> · © 2026 · Tous droits réservés
+  </footer>
+
+  <script>
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const prenom = document.getElementById('prenom').value;
+      btn.disabled = true;
+      btn.textContent = 'Envoi en cours…';
+      setTimeout(() => {
+        document.getElementById('contactForm').style.display = 'none';
+        const s = document.getElementById('successState');
+        document.getElementById('successName').textContent = prenom;
+        s.classList.add('active');
+      }, 1200);
+    });
+  </script>
+
+</body>
+</html>
