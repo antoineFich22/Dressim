@@ -20,7 +20,7 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: [
-        "'self'", "'unsafe-inline'",
+        "'self'", "'unsafe-inline'", "'unsafe-eval'",
         "https://static.sketchfab.com",
         "https://cdn.jsdelivr.net",
         "https://www.googletagmanager.com",
@@ -37,7 +37,7 @@ app.use(helmet({
         "https://storage.googleapis.com",
         "https://api.fashn.ai",
       ],
-      frameSrc: ["'self'", "https://sketchfab.com"],
+      frameSrc: ["'self'", "https://sketchfab.com", "https://*.sketchfab.com"],
       workerSrc: ["'self'", "blob:"],
       objectSrc: ["'none'"],
     },
