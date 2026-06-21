@@ -9,42 +9,33 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --accent: #c8a96e;
-      --accent-bg: #faf6f0;
-      --black: #1a1a1a;
-      --gray: #6b7280;
-      --border: #e5e7eb;
-      --bg: #f0f0f0;
+      --accent: #c8a96e; --accent-bg: #faf6f0;
+      --black: #1a1a1a; --gray: #6b7280; --border: #e5e7eb;
       --white: #fff;
     }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--black); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+    body { font-family: 'Inter', sans-serif; background: #ebebeb; color: var(--black); -webkit-font-smoothing: antialiased; min-height: 100vh; }
     nav { border-bottom: 1px solid var(--border); padding: .9rem 1.5rem; display: flex; align-items: center; justify-content: space-between; background: var(--white); }
     .logo { font-size: 1.1rem; font-weight: 700; text-decoration: none; color: var(--black); }
     .logo span { color: var(--accent); }
     .back { font-size: .82rem; color: var(--gray); text-decoration: none; }
     .back:hover { color: var(--black); }
-
     .shell { display: grid; grid-template-columns: 1fr 340px; min-height: calc(100vh - 57px); }
     @media (max-width: 760px) { .shell { grid-template-columns: 1fr; } }
 
-    /* 3D PANEL */
-    .canvas-panel { background: #f0f0f0; display: flex; flex-direction: column; align-items: center; justify-content: center; position: sticky; top: 57px; height: calc(100vh - 57px); overflow: hidden; }
+    /* 3D */
+    .canvas-panel { background: #ebebeb; display: flex; flex-direction: column; align-items: center; justify-content: center; position: sticky; top: 57px; height: calc(100vh - 57px); overflow: hidden; }
     #threeCanvas { display: block; cursor: grab; }
     #threeCanvas:active { cursor: grabbing; }
     .canvas-hint { font-size: .72rem; color: #aaa; margin-top: .5rem; }
-    .measure-badges { display: flex; gap: .5rem; justify-content: center; margin-top: .75rem; flex-wrap: wrap; }
-    .mbadge { background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: .25rem .75rem; font-size: .72rem; font-weight: 600; display: flex; align-items: center; gap: .35rem; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
-    .mbadge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: block; }
+    .measure-badges { display: flex; gap: .4rem; justify-content: center; margin-top: .6rem; flex-wrap: wrap; }
+    .mbadge { background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: .22rem .65rem; font-size: .71rem; font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
 
-    /* FORM PANEL */
+    /* Form */
     .form-panel { padding: 2rem 1.5rem; overflow-y: auto; background: var(--white); border-left: 1px solid var(--border); }
-
-    .step { display: none; }
-    .step.active { display: block; }
+    .step { display: none; } .step.active { display: block; }
     .step-dots { display: flex; gap: .4rem; margin-bottom: 1.5rem; }
     .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
     .dot.on { background: var(--accent); }
-
     .step-title { font-size: 1.1rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: .25rem; }
     .step-sub { font-size: .82rem; color: var(--gray); margin-bottom: 1.5rem; line-height: 1.5; }
 
@@ -79,12 +70,12 @@
     .mcell .mv { font-size: 1.1rem; font-weight: 700; }
     .mcell .ml { font-size: .65rem; color: var(--gray); margin-top: .1rem; }
 
-    .btn-primary { width: 100%; padding: .85rem; border-radius: 8px; background: var(--black); color: var(--white); font-size: .92rem; font-weight: 600; border: none; cursor: pointer; transition: opacity .2s; margin-bottom: .6rem; font-family: inherit; }
-    .btn-primary:hover { opacity: .85; }
-    .btn-secondary { width: 100%; padding: .75rem; border-radius: 8px; background: none; border: 1.5px solid var(--border); font-size: .88rem; cursor: pointer; color: var(--gray); transition: all .2s; font-family: inherit; }
-    .btn-secondary:hover { border-color: var(--black); color: var(--black); }
-    .btn-gold { width: 100%; padding: .85rem; border-radius: 8px; background: var(--accent); color: var(--white); font-size: .92rem; font-weight: 600; border: none; cursor: pointer; transition: opacity .2s; margin-bottom: .6rem; font-family: inherit; }
-    .btn-gold:hover { opacity: .9; }
+    .btn-primary { width:100%;padding:.85rem;border-radius:8px;background:var(--black);color:var(--white);font-size:.92rem;font-weight:600;border:none;cursor:pointer;transition:opacity .2s;margin-bottom:.6rem;font-family:inherit; }
+    .btn-primary:hover { opacity:.85; }
+    .btn-secondary { width:100%;padding:.75rem;border-radius:8px;background:none;border:1.5px solid var(--border);font-size:.88rem;cursor:pointer;color:var(--gray);transition:all .2s;font-family:inherit; }
+    .btn-secondary:hover { border-color:var(--black);color:var(--black); }
+    .btn-gold { width:100%;padding:.85rem;border-radius:8px;background:var(--accent);color:var(--white);font-size:.92rem;font-weight:600;border:none;cursor:pointer;transition:opacity .2s;margin-bottom:.6rem;font-family:inherit; }
+    .btn-gold:hover { opacity:.9; }
   </style>
 </head>
 <body>
@@ -95,22 +86,17 @@
 </nav>
 
 <div class="shell">
-
-  <!-- 3D PANEL -->
   <div class="canvas-panel" id="canvasPanel">
     <canvas id="threeCanvas"></canvas>
     <div class="canvas-hint">Cliquez et faites glisser pour pivoter</div>
     <div class="measure-badges">
-      <div class="mbadge" id="badgePoitrine">— cm</div>
-      <div class="mbadge" id="badgeTaille">— cm</div>
-      <div class="mbadge" id="badgeHanches">— cm</div>
+      <div class="mbadge" id="bPoitrine">—</div>
+      <div class="mbadge" id="bTaille">—</div>
+      <div class="mbadge" id="bHanches">—</div>
     </div>
   </div>
 
-  <!-- FORM PANEL -->
   <div class="form-panel">
-
-    <!-- Step 1 -->
     <div class="step active" id="step1">
       <div class="step-dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
       <div class="step-title">Bonjour 👋</div>
@@ -121,7 +107,6 @@
       </div>
     </div>
 
-    <!-- Step 2 -->
     <div class="step" id="step2">
       <div class="step-dots"><div class="dot"></div><div class="dot on"></div><div class="dot"></div></div>
       <div class="step-title">Taille &amp; Poids</div>
@@ -138,7 +123,6 @@
       <button class="btn-secondary" onclick="goStep(1)">← Retour</button>
     </div>
 
-    <!-- Step 3 -->
     <div class="step" id="step3">
       <div class="step-dots"><div class="dot"></div><div class="dot"></div><div class="dot on"></div></div>
       <div class="step-title">Votre silhouette</div>
@@ -152,7 +136,6 @@
       <button class="btn-secondary" onclick="goStep(2)">← Retour</button>
     </div>
 
-    <!-- Step 4 -->
     <div class="step" id="step4">
       <div class="step-title" style="margin-bottom:.25rem">Votre mannequin ✅</div>
       <div class="step-sub">Mensurations estimées à partir de votre profil.</div>
@@ -169,7 +152,6 @@
       <button class="btn-gold" onclick="window.location.href='/boutique.html'">👗 Essayer sur ma photo →</button>
       <button class="btn-secondary" onclick="goStep(3)">← Modifier ma silhouette</button>
     </div>
-
   </div>
 </div>
 
@@ -178,243 +160,359 @@
 // ── State ──────────────────────────────────────────────
 let genre = 'femme', sil = 'standard';
 
-// ── Renderer ───────────────────────────────────────────
-const canvas  = document.getElementById('threeCanvas');
-const cpanel  = document.getElementById('canvasPanel');
+// ── Renderer setup ─────────────────────────────────────
+const canvas   = document.getElementById('threeCanvas');
+const cpanel   = document.getElementById('canvasPanel');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
 
 const scene  = new THREE.Scene();
-scene.background = new THREE.Color(0xf0f0f0);
+scene.background = new THREE.Color(0xebebeb);
+// Subtle fog for depth
+scene.fog = new THREE.Fog(0xebebeb, 8, 18);
 
-const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
-camera.position.set(0, 0.9, 4.2);
-camera.lookAt(0, 0.9, 0);
+const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
+camera.position.set(0, 0.95, 4.8);
+camera.lookAt(0, 0.95, 0);
 
-// Lights — studio setup matching the mannequin reference photos
-scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-const key = new THREE.DirectionalLight(0xffffff, 1.1);
-key.position.set(2, 4, 3); key.castShadow = true; scene.add(key);
-const fill = new THREE.DirectionalLight(0xffffff, 0.35);
-fill.position.set(-2, 3, 2); scene.add(fill);
-const rim = new THREE.DirectionalLight(0xffffff, 0.2);
-rim.position.set(0, 1, -3); scene.add(rim);
+// ── Studio lighting ────────────────────────────────────
+// Matches the clean white mannequin look from reference photos
+scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+const key = new THREE.DirectionalLight(0xffffff, 1.4);
+key.position.set(2.5, 4.5, 3.5);
+key.castShadow = true;
+key.shadow.mapSize.set(1024, 1024);
+key.shadow.camera.near = 0.5; key.shadow.camera.far = 15;
+key.shadow.camera.left = -2; key.shadow.camera.right = 2;
+key.shadow.camera.top = 2.5; key.shadow.camera.bottom = -0.5;
+key.shadow.bias = -0.001;
+scene.add(key);
+
+const fill = new THREE.DirectionalLight(0xffffff, 0.5);
+fill.position.set(-2, 3, 2);
+scene.add(fill);
+
+const top = new THREE.DirectionalLight(0xffffff, 0.3);
+top.position.set(0, 5, 0);
+scene.add(top);
+
+const back = new THREE.DirectionalLight(0xffffff, 0.15);
+back.position.set(0, 2, -4);
+scene.add(back);
 
 // Floor
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(5,5), new THREE.ShadowMaterial({ opacity: 0.1 }));
-floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
+const floorMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(6, 6),
+  new THREE.ShadowMaterial({ opacity: 0.08 })
+);
+floorMesh.rotation.x = -Math.PI / 2;
+floorMesh.receiveShadow = true;
+scene.add(floorMesh);
 
-// Material — matte white like mannequins
-const mat = new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.9, metalness: 0 });
+// ── Material — smooth matte white ─────────────────────
+const mat = new THREE.MeshStandardMaterial({
+  color: 0xf2f2f2,
+  roughness: 0.88,
+  metalness: 0.0,
+});
 
-// ── Mannequin ──────────────────────────────────────────
+// ── Mannequin group ────────────────────────────────────
 const mannequin = new THREE.Group();
 scene.add(mannequin);
 
-function clamp(v,lo,hi) { return Math.max(lo,Math.min(hi,v)); }
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
-function mkMesh(geo) {
+// CatmullRom spline → LatheGeometry profile
+// This is the key to smooth, organic shapes
+function splineLthe(keyRY, divs = 32, lSegs = 36) {
+  const curve = new THREE.CatmullRomCurve3(
+    keyRY.map(([r, y]) => new THREE.Vector3(Math.max(0.002, r), y, 0)),
+    false, 'catmullrom', 0.5
+  );
+  const pts = curve.getPoints(divs).map(v => new THREE.Vector2(Math.max(0.002, v.x), v.y));
+  return new THREE.LatheGeometry(pts, lSegs);
+}
+
+function addMesh(geo, x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0) {
   const m = new THREE.Mesh(geo, mat);
-  m.castShadow = true; m.receiveShadow = true;
-  mannequin.add(m); return m;
+  m.castShadow = true;
+  m.receiveShadow = true;
+  m.position.set(x, y, z);
+  m.rotation.set(rx, ry, rz);
+  mannequin.add(m);
+  return m;
 }
 
 function buildMannequin(p) {
   while (mannequin.children.length) mannequin.remove(mannequin.children[0]);
 
-  const { headR, neckR, neckH, shW, shR,
-          bustW, waistW, hipW,
-          torsoH, waistH, hipH,
-          thighR, thighH, calfR, calfH,
-          uArmR, uArmH, lArmR, lArmH } = p;
+  const {
+    headR, neckR, neckH,
+    shW, shR,
+    bustW, waistW, hipW,
+    torsoH, waistH, hipH,
+    legSep,
+    thighR, thighH,
+    calfR, calfH,
+    uArmR, uArmH,
+    lArmR, lArmH,
+    isF
+  } = p;
 
-  // Helpers
-  const cap = (r,h) => new THREE.CapsuleGeometry(r, h, 5, 12);
+  // ── FEET ──────────────────────────────────────────────
+  const footProfile = [
+    [0.01,  0],
+    [0.048, 0.015],
+    [0.052, 0.04],
+    [0.045, 0.07],
+    [0.032, 0.10],
+  ];
+  [-1, 1].forEach(s => {
+    const f = addMesh(splineLthe(footProfile, 10, 18), s * legSep, 0, 0.03, -0.28, 0, 0);
+  });
 
-  // === Legs (bottom up) ===
-  let y = 0;
-  // Feet
-  [-1,1].forEach(side => {
-    const f = mkMesh(new THREE.CapsuleGeometry(0.048, 0.04, 4, 8));
-    f.position.set(side * thighR * 0.95, 0.08, 0.04);
-    f.rotation.x = -0.3;
-  });
-  y = 0.08;
-  // Calves
-  [-1,1].forEach(side => {
-    const c = mkMesh(cap(calfR, calfH));
-    c.position.set(side * thighR * 0.9, y + calfH/2 + calfR, 0);
-  });
-  y += calfH + calfR*2 - 0.04;
-  // Thighs
-  [-1,1].forEach(side => {
-    const t = mkMesh(cap(thighR, thighH));
-    t.position.set(side * thighR * 0.8, y + thighH/2 + thighR*0.6, 0);
-  });
-  y += thighH + thighR*1.5;
+  let y = 0.055;
+
+  // ── CALVES ────────────────────────────────────────────
+  // Natural calf bulge: widest at ~35% from bottom
+  const calfProfile = [
+    [calfR * 0.72, 0],
+    [calfR * 0.88, calfH * 0.15],
+    [calfR,        calfH * 0.35],
+    [calfR * 0.96, calfH * 0.55],
+    [calfR * 0.85, calfH * 0.78],
+    [calfR * 0.72, calfH],
+  ];
+  [-1, 1].forEach(s => addMesh(splineLthe(calfProfile, 20, 24), s * legSep, y));
+  y += calfH;
+
+  // Knee cap (small sphere blends calf → thigh)
+  [-1, 1].forEach(s => addMesh(new THREE.SphereGeometry(calfR * 0.88, 14, 12), s * legSep, y + 0.01, 0.02));
+
+  // ── THIGHS ────────────────────────────────────────────
+  // Natural thigh: wider at top, slight quad bulge
+  const thighProfile = [
+    [calfR * 0.82,  0],
+    [thighR * 0.88, thighH * 0.12],
+    [thighR,        thighH * 0.32],
+    [thighR * 0.98, thighH * 0.55],
+    [thighR * 0.90, thighH * 0.78],
+    [thighR * 0.78, thighH],
+  ];
+  [-1, 1].forEach(s => addMesh(splineLthe(thighProfile, 20, 24), s * legSep * 0.95, y + 0.01));
+  y += thighH + 0.01;
 
   const crotchY = y;
 
-  // === Torso — lathe geometry for natural curves ===
-  // Hips
-  const hipPts = [];
-  for (let i=0; i<=12; i++) {
-    const t = i/12;
-    const r = waistW/2 + (hipW/2 - waistW/2) * Math.sin(t * Math.PI * 0.95);
-    hipPts.push(new THREE.Vector2(r, hipH * t));
+  // ── TRUNK (single continuous mesh) ────────────────────
+  // All in one LatheGeometry: no visible seams
+  // Profile key: [radius, height_from_crotch]
+  const trunkH    = hipH + waistH + torsoH;
+  const trunkProfile = [
+    [legSep * 1.05,            0],                           // crotch width
+    [hipW / 2,                 hipH * 0.18],                 // hip start
+    [hipW / 2 * 1.01,          hipH * 0.42],                 // hip fullest point
+    [hipW / 2,                 hipH * 0.72],
+    [(hipW + waistW) / 4,      hipH * 0.90],                 // transition
+    [waistW / 2,               hipH + waistH * 0.45],        // waist narrowest
+    [(waistW + bustW) / 4,     hipH + waistH * 0.80],        // rising to chest
+    [bustW / 2 * 0.88,         hipH + waistH + torsoH * 0.2],
+    [bustW / 2,                hipH + waistH + torsoH * 0.5],
+    [bustW / 2 * 1.01,         hipH + waistH + torsoH * 0.72],
+    [bustW / 2 * 0.94,         hipH + waistH + torsoH * 0.88],
+    [bustW / 2 * 0.82,         trunkH],                      // shoulder base
+  ];
+  addMesh(splineLthe(trunkProfile, 40, 44), 0, crotchY);
+
+  // Female bust detail — subtle breast shape
+  if (isF) {
+    const bustDetailL = new THREE.SphereGeometry(bustW * 0.18, 14, 10);
+    const bustDetailR = new THREE.SphereGeometry(bustW * 0.18, 14, 10);
+    [-1,1].forEach((s, i) => {
+      const bd = new THREE.Mesh([bustDetailL, bustDetailR][i], mat);
+      bd.castShadow = true;
+      bd.position.set(s * bustW * 0.22, crotchY + hipH + waistH + torsoH * 0.48, bustW * 0.12);
+      mannequin.add(bd);
+    });
   }
-  const hipM = mkMesh(new THREE.LatheGeometry(hipPts, 32));
-  hipM.position.y = crotchY;
 
-  y = crotchY + hipH;
-
-  // Waist (slight hourglass)
-  const waistPts = [];
-  for (let i=0; i<=8; i++) {
-    waistPts.push(new THREE.Vector2(waistW/2 + 0.005, waistH * i/8));
-  }
-  const waistM = mkMesh(new THREE.LatheGeometry(waistPts, 32));
-  waistM.position.y = y;
-  y += waistH;
-
-  // Torso/Chest
-  const torsoPts = [];
-  for (let i=0; i<=14; i++) {
-    const t = i/14;
-    const r = waistW/2 + (bustW/2 - waistW/2) * Math.sin(t * Math.PI * 0.88) + 0.005;
-    torsoPts.push(new THREE.Vector2(r, torsoH * t));
-  }
-  const torsoM = mkMesh(new THREE.LatheGeometry(torsoPts, 32));
-  torsoM.position.y = y;
-  y += torsoH;
-
+  y = crotchY + trunkH;
   const shoulderBaseY = y;
 
-  // Shoulders bar
-  const shBar = mkMesh(new THREE.CapsuleGeometry(shR, shW, 5, 12));
-  shBar.rotation.z = Math.PI/2;
-  shBar.position.y = shoulderBaseY + shR * 0.7;
+  // ── SHOULDER BAR ──────────────────────────────────────
+  const shBarProfile = [
+    [shR * 0.4,  0],
+    [shR * 0.9,  0.01],
+    [shR,        0.025],
+    [shR * 0.88, 0.04],
+    [shR * 0.6,  0.055],
+  ];
+  // Build as capsule but blended into torso
+  const shBar = new THREE.Mesh(
+    new THREE.CapsuleGeometry(shR, shW * 0.88, 6, 20),
+    mat
+  );
+  shBar.castShadow = true;
+  shBar.rotation.z = Math.PI / 2;
+  shBar.position.y = shoulderBaseY + shR * 0.65;
+  mannequin.add(shBar);
 
-  // Neck
-  const neck = mkMesh(cap(neckR, neckH));
-  neck.position.y = shoulderBaseY + neckH/2 + shR * 0.6;
+  // ── NECK ──────────────────────────────────────────────
+  const neckProfile = [
+    [neckR * 0.82, 0],
+    [neckR * 0.90, neckH * 0.2],
+    [neckR,        neckH * 0.5],
+    [neckR * 1.06, neckH * 0.82],
+    [neckR * 1.12, neckH],
+  ];
+  addMesh(splineLthe(neckProfile, 14, 22), 0, shoulderBaseY + 0.008);
 
-  // Head
-  const head = mkMesh(new THREE.SphereGeometry(headR, 20, 16));
-  head.position.y = shoulderBaseY + neckH + headR * 1.4 + shR * 0.5;
+  // ── HEAD ──────────────────────────────────────────────
+  const headY = shoulderBaseY + neckH + headR * 1.35 + 0.015;
+  // Slightly elongated head (more realistic)
+  const headGeo = new THREE.SphereGeometry(headR, 26, 20);
+  headGeo.scale(1, 1.12, 0.97);
+  addMesh(headGeo, 0, headY);
 
-  // Arms
-  [-1,1].forEach(side => {
-    const armX = side * (shW/2 + uArmR * 0.7);
-    const armY = shoulderBaseY + shR * 0.7 - uArmH * 0.1;
-    const ua = mkMesh(cap(uArmR, uArmH));
-    ua.position.set(armX, armY, 0);
-    ua.rotation.z = side * 0.18;
+  // ── ARMS ──────────────────────────────────────────────
+  [-1, 1].forEach(side => {
+    const ax = side * (shW * 0.46 + uArmR * 0.5);
+    const ay = shoulderBaseY + shR * 0.65;
+    const armTilt = side * 0.20; // slight outward angle
 
-    const elbowY = armY - uArmH/2 - uArmR;
-    const la = mkMesh(cap(lArmR, lArmH));
-    la.position.set(armX + side * 0.02, elbowY - lArmH/2 - lArmR * 0.3, 0);
-    la.rotation.z = side * 0.12;
+    // Upper arm: tapers naturally from shoulder to elbow
+    const uArmProfile = [
+      [uArmR * 0.55, 0],
+      [uArmR * 0.90, uArmH * 0.08],
+      [uArmR,        uArmH * 0.28],
+      [uArmR * 0.96, uArmH * 0.55],
+      [uArmR * 0.84, uArmH * 0.80],
+      [uArmR * 0.72, uArmH],
+    ];
+    const ua = addMesh(splineLthe(uArmProfile, 18, 20), ax, ay - uArmH * 0.08, 0, 0, 0, armTilt);
+
+    // Elbow sphere
+    const ey = ay - uArmH * 0.92;
+    const ex = ax + side * Math.sin(Math.abs(armTilt)) * uArmH * 0.15;
+    addMesh(new THREE.SphereGeometry(uArmR * 0.74, 10, 9), ex, ey, 0);
+
+    // Forearm: narrower, tapers to wrist
+    const lArmProfile = [
+      [uArmR * 0.70, 0],
+      [lArmR,        lArmH * 0.1],
+      [lArmR * 0.96, lArmH * 0.4],
+      [lArmR * 0.88, lArmH * 0.72],
+      [lArmR * 0.74, lArmH],
+    ];
+    addMesh(splineLthe(lArmProfile, 16, 18), ex, ey - lArmH * 0.05, 0, 0, 0, armTilt * 0.6);
 
     // Hand
-    const hand = mkMesh(new THREE.CapsuleGeometry(lArmR*0.9, 0.06, 4, 8));
-    hand.position.set(armX + side * 0.03, elbowY - lArmH - lArmR * 1.2, 0);
+    const handY = ey - lArmH * 0.95;
+    const handGeo = new THREE.CapsuleGeometry(lArmR * 0.68, 0.075, 4, 10);
+    addMesh(handGeo, ex + side * 0.01, handY - 0.04, 0.01);
   });
 
   // Center vertically
-  const totalH = shoulderBaseY + neckH + headR * 2.8 + shR * 0.5;
-  mannequin.position.y = -totalH * 0.48;
+  const totalH = headY + headR * 1.3;
+  mannequin.position.y = -totalH * 0.5;
 }
 
-// ── Anthropometric → params ────────────────────────────
+// ── Anthropometric formulas ────────────────────────────
 function calcMeasures(h, w, g, sl) {
-  const bmi = w / Math.pow(h/100, 2);
+  const bmi = w / Math.pow(h / 100, 2);
   let bust, waist, hips;
   if (g === 'femme') {
-    bust  = 90  + (h-165)*0.30 + (bmi-22)*1.5;
-    waist = 72  + (h-165)*0.18 + (bmi-22)*1.8;
-    hips  = 96  + (h-165)*0.35 + (bmi-22)*2.0;
-    if (sl==='slim')  { bust-=3; waist-=5; hips-=6; }
-    if (sl==='curvy') { bust+=6; waist+=3; hips+=10; }
+    bust  = 90  + (h - 165) * 0.30 + (bmi - 22) * 1.5;
+    waist = 72  + (h - 165) * 0.18 + (bmi - 22) * 1.8;
+    hips  = 96  + (h - 165) * 0.35 + (bmi - 22) * 2.0;
+    if (sl === 'slim')  { bust -= 3; waist -= 5; hips -= 6; }
+    if (sl === 'curvy') { bust += 6; waist += 3; hips += 10; }
   } else {
-    bust  = 96  + (h-175)*0.35 + (bmi-23)*1.5;
-    waist = 84  + (h-175)*0.20 + (bmi-23)*2.0;
-    hips  = 98  + (h-175)*0.30 + (bmi-23)*1.8;
-    if (sl==='slim')     { bust-=4; waist-=6; hips-=4; }
-    if (sl==='athletic') { bust+=8; waist-=4; hips+=2; }
+    bust  = 96  + (h - 175) * 0.35 + (bmi - 23) * 1.5;
+    waist = 84  + (h - 175) * 0.20 + (bmi - 23) * 2.0;
+    hips  = 98  + (h - 175) * 0.30 + (bmi - 23) * 1.8;
+    if (sl === 'slim')     { bust -= 4; waist -= 6; hips -= 4; }
+    if (sl === 'athletic') { bust += 8; waist -= 4; hips += 2; }
   }
-  return { bust:Math.round(bust), waist:Math.round(waist), hips:Math.round(hips) };
+  return { bust: Math.round(bust), waist: Math.round(waist), hips: Math.round(hips) };
 }
 
+// Map measurements → mannequin geometry parameters
 function toParams(h, m, g) {
-  const s  = h / 170;
-  const bR = m.bust  / 200;
-  const wR = m.waist / 200;
-  const hR = m.hips  / 200;
+  const s   = h / 170;
+  const bR  = m.bust  / 200;
+  const wR  = m.waist / 200;
+  const hR  = m.hips  / 200;
   const isF = g === 'femme';
   return {
-    headR:   clamp(0.092*s, 0.078, 0.115),
-    neckR:   clamp(0.036*s, 0.028, 0.045),
-    neckH:   clamp(0.06*s,  0.045, 0.08),
-    shW:     clamp(bR*1.25, 0.18,  0.32),
-    shR:     0.038*s,
-    bustW:   clamp(bR*1.9,  0.13,  0.30),
-    waistW:  clamp(wR*1.9,  0.10,  0.26),
-    hipW:    clamp(hR*1.9,  0.14,  0.36),
-    torsoH:  clamp(0.19*s,  0.14,  0.25),
-    waistH:  clamp(0.09*s,  0.06,  0.13),
-    hipH:    clamp(0.12*s,  0.08,  0.17),
-    thighR:  clamp(hR*0.52, 0.055, 0.115),
-    thighH:  clamp(0.26*s,  0.20,  0.33),
-    calfR:   clamp(hR*0.35, 0.038, 0.078),
-    calfH:   clamp(0.23*s,  0.17,  0.29),
-    uArmR:   isF ? clamp(0.038*s,0.03,0.05) : clamp(0.046*s,0.036,0.06),
-    uArmH:   0.18*s,
-    lArmR:   isF ? 0.030*s : 0.038*s,
-    lArmH:   0.16*s,
+    isF,
+    headR:   clamp(0.092 * s, 0.078, 0.112),
+    neckR:   clamp((isF ? 0.033 : 0.040) * s, 0.026, 0.048),
+    neckH:   clamp(0.062 * s, 0.048, 0.08),
+    shW:     clamp(isF ? bR * 1.20 : bR * 1.15, 0.17, 0.32),
+    shR:     clamp(0.036 * s, 0.028, 0.045),
+    bustW:   clamp(bR * 1.92, 0.12, 0.31),
+    waistW:  clamp(wR * 1.92, 0.095, 0.27),
+    hipW:    clamp(hR * 1.92, 0.13, 0.38),
+    torsoH:  clamp((isF ? 0.195 : 0.210) * s, 0.145, 0.265),
+    waistH:  clamp(0.088 * s, 0.060, 0.13),
+    hipH:    clamp(0.120 * s, 0.085, 0.170),
+    legSep:  clamp(hR * 0.48, 0.042, 0.095),
+    thighR:  clamp(hR * (isF ? 0.50 : 0.46), 0.05, 0.115),
+    thighH:  clamp(0.260 * s, 0.195, 0.325),
+    calfR:   clamp(hR * (isF ? 0.34 : 0.32), 0.035, 0.080),
+    calfH:   clamp(0.228 * s, 0.168, 0.285),
+    uArmR:   clamp((isF ? 0.036 : 0.044) * s, 0.028, 0.060),
+    uArmH:   clamp(0.185 * s, 0.140, 0.235),
+    lArmR:   clamp((isF ? 0.028 : 0.036) * s, 0.022, 0.050),
+    lArmH:   clamp(0.162 * s, 0.122, 0.205),
   };
 }
 
-function updateMannequin() {
+function refresh() {
   const h = parseInt(document.getElementById('sT').value);
   const w = parseInt(document.getElementById('sP').value);
   const m = calcMeasures(h, w, genre, sil);
   buildMannequin(toParams(h, m, genre));
-  document.getElementById('badgePoitrine').textContent = `${m.bust} cm poitrine`;
-  document.getElementById('badgeTaille').textContent   = `${m.waist} cm taille`;
-  document.getElementById('badgeHanches').textContent  = `${m.hips} cm hanches`;
+  document.getElementById('bPoitrine').textContent = `Poitrine ${m.bust} cm`;
+  document.getElementById('bTaille').textContent   = `Taille ${m.waist} cm`;
+  document.getElementById('bHanches').textContent  = `Hanches ${m.hips} cm`;
+  return m;
 }
 
-// ── Orbit (manual) ─────────────────────────────────────
-let drag=false, lx=0, ly=0, rotY=0.2, rotX=0.04;
-canvas.addEventListener('mousedown', e=>{drag=true;lx=e.clientX;ly=e.clientY;});
-window.addEventListener('mouseup',   ()=>drag=false);
-window.addEventListener('mousemove', e=>{
-  if(!drag) return;
-  rotY += (e.clientX-lx)*0.012; lx=e.clientX;
-  rotX += (e.clientY-ly)*0.008; rotX=clamp(rotX,-0.4,0.5); ly=e.clientY;
+// ── Orbit ──────────────────────────────────────────────
+let drag = false, lx = 0, ly = 0, rotY = 0.25, rotX = 0.03;
+canvas.addEventListener('mousedown',  e => { drag=true; lx=e.clientX; ly=e.clientY; });
+window.addEventListener('mouseup',    ()=> drag=false);
+window.addEventListener('mousemove',  e => {
+  if (!drag) return;
+  rotY += (e.clientX-lx) * 0.012; lx=e.clientX;
+  rotX += (e.clientY-ly) * 0.008; rotX=clamp(rotX,-0.45,0.55); ly=e.clientY;
 });
-canvas.addEventListener('touchstart',e=>{drag=true;lx=e.touches[0].clientX;},{passive:true});
-window.addEventListener('touchend',()=>drag=false);
-window.addEventListener('touchmove',e=>{
-  if(!drag)return;
-  rotY+=(e.touches[0].clientX-lx)*0.015; lx=e.touches[0].clientX;
-},{passive:true});
+canvas.addEventListener('touchstart', e => { drag=true; lx=e.touches[0].clientX; }, {passive:true});
+window.addEventListener('touchend',   ()=> drag=false);
+window.addEventListener('touchmove',  e => {
+  if (!drag) return;
+  rotY += (e.touches[0].clientX-lx) * 0.015; lx=e.touches[0].clientX;
+}, {passive:true});
 
 // ── Resize ─────────────────────────────────────────────
 function resize() {
   const w = cpanel.clientWidth;
-  const h = Math.max(cpanel.clientHeight - 90, 200);
+  const h = Math.max(cpanel.clientHeight - 90, 300);
   renderer.setSize(w, h);
-  camera.aspect = w/h;
+  camera.aspect = w / h;
   camera.updateProjectionMatrix();
 }
-window.addEventListener('resize', () => { resize(); });
+window.addEventListener('resize', resize);
 resize();
 
-// ── Loop ───────────────────────────────────────────────
+// ── Render loop ────────────────────────────────────────
 (function loop() {
   requestAnimationFrame(loop);
   mannequin.rotation.y = rotY;
@@ -424,31 +522,36 @@ resize();
 
 // ── UI ─────────────────────────────────────────────────
 function goStep(n) {
-  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
-  document.getElementById('step'+n).classList.add('active');
-  if (n >= 2) updateMannequin();
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+  if (n >= 2) refresh();
 }
 
 function pickGenre(btn) {
-  document.querySelectorAll('.gbtn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.gbtn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   genre = btn.dataset.g;
-  if (genre==='homme') { document.getElementById('curvyLbl').textContent='Athletic'; document.getElementById('curvyDesc').textContent='Musculature marquée'; }
-  else                 { document.getElementById('curvyLbl').textContent='Curvy';    document.getElementById('curvyDesc').textContent='Formes marquées'; }
+  if (genre === 'homme') {
+    document.getElementById('curvyLbl').textContent  = 'Athletic';
+    document.getElementById('curvyDesc').textContent = 'Musculature marquée';
+  } else {
+    document.getElementById('curvyLbl').textContent  = 'Curvy';
+    document.getElementById('curvyDesc').textContent = 'Formes marquées';
+  }
   goStep(2);
 }
 
 function pickSil(btn) {
-  document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.sbtn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   sil = btn.dataset.s;
-  updateMannequin();
+  refresh();
 }
 
 function onSlide() {
   document.getElementById('vT').textContent = document.getElementById('sT').value;
   document.getElementById('vP').textContent = document.getElementById('sP').value;
-  updateMannequin();
+  refresh();
 }
 
 const SIZING = [
@@ -460,18 +563,15 @@ const SIZING = [
 ];
 
 function showResult() {
-  const h = parseInt(document.getElementById('sT').value);
-  const w = parseInt(document.getElementById('sP').value);
-  const m = calcMeasures(h, w, genre, sil);
+  const m = refresh();
   document.getElementById('rPoitrine').textContent = m.bust;
   document.getElementById('rTaille').textContent   = m.waist;
   document.getElementById('rHanches').textContent  = m.hips;
-  let iB = SIZING.findIndex(s=>m.bust>=s.bust[0]&&m.bust<=s.bust[1]);
-  let iW = SIZING.findIndex(s=>m.waist>=s.waist[0]&&m.waist<=s.waist[1]);
-  if(iB<0) iB = m.bust>108?4:0;
-  if(iW<0) iW = m.waist>88?4:0;
-  const idx = Math.min(Math.max(iB,iW),4);
-  const sz = SIZING[idx].size;
+  let iB = SIZING.findIndex(s => m.bust  >= s.bust[0]  && m.bust  <= s.bust[1]);
+  let iW = SIZING.findIndex(s => m.waist >= s.waist[0] && m.waist <= s.waist[1]);
+  if (iB < 0) iB = m.bust  > 108 ? 4 : 0;
+  if (iW < 0) iW = m.waist > 88  ? 4 : 0;
+  const sz = SIZING[Math.min(Math.max(iB, iW), 4)].size;
   document.getElementById('rSize').textContent = sz;
   document.getElementById('rExplain').innerHTML =
     `Poitrine estimée <strong>${m.bust} cm</strong>, tour de taille <strong>${m.waist} cm</strong>. Robe coupe ajustée, viscose — taille <strong>${sz}</strong> recommandée.`;
@@ -479,7 +579,7 @@ function showResult() {
 }
 
 // Init
-updateMannequin();
+refresh();
 </script>
 </body>
 </html>
