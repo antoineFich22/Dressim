@@ -4,412 +4,733 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dressim — Mon avatar</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --accent: #c8a96e; --accent-bg: #faf6f0;
-      --black: #1a1a1a; --gray: #6b7280;
-      --border: #e5e7eb; --white: #fff;
+    body { font-family: 'Inter', sans-serif; background: #080810; color: #fff; height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ── VIEWER ── */
+    #viewer { position: fixed; inset: 0; z-index: 0; opacity: 0; transition: opacity 1.4s ease; pointer-events: none; }
+    #viewer.revealed { opacity: 1; pointer-events: all; }
+    #viewer iframe { width: 100%; height: 100%; border: none; display: block; }
+
+    /* ── BG ANIMÉ ── */
+    #bgAnim {
+      position: fixed; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse at 30% 40%, #12101e 0%, #080810 70%);
+      transition: opacity 1.2s ease;
     }
-    body { font-family: 'Inter', sans-serif; background: #e8e8e8; color: var(--black); -webkit-font-smoothing: antialiased; min-height: 100vh; }
-    nav { border-bottom: 1px solid var(--border); padding: .9rem 1.5rem; display: flex; align-items: center; justify-content: space-between; background: var(--white); }
-    .logo { font-size: 1.1rem; font-weight: 700; text-decoration: none; color: var(--black); }
-    .logo span { color: var(--accent); }
-    .back { font-size: .82rem; color: var(--gray); text-decoration: none; }
-    .back:hover { color: var(--black); }
-    .shell { display: grid; grid-template-columns: 1fr 340px; min-height: calc(100vh - 57px); }
-    @media (max-width: 760px) { .shell { grid-template-columns: 1fr; } }
+    #bgAnim.hidden { opacity: 0; pointer-events: none; }
+    .pt { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #c8a96e; opacity: 0; animation: floatUp var(--d) ease-in infinite var(--dl); }
+    @keyframes floatUp { 0%{opacity:0;transform:translateY(0) scale(1)} 20%{opacity:.5} 100%{opacity:0;transform:translateY(-100px) scale(0)} }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Avatar panel */
-    .avatar-panel {
-      background: radial-gradient(ellipse at 38% 28%, #f8f8f8 0%, #d6d6d6 100%);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      position: sticky; top: 57px; height: calc(100vh - 57px); overflow: hidden;
-    }
-    #avatarWrap { transition: transform .35s cubic-bezier(.4,0,.2,1); }
-    #avatarSvg { display: block; }
-    .badges { display: flex; gap: .45rem; margin-top: 1rem; flex-wrap: wrap; justify-content: center; }
-    .badge { background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: .25rem .7rem; font-size: .71rem; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+    /* ── VIGNETTE ── */
+    #vignette { position: fixed; inset: 0; z-index: 1; background: radial-gradient(ellipse at center, transparent 35%, rgba(8,8,16,.7) 100%); pointer-events: none; }
 
-    /* Form panel */
-    .form-panel { padding: 2rem 1.5rem; overflow-y: auto; background: var(--white); border-left: 1px solid var(--border); }
-    .step { display: none; } .step.active { display: block; }
-    .dots { display: flex; gap: .4rem; margin-bottom: 1.5rem; }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
-    .dot.on { background: var(--accent); }
-    .step-title { font-size: 1.1rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: .25rem; }
-    .step-sub { font-size: .82rem; color: var(--gray); margin-bottom: 1.5rem; line-height: 1.5; }
+    /* ── NAV ── */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: .9rem 1.5rem; background: linear-gradient(to bottom, rgba(8,8,16,.9), transparent); }
+    .logo { font-size: 1.1rem; font-weight: 700; color: #fff; text-decoration: none; }
+    .logo span { color: #c8a96e; }
+    .back { font-size: .8rem; color: rgba(255,255,255,.45); text-decoration: none; }
+    .back:hover { color: #fff; }
 
-    .gender-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
-    .gbtn { border: 2px solid var(--border); border-radius: 12px; padding: 1.2rem .75rem; text-align: center; cursor: pointer; background: none; transition: all .2s; font-family: inherit; width: 100%; }
-    .gbtn:hover, .gbtn.active { border-color: var(--accent); background: var(--accent-bg); }
-    .gbtn .gi { font-size: 2.2rem; display: block; margin-bottom: .4rem; }
-    .gbtn .gl { font-size: .85rem; font-weight: 600; }
+    /* ── PANEL ── */
+    #panel { position: fixed; top: 50%; right: 2rem; transform: translateY(-50%); z-index: 10; width: 310px; background: rgba(10,10,18,.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(200,169,110,.2); border-radius: 20px; padding: 1.5rem; max-height: calc(100vh - 6rem); overflow-y: auto; }
+    .step { display: none; }
+    .step.active { display: block; }
+    .dots { display: flex; gap: .35rem; margin-bottom: 1.25rem; }
+    .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.15); transition: background .3s; }
+    .dot.on { background: #c8a96e; }
+    .step-title { font-size: 1rem; font-weight: 700; margin-bottom: .2rem; }
+    .step-sub { font-size: .75rem; color: rgba(255,255,255,.45); margin-bottom: 1.25rem; line-height: 1.55; }
 
-    .sfield { margin-bottom: 1.25rem; }
-    .shead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .4rem; }
-    .slabel { font-size: .78rem; font-weight: 600; }
-    .sval { font-size: .95rem; font-weight: 700; color: var(--accent); }
-    input[type=range] { width: 100%; -webkit-appearance: none; height: 4px; background: var(--border); border-radius: 2px; outline: none; cursor: pointer; }
-    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid var(--white); box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+    /* Genre */
+    .gender-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+    .gbtn { border: 1px solid rgba(255,255,255,.12); border-radius: 12px; padding: 1rem .5rem; text-align: center; cursor: pointer; background: rgba(255,255,255,.04); transition: all .2s; font-family: inherit; color: #fff; width: 100%; }
+    .gbtn:hover { border-color: rgba(200,169,110,.5); background: rgba(200,169,110,.08); }
+    .gbtn.active { border-color: #c8a96e; background: rgba(200,169,110,.15); }
+    .gbtn .gi { font-size: 1.8rem; display: block; margin-bottom: .3rem; }
+    .gbtn .gl { font-size: .8rem; font-weight: 600; }
 
-    .sil-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .6rem; margin-bottom: 1.25rem; }
-    .sbtn { border: 2px solid var(--border); border-radius: 10px; padding: .75rem .4rem; text-align: center; cursor: pointer; background: none; transition: all .2s; font-family: inherit; width: 100%; }
-    .sbtn:hover, .sbtn.active { border-color: var(--accent); background: var(--accent-bg); }
-    .sbtn .si { font-size: 1.5rem; display: block; margin-bottom: .3rem; }
-    .sbtn .sn { font-size: .72rem; font-weight: 600; display: block; }
-    .sbtn .sd { font-size: .62rem; color: var(--gray); display: block; margin-top: .1rem; }
+    /* Tabs */
+    .tab-btn { padding: .6rem; border-radius: 10px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04); color: rgba(255,255,255,.5); font-size: .78rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .2s; }
+    .tab-btn.active { border-color: #c8a96e; background: rgba(200,169,110,.15); color: #c8a96e; }
+    .mb { margin-bottom: .75rem; }
 
-    .result-card { background: var(--accent-bg); border: 1.5px solid var(--accent); border-radius: 12px; padding: 1.1rem; margin-bottom: 1rem; }
-    .rs-lbl { font-size: .68rem; color: var(--gray); margin-bottom: .2rem; }
-    .rs-size { font-size: 2.4rem; font-weight: 800; letter-spacing: -.04em; }
-    .rs-exp { font-size: .78rem; color: var(--gray); line-height: 1.6; margin-top: .6rem; border-top: 1px solid rgba(200,169,110,.3); padding-top: .6rem; }
-    .meas-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .5rem; margin-bottom: 1rem; }
-    .mcell { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: .6rem; text-align: center; }
-    .mcell .mv { font-size: 1.1rem; font-weight: 700; }
-    .mcell .ml { font-size: .65rem; color: var(--gray); margin-top: .1rem; }
+    /* Photo */
+    .photo-zone { border: 1.5px dashed rgba(200,169,110,.3); border-radius: 14px; padding: 1.5rem 1rem; text-align: center; margin-bottom: 1rem; cursor: pointer; transition: border-color .2s; position: relative; overflow: hidden; }
+    .photo-zone:hover { border-color: rgba(200,169,110,.6); }
+    .photo-zone canvas { width: 100%; border-radius: 10px; display: none; }
+    .photo-zone video { width: 100%; border-radius: 10px; display: none; }
+    .photo-placeholder { pointer-events: none; }
+    .photo-placeholder .pi { font-size: 2.5rem; margin-bottom: .5rem; display: block; }
+    .photo-placeholder p { font-size: .75rem; color: rgba(255,255,255,.4); line-height: 1.5; }
 
-    .btn-p { width:100%; padding:.85rem; border-radius:8px; background:var(--black); color:var(--white); font-size:.9rem; font-weight:600; border:none; cursor:pointer; margin-bottom:.6rem; font-family:inherit; transition:opacity .2s; }
-    .btn-p:hover { opacity:.85; }
-    .btn-s { width:100%; padding:.75rem; border-radius:8px; background:none; border:1.5px solid var(--border); font-size:.88rem; cursor:pointer; color:var(--gray); font-family:inherit; transition:all .2s; }
-    .btn-s:hover { border-color:var(--black); color:var(--black); }
-    .btn-g { width:100%; padding:.85rem; border-radius:8px; background:var(--accent); color:var(--white); font-size:.9rem; font-weight:600; border:none; cursor:pointer; margin-bottom:.6rem; font-family:inherit; transition:opacity .2s; }
-    .btn-g:hover { opacity:.9; }
+    /* Skeleton overlay */
+    #skeletonCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; pointer-events: none; }
+
+    .photo-actions { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-bottom: 1rem; }
+    .btn-cam { padding: .7rem; border-radius: 10px; background: rgba(200,169,110,.15); border: 1px solid rgba(200,169,110,.35); color: #c8a96e; font-size: .78rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .2s; }
+    .btn-cam:hover { background: rgba(200,169,110,.25); }
+    .btn-file { padding: .7rem; border-radius: 10px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.6); font-size: .78rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .2s; }
+    .btn-file:hover { border-color: rgba(255,255,255,.3); color: #fff; }
+
+    /* Analyse animation */
+    #analyseBox { display: none; text-align: center; padding: 1rem 0; }
+    .spin-ring { width: 36px; height: 36px; border: 2px solid rgba(200,169,110,.2); border-top-color: #c8a96e; border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto .75rem; }
+    #analyseLabel { font-size: .78rem; color: rgba(255,255,255,.5); }
+
+    /* Résultat analyse */
+    #analyseResult, #analyseResult2 { display: none; background: rgba(200,169,110,.08); border: 1px solid rgba(200,169,110,.25); border-radius: 10px; padding: .85rem; margin-bottom: 1rem; text-align: center; }
+    #analyseResult .ar-lbl { font-size: .65rem; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .1em; margin-bottom: .25rem; }
+    #analyseResult .ar-val { font-size: 1rem; font-weight: 700; color: #c8a96e; }
+
+    /* Slider */
+    .sfield { margin-bottom: 1.1rem; }
+    .shead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .45rem; }
+    .slabel { font-size: .72rem; font-weight: 600; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: .06em; }
+    .sval { font-size: .95rem; font-weight: 700; color: #c8a96e; }
+    input[type=range] { width: 100%; -webkit-appearance: none; height: 3px; background: rgba(255,255,255,.12); border-radius: 2px; outline: none; cursor: pointer; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #c8a96e; cursor: pointer; border: 2px solid #080810; box-shadow: 0 0 8px rgba(200,169,110,.5); }
+
+    /* Buttons */
+    .btn-p { width: 100%; padding: .8rem; border-radius: 10px; background: #c8a96e; color: #080810; font-size: .85rem; font-weight: 700; border: none; cursor: pointer; margin-bottom: .5rem; font-family: inherit; transition: opacity .2s, transform .15s; }
+    .btn-p:hover { opacity: .9; transform: translateY(-1px); }
+    .btn-p:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+    .btn-s { width: 100%; padding: .7rem; border-radius: 10px; background: none; border: 1px solid rgba(255,255,255,.12); font-size: .82rem; cursor: pointer; color: rgba(255,255,255,.5); font-family: inherit; transition: all .2s; }
+    .btn-s:hover { border-color: rgba(255,255,255,.3); color: #fff; }
+
+    /* Résultat final */
+    .divider { border: none; border-top: 1px solid rgba(255,255,255,.08); margin: 1rem 0; }
+    .meas-row { display: grid; grid-template-columns: repeat(3,1fr); gap: .4rem; margin-bottom: 1rem; }
+    .mcell { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: .55rem .3rem; text-align: center; }
+    .mcell .mv { font-size: 1rem; font-weight: 700; color: #c8a96e; }
+    .mcell .ml { font-size: .6rem; color: rgba(255,255,255,.4); margin-top: .1rem; }
+    .size-badge { background: linear-gradient(135deg,rgba(200,169,110,.2),rgba(200,169,110,.06)); border: 1px solid rgba(200,169,110,.35); border-radius: 12px; padding: 1rem; text-align: center; margin-bottom: 1rem; }
+    .size-lbl { font-size: .65rem; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .1em; margin-bottom: .3rem; }
+    .size-val { font-size: 2.2rem; font-weight: 800; color: #c8a96e; letter-spacing: -.04em; line-height: 1; }
+    .size-sub { font-size: .72rem; color: rgba(255,255,255,.45); margin-top: .35rem; line-height: 1.5; }
+
+    /* Ajustements */
+    .adj-field { margin-bottom: 1.1rem; }
+    .adj-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .5rem; }
+    .adj-icon { font-size: 1rem; }
+    .adj-lbl { font-size: .75rem; font-weight: 600; color: rgba(255,255,255,.7); }
+    .adj-track { display: flex; align-items: center; gap: .5rem; }
+    .adj-minus, .adj-plus { font-size: .9rem; color: rgba(255,255,255,.3); font-weight: 700; flex-shrink: 0; width: 12px; text-align: center; }
+    .adj-val { font-size: .68rem; color: #c8a96e; margin-top: .3rem; text-align: center; font-weight: 600; }
+
+    /* Loading 3D */
+    #loadingOverlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #080810; z-index: 5; transition: opacity .8s; }
+    #loadingOverlay .spin-ring { width: 40px; height: 40px; margin-bottom: 1rem; }
+    #loadingOverlay p { font-size: .78rem; color: rgba(255,255,255,.35); letter-spacing: .1em; }
+
+    /* Mesures overlay */
+    #measOverlay { position: fixed; bottom: 2rem; left: 2rem; z-index: 10; display: none; gap: .6rem; }
+    #measOverlay.visible { display: flex; }
+    .mchip { background: rgba(10,10,18,.8); backdrop-filter: blur(12px); border: 1px solid rgba(200,169,110,.25); border-radius: 20px; padding: .35rem .85rem; font-size: .72rem; font-weight: 600; color: rgba(255,255,255,.7); }
+    .mchip span { color: #c8a96e; }
   </style>
 </head>
 <body>
+
+<div id="bgAnim"></div>
+
+<div id="viewer">
+  <iframe id="sketchfabFrame" title="Mannequin — Dressim" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
+  <div id="loadingOverlay">
+    <div class="spin-ring"></div>
+    <p>GÉNÉRATION DE VOTRE AVATAR</p>
+  </div>
+</div>
+
+<div id="vignette"></div>
 
 <nav>
   <a href="/" class="logo">Dress<span>im</span></a>
   <a href="/boutique.html" class="back">← Boutique démo</a>
 </nav>
 
-<div class="shell">
+<div id="panel">
 
-  <!-- AVATAR -->
-  <div class="avatar-panel">
-    <div id="avatarWrap">
-      <svg id="avatarSvg" viewBox="0 0 200 480" width="160" height="384" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <!-- Studio light: bright top-left, shadow bottom-right -->
-          <linearGradient id="gL" x1="15%" y1="0%" x2="95%" y2="100%">
-            <stop offset="0%"   stop-color="#ffffff"/>
-            <stop offset="40%"  stop-color="#f0f0f0"/>
-            <stop offset="100%" stop-color="#b8b8b8"/>
-          </linearGradient>
-          <!-- Slightly darker for right arm / right leg -->
-          <linearGradient id="gR" x1="5%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%"   stop-color="#ebebeb"/>
-            <stop offset="50%"  stop-color="#e0e0e0"/>
-            <stop offset="100%" stop-color="#acacac"/>
-          </linearGradient>
-          <!-- Highlight streak -->
-          <linearGradient id="gHL" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.7"/>
-            <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-          </linearGradient>
-          <filter id="fs" x="-30%" y="-10%" width="160%" height="130%">
-            <feDropShadow dx="2" dy="8" stdDeviation="10" flood-color="#00000020"/>
-          </filter>
-        </defs>
-
-        <g filter="url(#fs)">
-          <!-- Right arm (behind body, drawn first) -->
-          <path id="armR" fill="url(#gR)"/>
-          <!-- Right leg -->
-          <path id="legR" fill="url(#gR)"/>
-          <!-- Left leg -->
-          <path id="legL" fill="url(#gL)"/>
-          <!-- Body -->
-          <path id="body" fill="url(#gL)"/>
-          <!-- Left arm (in front) -->
-          <path id="armL" fill="url(#gL)"/>
-          <!-- Neck -->
-          <path id="neck" fill="url(#gL)"/>
-          <!-- Head -->
-          <ellipse id="head" cx="100" cy="38" rx="26" ry="30" fill="url(#gL)"/>
-          <!-- Hair -->
-          <path id="hair" fill="#c8c8c8"/>
-          <!-- Highlight on torso -->
-          <path id="hiLight" fill="url(#gHL)" opacity="0.5"/>
-        </g>
-      </svg>
-    </div>
-    <div class="badges">
-      <div class="badge" id="bP">— cm</div>
-      <div class="badge" id="bT">— cm</div>
-      <div class="badge" id="bH">— cm</div>
+  <!-- STEP 1 : Genre -->
+  <div class="step active" id="step1">
+    <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="step-title">Bonjour 👋</div>
+    <div class="step-sub">Pour commencer, dites-nous qui vous êtes.</div>
+    <div class="gender-grid">
+      <button class="gbtn" data-g="femme" onclick="pickGenre(this)"><span class="gi">👩</span><span class="gl">Femme</span></button>
+      <button class="gbtn" data-g="homme" onclick="pickGenre(this)"><span class="gi">👨</span><span class="gl">Homme</span></button>
     </div>
   </div>
 
-  <!-- FORM -->
-  <div class="form-panel">
+  <!-- STEP 2 : Photo ou Manuel -->
+  <div class="step" id="step2">
+    <div class="dots"><div class="dot"></div><div class="dot on"></div><div class="dot"></div></div>
+    <div class="step-title">Votre silhouette</div>
+    <div class="step-sub">Choisissez comment renseigner votre profil.</div>
 
-    <div class="step active" id="step1">
-      <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
-      <div class="step-title">Bonjour 👋</div>
-      <div class="step-sub">Choisissez votre genre pour adapter les proportions du mannequin.</div>
-      <div class="gender-grid">
-        <button class="gbtn" data-g="femme" onclick="pickGenre(this)"><span class="gi">👩</span><span class="gl">Femme</span></button>
-        <button class="gbtn" data-g="homme" onclick="pickGenre(this)"><span class="gi">👨</span><span class="gl">Homme</span></button>
-      </div>
+    <!-- Tabs -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1.1rem;">
+      <button class="tab-btn active" id="tabPhoto" onclick="switchTab('photo')">📷 Par photo</button>
+      <button class="tab-btn" id="tabManuel" onclick="switchTab('manuel')">✏️ Manuel</button>
     </div>
 
-    <div class="step" id="step2">
-      <div class="dots"><div class="dot"></div><div class="dot on"></div><div class="dot"></div></div>
-      <div class="step-title">Taille &amp; Poids</div>
-      <div class="step-sub">Ces deux infos suffisent — les mensurations sont calculées automatiquement.</div>
+    <!-- TAB PHOTO -->
+    <div id="tabPhotoContent">
+      <div class="photo-zone" id="photoZone">
+        <div class="photo-placeholder" id="photoPlaceholder">
+          <span class="pi">📷</span>
+          <p>Photo en pied, fond neutre<br/>Vêtements ajustés de préférence</p>
+        </div>
+        <video id="videoEl" autoplay playsinline muted></video>
+        <canvas id="photoCanvas"></canvas>
+        <canvas id="skeletonCanvas"></canvas>
+      </div>
+
+      <div id="analyseBox">
+        <div class="spin-ring"></div>
+        <div id="analyseLabel">Chargement de l'IA…</div>
+      </div>
+
+      <div id="analyseResult">
+        <div class="ar-lbl">Silhouette détectée</div>
+        <div class="ar-val" id="analyseVal">—</div>
+      </div>
+
+      <div class="photo-actions">
+        <button class="btn-cam" onclick="startCamera()">📷 Caméra</button>
+        <label class="btn-file">📁 Importer<input type="file" accept="image/*" style="display:none" onchange="handleFile(this)"/></label>
+      </div>
+      <button class="btn-p" id="btnCapture" style="display:none" onclick="capturePhoto()">Analyser cette photo →</button>
+      <button class="btn-p" id="btnNext2" style="display:none" onclick="goStep(3)">Continuer →</button>
+    </div>
+
+    <!-- TAB MANUEL -->
+    <div id="tabManuelContent" style="display:none;">
       <div class="sfield">
-        <div class="shead"><span class="slabel">Taille</span><span class="sval"><span id="vT">165</span> cm</span></div>
-        <input type="range" id="sT" min="145" max="205" value="165" step="1" oninput="onSlide()"/>
+        <div class="shead"><span class="slabel">Taille</span><span class="sval"><span id="vTm">165</span> cm</span></div>
+        <input type="range" id="sTm" min="145" max="205" value="165" step="1" oninput="document.getElementById('vTm').textContent=this.value; syncManuel()"/>
       </div>
       <div class="sfield">
-        <div class="shead"><span class="slabel">Poids</span><span class="sval"><span id="vP">62</span> kg</span></div>
-        <input type="range" id="sP" min="40" max="130" value="62" step="1" oninput="onSlide()"/>
+        <div class="shead"><span class="slabel">Poids</span><span class="sval"><span id="vPm">62</span> kg</span></div>
+        <input type="range" id="sPm" min="40" max="130" value="62" step="1" oninput="document.getElementById('vPm').textContent=this.value; syncManuel()"/>
       </div>
-      <button class="btn-p" onclick="goStep(3)">Continuer →</button>
-      <button class="btn-s" onclick="goStep(1)">← Retour</button>
+      <div id="manuelResult" style="display:none;" class="mb">
+        <div id="analyseResult2">
+          <div class="ar-lbl">Silhouette estimée</div>
+          <div class="ar-val" id="analyseVal2">—</div>
+        </div>
+      </div>
+      <button class="btn-p" id="btnNext2m" style="display:none" onclick="goStep(3)">Continuer →</button>
     </div>
 
-    <div class="step" id="step3">
-      <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot on"></div></div>
-      <div class="step-title">Votre silhouette</div>
-      <div class="step-sub">Choisissez la silhouette qui vous ressemble le plus.</div>
-      <div class="sil-grid">
-        <button class="sbtn" data-s="slim" onclick="pickSil(this)"><span class="si">🕴</span><span class="sn">Slim</span><span class="sd">Fine</span></button>
-        <button class="sbtn active" data-s="standard" onclick="pickSil(this)"><span class="si">🧍</span><span class="sn">Standard</span><span class="sd">Moyenne</span></button>
-        <button class="sbtn" data-s="curvy" onclick="pickSil(this)"><span class="si">🙋</span><span class="sn" id="curvyLbl">Curvy</span><span class="sd" id="curvyDesc">Formes</span></button>
-      </div>
-      <button class="btn-p" onclick="showResult()">Créer mon avatar →</button>
-      <button class="btn-s" onclick="goStep(2)">← Retour</button>
-    </div>
-
-    <div class="step" id="step4">
-      <div class="step-title" style="margin-bottom:.25rem">Votre avatar ✅</div>
-      <div class="step-sub">Mensurations estimées à partir de votre profil.</div>
-      <div class="meas-grid">
-        <div class="mcell"><div class="mv" id="rP">—</div><div class="ml">Poitrine cm</div></div>
-        <div class="mcell"><div class="mv" id="rT">—</div><div class="ml">Taille cm</div></div>
-        <div class="mcell"><div class="mv" id="rH">—</div><div class="ml">Hanches cm</div></div>
-      </div>
-      <div class="result-card">
-        <div class="rs-lbl">Taille recommandée pour ce vêtement</div>
-        <div class="rs-size" id="rSz">—</div>
-        <div class="rs-exp" id="rExp"></div>
-      </div>
-      <button class="btn-g" onclick="window.location.href='/boutique.html'">← Retour à la boutique</button>
-      <button class="btn-s" onclick="goStep(3)">← Modifier ma silhouette</button>
-    </div>
-
+    <button class="btn-s" style="margin-top:.5rem" onclick="resetPhoto(); goStep(1)">← Retour</button>
   </div>
+
+  <!-- STEP 3 : Taille -->
+  <div class="step" id="step3">
+    <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot on"></div><div class="dot"></div></div>
+    <div class="step-title">Votre taille</div>
+    <div class="step-sub">Pour calibrer vos mensurations en cm.</div>
+    <div class="sfield">
+      <div class="shead"><span class="slabel">Taille</span><span class="sval"><span id="vT">165</span> cm</span></div>
+      <input type="range" id="sT" min="145" max="205" value="165" step="1" oninput="document.getElementById('vT').textContent=this.value"/>
+    </div>
+    <button class="btn-p" onclick="goStep(4)">Continuer →</button>
+    <button class="btn-s" onclick="goStep(2)">← Retour</button>
+  </div>
+
+  <!-- STEP 4 : Ajustements fins -->
+  <div class="step" id="step4">
+    <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot on"></div></div>
+    <div class="step-title">Affinez votre profil</div>
+    <div class="step-sub">Certaines zones sont différentes du reste de votre corps ? Ajustez ici.</div>
+
+    <div class="adj-field">
+      <div class="adj-head">
+        <span class="adj-icon">👙</span>
+        <span class="adj-lbl" id="bustLbl">Poitrine</span>
+      </div>
+      <div class="adj-track">
+        <span class="adj-minus">−</span>
+        <input type="range" id="adjBust" min="-2" max="2" value="0" step="1" oninput="updateAdj()"/>
+        <span class="adj-plus">+</span>
+      </div>
+      <div class="adj-val" id="adjBustVal">Normal</div>
+    </div>
+
+    <div class="adj-field">
+      <div class="adj-head">
+        <span class="adj-icon">⌛</span>
+        <span class="adj-lbl">Taille / ventre</span>
+      </div>
+      <div class="adj-track">
+        <span class="adj-minus">−</span>
+        <input type="range" id="adjWaist" min="-2" max="2" value="0" step="1" oninput="updateAdj()"/>
+        <span class="adj-plus">+</span>
+      </div>
+      <div class="adj-val" id="adjWaistVal">Normal</div>
+    </div>
+
+    <div class="adj-field">
+      <div class="adj-head">
+        <span class="adj-icon">🍑</span>
+        <span class="adj-lbl">Hanches / cuisses</span>
+      </div>
+      <div class="adj-track">
+        <span class="adj-minus">−</span>
+        <input type="range" id="adjHips" min="-2" max="2" value="0" step="1" oninput="updateAdj()"/>
+        <span class="adj-plus">+</span>
+      </div>
+      <div class="adj-val" id="adjHipsVal">Normal</div>
+    </div>
+
+    <div id="adjAlert" style="display:none;font-size:.72rem;color:rgba(255,255,255,.45);background:rgba(200,169,110,.07);border:1px solid rgba(200,169,110,.2);border-radius:8px;padding:.65rem .85rem;margin-bottom:.75rem;line-height:1.5;"></div>
+
+    <button class="btn-p" onclick="showResult()">Voir mon avatar →</button>
+    <button class="btn-s" onclick="goStep(3)">← Retour</button>
+  </div>
+
+  <!-- STEP 5 : Résultat -->
+  <div class="step" id="step5">
+    <div class="step-title">Votre avatar ✨</div>
+    <div class="step-sub">Mannequin généré selon votre profil.</div>
+    <div class="meas-row">
+      <div class="mcell"><div class="mv" id="rP">—</div><div class="ml">Poitrine</div></div>
+      <div class="mcell"><div class="mv" id="rT">—</div><div class="ml">Taille</div></div>
+      <div class="mcell"><div class="mv" id="rH">—</div><div class="ml">Hanches</div></div>
+    </div>
+    <div class="size-badge">
+      <div class="size-lbl">Taille recommandée</div>
+      <div class="size-val" id="rSz">—</div>
+      <div class="size-sub" id="rExp"></div>
+    </div>
+    <hr class="divider"/>
+    <button class="btn-p" onclick="window.location.href='/boutique.html'">🛍 Aller à la boutique →</button>
+    <button class="btn-s" onclick="resetAll()">Modifier mon profil</button>
+  </div>
+
+</div><!-- /panel -->
+
+<div id="measOverlay">
+  <div class="mchip">Poitrine <span id="oP">—</span> cm</div>
+  <div class="mchip">Taille <span id="oT">—</span> cm</div>
+  <div class="mchip">Hanches <span id="oH">—</span> cm</div>
 </div>
 
+<!-- TensorFlow.js -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core@4.10.0/dist/tf-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.10.0/dist/tf-backend-webgl.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.3/dist/pose-detection.min.js"></script>
+
 <script>
-let genre = 'femme', sil = 'standard';
-const cx = 100;
+// ── État ──────────────────────────────────────────────────────────────
+let genre = 'femme';
+let detectedSil = 'standard';
+let detector = null;
+let stream = null;
+let photoReady = false;
 
-function calc(h, w, g, sl) {
-  const bmi = w / Math.pow(h / 100, 2);
-  let bust, waist, hips;
-  if (g === 'femme') {
-    bust  = 90  + (h-165)*0.30 + (bmi-22)*1.5;
-    waist = 72  + (h-165)*0.18 + (bmi-22)*1.8;
-    hips  = 96  + (h-165)*0.35 + (bmi-22)*2.0;
-    if (sl==='slim')  { bust-=3; waist-=5; hips-=6; }
-    if (sl==='curvy') { bust+=6; waist+=3; hips+=10; }
-  } else {
-    bust  = 96  + (h-175)*0.35 + (bmi-23)*1.5;
-    waist = 84  + (h-175)*0.20 + (bmi-23)*2.0;
-    hips  = 98  + (h-175)*0.30 + (bmi-23)*1.8;
-    if (sl==='slim')     { bust-=4; waist-=6; hips-=4; }
-    if (sl==='athletic') { bust+=8; waist-=4; hips+=2; }
+// ── Modèles Sketchfab ─────────────────────────────────────────────────
+const MODELS = {
+  femme_slim:      '7f9d35c58bd2421598eeed0df9b19f37',
+  femme_standard:  '7f9d35c58bd2421598eeed0df9b19f37',
+  femme_curvy:     '7f9d35c58bd2421598eeed0df9b19f37',
+  femme_athletic:  '7f9d35c58bd2421598eeed0df9b19f37',
+  homme_slim:      'ecefd207c85845a7b0d116c34da5e7fe',
+  homme_standard:  'ecefd207c85845a7b0d116c34da5e7fe',
+  homme_curvy:     'ecefd207c85845a7b0d116c34da5e7fe',
+  homme_athletic:  'ecefd207c85845a7b0d116c34da5e7fe',
+};
+
+const SIL_LABELS = {
+  slim: 'Silhouette fine', standard: 'Silhouette standard',
+  curvy: 'Silhouette ronde', athletic: 'Silhouette athlétique',
+};
+
+// ── Ajustements fins ──────────────────────────────────────────────────
+const ADJ_LABELS = ['Bien plus petit', 'Plus petit', 'Normal', 'Plus large', 'Bien plus large'];
+
+function updateAdj() {
+  ['Bust','Waist','Hips'].forEach(z => {
+    const v   = +document.getElementById('adj'+z).value;
+    const lbl = ADJ_LABELS[v + 2];
+    const el  = document.getElementById('adj'+z+'Val');
+    el.textContent  = lbl;
+    el.style.color  = v === 0 ? 'rgba(255,255,255,.35)' : '#c8a96e';
+  });
+
+  // Alerte si zones contradictoires (ex: poitrine++ mais taille--)
+  const b = +document.getElementById('adjBust').value;
+  const w = +document.getElementById('adjWaist').value;
+  const h = +document.getElementById('adjHips').value;
+  const alert = document.getElementById('adjAlert');
+  let msg = '';
+  if (b >= 1 && w <= -1) msg = '💡 Poitrine large + taille fine → pensez à prendre la taille pour la poitrine et ajuster la taille avec un cintre ou ceinture.';
+  else if (h >= 1 && w <= -1) msg = '💡 Hanches larges + taille fine → préférez les coupes trapèze ou à taille élastique.';
+  else if (b >= 1 && h >= 1 && w <= 0) msg = '💡 Forte poitrine et hanches larges → les robes empire ou wrap sont idéales pour vous.';
+  alert.style.display = msg ? 'block' : 'none';
+  alert.textContent   = msg;
+}
+
+// ── Sizing ────────────────────────────────────────────────────────────
+const SIZING = [
+  {size:'XS', bust:[78,83],  waist:[58,63]},
+  {size:'S',  bust:[84,89],  waist:[64,69]},
+  {size:'M',  bust:[90,95],  waist:[70,75]},
+  {size:'L',  bust:[96,101], waist:[76,81]},
+  {size:'XL', bust:[102,108],waist:[82,88]},
+];
+
+// ── Particules fond ───────────────────────────────────────────────────
+(function() {
+  const bg = document.getElementById('bgAnim');
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'pt';
+    p.style.cssText = `left:${Math.random()*100}%;bottom:${Math.random()*30}%;--d:${3+Math.random()*5}s;--dl:${Math.random()*6}s`;
+    bg.appendChild(p);
   }
-  return { bust:Math.round(bust), waist:Math.round(waist), hips:Math.round(hips) };
-}
+})();
 
-function attr(id, a, v) { document.getElementById(id).setAttribute(a, v); }
-
-function draw(h, w, g, sl) {
-  const m     = calc(h, w, g, sl);
-  const sc    = h / 168;
-  const isF   = g === 'femme';
-
-  // Half-widths in SVG units (viewBox 200 wide)
-  const sW  = Math.min(Math.max(m.bust  * 0.32, 34), 58);
-  const wW  = Math.min(Math.max(m.waist * 0.29, 21), 46);
-  const hW  = Math.min(Math.max(m.hips  * 0.33, 36), 62);
-  const lW  = hW * 0.43; // thigh half-width at crotch
-  const cW  = hW * 0.29; // calf half-width
-  const aW  = sW * 0.19; // arm half-width
-
-  // Y landmarks
-  const headR  = 30;
-  const headCY = 38;
-  const neckT  = headCY + headR - 5;
-  const neckB  = neckT + Math.round(16 * sc);
-  const shY    = neckB;
-  const bustY  = shY  + Math.round(52 * sc);
-  const waistY = bustY + Math.round(36 * sc);
-  const hipY   = waistY+ Math.round(30 * sc);
-  const crotY  = hipY  + Math.round(18 * sc);
-  const kneeY  = crotY + Math.round(105* sc);
-  const ankleY = kneeY + Math.round(95 * sc);
-  const footY  = ankleY+ Math.round(14 * sc);
-
-  // ── HEAD ──────────────────────────────────────────────
-  attr('head', 'cy', headCY);
-  attr('head', 'rx', isF ? 25 : 27);
-  attr('head', 'ry', headR);
-
-  // Hair (top arc)
-  const hairRx = isF ? 26 : 28;
-  const hairRy = isF ? 22 : 17;
-  attr('hair', 'd', `M ${cx-hairRx} ${headCY-4}
-    A ${hairRx} ${hairRy} 0 0 1 ${cx+hairRx} ${headCY-4}
-    Q ${cx+hairRx+2} ${headCY-headR-2} ${cx} ${headCY-headR-2}
-    Q ${cx-hairRx-2} ${headCY-headR-2} ${cx-hairRx} ${headCY-4} Z`);
-
-  // ── NECK ──────────────────────────────────────────────
-  const nW = isF ? 11 : 14;
-  attr('neck', 'd', `M ${cx-nW} ${neckT}
-    C ${cx-nW-1} ${neckT+5} ${cx-nW} ${neckB-4} ${cx-nW+1} ${neckB}
-    L ${cx+nW-1} ${neckB}
-    C ${cx+nW} ${neckB-4} ${cx+nW+1} ${neckT+5} ${cx+nW} ${neckT}
-    Q ${cx} ${neckT-3} ${cx-nW} ${neckT} Z`);
-
-  // ── BODY (torso, hips, shoulders in one smooth path) ──
-  // Key trick: cubic bezier gives organic waist curve
-  const body = `M ${cx-sW} ${shY}
-    C ${cx-sW-3} ${shY+18} ${cx-wW-5} ${bustY+8} ${cx-wW} ${waistY}
-    C ${cx-wW}   ${waistY+14} ${cx-hW+3} ${hipY-6} ${cx-hW} ${hipY}
-    C ${cx-hW}   ${hipY+10}   ${cx-lW*1.12} ${crotY-6} ${cx-lW*1.08} ${crotY}
-    L ${cx+lW*1.08} ${crotY}
-    C ${cx+hW}   ${hipY+10}   ${cx+hW-3} ${hipY-6}  ${cx+hW} ${hipY}
-    C ${cx+wW}   ${waistY+14} ${cx+sW+3} ${shY+18}  ${cx+sW} ${shY}
-    Q ${cx} ${shY-8} ${cx-sW} ${shY} Z`;
-  attr('body', 'd', body);
-
-  // Female bust detail
-  const hiLight = isF
-    ? `M ${cx-sW*0.5} ${shY+14}
-       Q ${cx-sW*0.35} ${bustY-6} ${cx-wW*0.7} ${waistY-10}
-       Q ${cx-sW*0.25} ${bustY-8} ${cx-sW*0.38} ${shY+14} Z`
-    : `M ${cx-sW*0.45} ${shY+10}
-       Q ${cx-sW*0.3} ${bustY+10} ${cx-wW*0.6} ${waistY-6}
-       Q ${cx-sW*0.2} ${bustY+8} ${cx-sW*0.35} ${shY+10} Z`;
-  attr('hiLight', 'd', hiLight);
-
-  // ── LEFT LEG ──────────────────────────────────────────
-  const legL = `M ${cx-lW*1.06} ${crotY}
-    C ${cx-lW-3}  ${crotY+20}  ${cx-lW-4}  ${kneeY-30}  ${cx-lW*0.9}  ${kneeY}
-    C ${cx-cW-2}  ${kneeY+12}  ${cx-cW}    ${ankleY-18} ${cx-cW*0.85} ${ankleY}
-    L ${cx-cW*0.7} ${footY}
-    Q ${cx-2} ${footY+8} ${cx+2} ${footY}
-    L ${cx+2} ${ankleY}
-    C ${cx+cW*0.2} ${ankleY-18} ${cx+cW*0.1} ${kneeY+10} ${cx-lW*0.05} ${kneeY}
-    C ${cx-lW*0.12} ${kneeY-30} ${cx-lW*0.14} ${crotY+18} ${cx-lW*0.2} ${crotY} Z`;
-  attr('legL', 'd', legL);
-
-  // ── RIGHT LEG ─────────────────────────────────────────
-  const legR = `M ${cx+lW*1.06} ${crotY}
-    C ${cx+lW+3}  ${crotY+20}  ${cx+lW+4}  ${kneeY-30}  ${cx+lW*0.9}  ${kneeY}
-    C ${cx+cW+2}  ${kneeY+12}  ${cx+cW}    ${ankleY-18} ${cx+cW*0.85} ${ankleY}
-    L ${cx+cW*0.7} ${footY}
-    Q ${cx+2} ${footY+8} ${cx-2} ${footY}
-    L ${cx-2} ${ankleY}
-    C ${cx-cW*0.2} ${ankleY-18} ${cx-cW*0.1} ${kneeY+10} ${cx+lW*0.05} ${kneeY}
-    C ${cx+lW*0.12} ${kneeY-30} ${cx+lW*0.14} ${crotY+18} ${cx+lW*0.2} ${crotY} Z`;
-  attr('legR', 'd', legR);
-
-  // ── LEFT ARM ──────────────────────────────────────────
-  const axL   = cx - sW - 1;
-  const armBY = waistY + Math.round(14 * sc);
-  const armL = `M ${cx-sW+3} ${shY+3}
-    C ${axL-6} ${shY+22} ${axL-9} ${armBY-24} ${axL-2} ${armBY}
-    C ${axL+aW} ${armBY+4} ${axL+aW+4} ${armBY-10} ${cx-sW+aW*1.8} ${shY+5}
-    Z`;
-  attr('armL', 'd', armL);
-
-  // ── RIGHT ARM ─────────────────────────────────────────
-  const axR = cx + sW + 1;
-  const armR = `M ${cx+sW-3} ${shY+3}
-    C ${axR+6} ${shY+22} ${axR+9} ${armBY-24} ${axR+2} ${armBY}
-    C ${axR-aW} ${armBY+4} ${axR-aW-4} ${armBY-10} ${cx+sW-aW*1.8} ${shY+5}
-    Z`;
-  attr('armR', 'd', armR);
-
-  // Resize SVG viewBox to fit
-  const totalH = footY + 14;
-  const svgEl  = document.getElementById('avatarSvg');
-  svgEl.setAttribute('viewBox', `0 0 200 ${totalH}`);
-  const displayH = Math.min(totalH * 0.85, 440);
-  svgEl.setAttribute('height', Math.round(displayH));
-  svgEl.setAttribute('width',  Math.round(displayH * 200 / totalH));
-
-  // Badges
-  document.getElementById('bP').textContent = `Poitrine ${m.bust} cm`;
-  document.getElementById('bT').textContent = `Taille ${m.waist} cm`;
-  document.getElementById('bH').textContent = `Hanches ${m.hips} cm`;
-
-  return m;
-}
-
-// Navigation
+// ── Navigation ────────────────────────────────────────────────────────
 function goStep(n) {
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   document.getElementById('step' + n).classList.add('active');
-  if (n >= 2) draw(+document.getElementById('sT').value, +document.getElementById('sP').value, genre, sil);
 }
 
 function pickGenre(btn) {
   document.querySelectorAll('.gbtn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   genre = btn.dataset.g;
-  document.getElementById('curvyLbl').textContent  = genre==='homme' ? 'Athletic' : 'Curvy';
-  document.getElementById('curvyDesc').textContent = genre==='homme' ? 'Musculé' : 'Formes';
   goStep(2);
 }
 
-function pickSil(btn) {
-  document.querySelectorAll('.sbtn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  sil = btn.dataset.s;
-  draw(+document.getElementById('sT').value, +document.getElementById('sP').value, genre, sil);
+// ── Tabs ──────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('tabPhoto').classList.toggle('active', tab === 'photo');
+  document.getElementById('tabManuel').classList.toggle('active', tab === 'manuel');
+  document.getElementById('tabPhotoContent').style.display  = tab === 'photo'  ? 'block' : 'none';
+  document.getElementById('tabManuelContent').style.display = tab === 'manuel' ? 'block' : 'none';
+  if (tab === 'manuel') syncManuel();
 }
 
-function onSlide() {
-  document.getElementById('vT').textContent = document.getElementById('sT').value;
-  document.getElementById('vP').textContent = document.getElementById('sP').value;
-  draw(+document.getElementById('sT').value, +document.getElementById('sP').value, genre, sil);
+function syncManuel() {
+  const h   = +document.getElementById('sTm').value;
+  const w   = +document.getElementById('sPm').value;
+  const bmi = w / Math.pow(h / 100, 2);
+  let sil;
+  if (genre === 'femme') {
+    sil = bmi < 19 ? 'slim' : bmi < 25 ? 'standard' : bmi < 30 ? 'curvy' : 'curvy';
+  } else {
+    sil = bmi < 19 ? 'slim' : bmi < 25 ? 'standard' : bmi < 30 ? 'curvy' : 'curvy';
+  }
+  detectedSil = sil;
+  // Sync slider taille vers étape 3
+  document.getElementById('sT').value = h;
+  document.getElementById('vT').textContent = h;
+
+  document.getElementById('analyseVal2').textContent = SIL_LABELS[sil];
+  document.getElementById('manuelResult').style.display = 'block';
+  document.getElementById('analyseResult2').style.display = 'block';
+  document.getElementById('btnNext2m').style.display = 'block';
 }
 
-const SIZING = [
-  {size:'XS',bust:[78,83], waist:[58,63]},
-  {size:'S', bust:[84,89], waist:[64,69]},
-  {size:'M', bust:[90,95], waist:[70,75]},
-  {size:'L', bust:[96,101],waist:[76,81]},
-  {size:'XL',bust:[102,108],waist:[82,88]},
-];
+// ── Caméra ────────────────────────────────────────────────────────────
+async function startCamera() {
+  resetPhoto();
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+    const video = document.getElementById('videoEl');
+    video.srcObject = stream;
+    video.style.display = 'block';
+    document.getElementById('photoPlaceholder').style.display = 'none';
+    document.getElementById('btnCapture').style.display = 'block';
+  } catch(e) {
+    alert('Impossible d\'accéder à la caméra. Importez une photo à la place.');
+  }
+}
 
+function capturePhoto() {
+  const video = document.getElementById('videoEl');
+  const canvas = document.getElementById('photoCanvas');
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  canvas.style.display = 'block';
+  video.style.display = 'none';
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  document.getElementById('btnCapture').style.display = 'none';
+  analyzePhoto(canvas);
+}
+
+function handleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const img = new Image();
+  img.onload = function() {
+    const canvas = document.getElementById('photoCanvas');
+    canvas.width  = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    canvas.getContext('2d').drawImage(img, 0, 0);
+    canvas.style.display = 'block';
+    document.getElementById('photoPlaceholder').style.display = 'none';
+    analyzePhoto(canvas);
+  };
+  img.src = URL.createObjectURL(file);
+}
+
+function resetPhoto() {
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  const video = document.getElementById('videoEl');
+  const canvas = document.getElementById('photoCanvas');
+  const sk = document.getElementById('skeletonCanvas');
+  video.style.display = 'none';
+  canvas.style.display = 'none';
+  canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+  sk.getContext('2d').clearRect(0,0,sk.width,sk.height);
+  document.getElementById('photoPlaceholder').style.display = 'block';
+  document.getElementById('btnCapture').style.display = 'none';
+  document.getElementById('btnNext2').style.display = 'none';
+  document.getElementById('analyseBox').style.display = 'none';
+  document.getElementById('analyseResult').style.display = 'none';
+  photoReady = false;
+}
+
+// ── Analyse TensorFlow.js ─────────────────────────────────────────────
+async function analyzePhoto(canvas) {
+  const analyseBox   = document.getElementById('analyseBox');
+  const analyseLabel = document.getElementById('analyseLabel');
+  const analyseResult= document.getElementById('analyseResult');
+  const btnNext2     = document.getElementById('btnNext2');
+
+  analyseBox.style.display = 'block';
+  analyseResult.style.display = 'none';
+  btnNext2.style.display = 'none';
+  analyseLabel.textContent = 'Chargement de l\'IA…';
+
+  try {
+    if (!detector) {
+      await tf.ready();
+      analyseLabel.textContent = 'Détection de la silhouette…';
+      detector = await poseDetection.createDetector(
+        poseDetection.SupportedModels.MoveNet,
+        { modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER }
+      );
+    }
+
+    analyseLabel.textContent = 'Analyse en cours…';
+    const poses = await detector.estimatePoses(canvas);
+
+    if (!poses || poses.length === 0) {
+      analyseLabel.textContent = 'Aucun corps détecté — réessayez.';
+      return;
+    }
+
+    drawSkeleton(canvas, poses[0].keypoints);
+    detectedSil = classifySilhouette(poses[0].keypoints, genre);
+
+    analyseBox.style.display = 'none';
+    analyseResult.style.display = 'block';
+    document.getElementById('analyseVal').textContent = SIL_LABELS[detectedSil];
+    btnNext2.style.display = 'block';
+    photoReady = true;
+
+  } catch(e) {
+    console.error(e);
+    analyseLabel.textContent = 'Erreur d\'analyse. Réessayez.';
+  }
+}
+
+function classifySilhouette(keypoints, g) {
+  const kp = {};
+  keypoints.forEach(k => { kp[k.name] = k; });
+
+  const ls = kp['left_shoulder'],  rs = kp['right_shoulder'];
+  const lh = kp['left_hip'],       rh = kp['right_hip'];
+
+  if (!ls || !rs || !lh || !rh) return 'standard';
+  if ([ls,rs,lh,rh].some(k => k.score < 0.3)) return 'standard';
+
+  const shoulderW = Math.abs(ls.x - rs.x);
+  const hipW      = Math.abs(lh.x - rh.x);
+  const torsoH    = Math.abs((ls.y+rs.y)/2 - (lh.y+rh.y)/2);
+  if (torsoH === 0) return 'standard';
+
+  const sRatio = shoulderW / torsoH;  // largeur épaules relative
+  const hRatio = hipW      / torsoH;  // largeur hanches relative
+  const h2s    = hipW / shoulderW;    // rapport hanches/épaules
+
+  if (g === 'femme') {
+    if (h2s > 1.18 && hRatio > 0.58)         return 'curvy';
+    if (sRatio > 0.68 && h2s < 0.92)          return 'athletic';
+    if (sRatio < 0.52 && hRatio < 0.48)       return 'slim';
+    return 'standard';
+  } else {
+    if (sRatio > 0.72 && h2s < 0.88)          return 'athletic';
+    if (hRatio > 0.62 && h2s > 1.02)          return 'curvy';
+    if (sRatio < 0.52 && hRatio < 0.46)       return 'slim';
+    return 'standard';
+  }
+}
+
+function drawSkeleton(canvas, keypoints) {
+  const sk = document.getElementById('skeletonCanvas');
+  sk.width  = canvas.width;
+  sk.height = canvas.height;
+
+  // Positionne le canvas par-dessus
+  const rect = canvas.getBoundingClientRect();
+  sk.style.position = 'absolute';
+
+  const ctx = sk.getContext('2d');
+  const CONNECTIONS = [
+    ['left_shoulder','right_shoulder'],['left_shoulder','left_hip'],
+    ['right_shoulder','right_hip'],['left_hip','right_hip'],
+    ['left_shoulder','left_elbow'],['left_elbow','left_wrist'],
+    ['right_shoulder','right_elbow'],['right_elbow','right_wrist'],
+    ['left_hip','left_knee'],['left_knee','left_ankle'],
+    ['right_hip','right_knee'],['right_knee','right_ankle'],
+  ];
+
+  const kpMap = {};
+  keypoints.forEach(k => { kpMap[k.name] = k; });
+
+  ctx.strokeStyle = 'rgba(200,169,110,.8)';
+  ctx.lineWidth = Math.max(canvas.width / 200, 1.5);
+  CONNECTIONS.forEach(([a,b]) => {
+    const ka = kpMap[a], kb = kpMap[b];
+    if (ka && kb && ka.score > 0.3 && kb.score > 0.3) {
+      ctx.beginPath();
+      ctx.moveTo(ka.x, ka.y);
+      ctx.lineTo(kb.x, kb.y);
+      ctx.stroke();
+    }
+  });
+
+  ctx.fillStyle = '#c8a96e';
+  keypoints.forEach(k => {
+    if (k.score > 0.3) {
+      ctx.beginPath();
+      ctx.arc(k.x, k.y, Math.max(canvas.width / 120, 3), 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+
+  // Efface après 2s
+  setTimeout(() => ctx.clearRect(0, 0, sk.width, sk.height), 2000);
+}
+
+// ── Calcul mensurations ───────────────────────────────────────────────
+function getAdj() {
+  return {
+    bust:  +document.getElementById('adjBust').value  * 3,
+    waist: +document.getElementById('adjWaist').value * 3,
+    hips:  +document.getElementById('adjHips').value  * 3,
+  };
+}
+
+function calcMeasures(h, g, sil) {
+  // Utilise BMI moyen par silhouette pour estimer le poids implicite
+  const bmiMap = { slim: 18, standard: 22, curvy: 28, athletic: 24 };
+  const bmi = bmiMap[sil] || 22;
+  const w   = bmi * Math.pow(h / 100, 2);
+
+  let bust, waist, hips;
+  if (g === 'femme') {
+    bust  = 90  + (h-165)*0.30 + (bmi-22)*1.5;
+    waist = 72  + (h-165)*0.18 + (bmi-22)*1.8;
+    hips  = 96  + (h-165)*0.35 + (bmi-22)*2.0;
+    if (sil==='slim')     { bust-=3; waist-=5; hips-=6; }
+    if (sil==='curvy')    { bust+=6; waist+=3; hips+=10; }
+    if (sil==='athletic') { bust+=4; waist-=2; hips+=2; }
+  } else {
+    bust  = 96  + (h-175)*0.35 + (bmi-23)*1.5;
+    waist = 84  + (h-175)*0.20 + (bmi-23)*2.0;
+    hips  = 98  + (h-175)*0.30 + (bmi-23)*1.8;
+    if (sil==='slim')     { bust-=4; waist-=6; hips-=4; }
+    if (sil==='athletic') { bust+=8; waist-=4; hips+=2; }
+    if (sil==='curvy')    { bust+=5; waist+=6; hips+=8; }
+  }
+  const adj = getAdj();
+  return { bust: Math.round(bust + adj.bust), waist: Math.round(waist + adj.waist), hips: Math.round(hips + adj.hips) };
+}
+
+// ── Résultat & révélation ─────────────────────────────────────────────
 function showResult() {
-  const m = draw(+document.getElementById('sT').value, +document.getElementById('sP').value, genre, sil);
+  const h = +document.getElementById('sT').value;
+  const m = calcMeasures(h, genre, detectedSil);
+
   document.getElementById('rP').textContent = m.bust;
   document.getElementById('rT').textContent = m.waist;
   document.getElementById('rH').textContent = m.hips;
-  let iB = SIZING.findIndex(s=>m.bust>=s.bust[0]&&m.bust<=s.bust[1]);
-  let iW = SIZING.findIndex(s=>m.waist>=s.waist[0]&&m.waist<=s.waist[1]);
-  if(iB<0)iB=m.bust>108?4:0; if(iW<0)iW=m.waist>88?4:0;
-  const sz = SIZING[Math.min(Math.max(iB,iW),4)].size;
+  document.getElementById('oP').textContent = m.bust;
+  document.getElementById('oT').textContent = m.waist;
+  document.getElementById('oH').textContent = m.hips;
+  document.getElementById('measOverlay').classList.add('visible');
+
+  let iB = SIZING.findIndex(s => m.bust  >= s.bust[0]  && m.bust  <= s.bust[1]);
+  let iW = SIZING.findIndex(s => m.waist >= s.waist[0] && m.waist <= s.waist[1]);
+  if (iB < 0) iB = m.bust  > 108 ? 4 : 0;
+  if (iW < 0) iW = m.waist > 88  ? 4 : 0;
+  const sz = SIZING[Math.min(Math.max(iB, iW), 4)].size;
+
   document.getElementById('rSz').textContent = sz;
-  document.getElementById('rExp').innerHTML =
-    `Poitrine estimée <strong>${m.bust} cm</strong>, taille <strong>${m.waist} cm</strong>. Robe coupe ajustée, viscose — taille <strong>${sz}</strong>.`;
-  goStep(4);
+  document.getElementById('rExp').textContent = `Poitrine ${m.bust} · Taille ${m.waist} · Hanches ${m.hips} cm`;
+
+  // Sauvegarde dans localStorage
+  const key     = `${genre}_${detectedSil}`;
+  const modelId = MODELS[key];
+  localStorage.setItem('dressim_avatar', JSON.stringify({
+    genre, silhouette: detectedSil, taille: h,
+    adjustments: getAdj(),
+    measures: m, size: sz, modelId,
+    createdAt: Date.now(),
+  }));
+
+  goStep(5);
+  if (modelId) loadModel(modelId);
 }
 
-// Init
-draw(165, 62, 'femme', 'standard');
+function loadModel(modelId) {
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.style.opacity = '1';
+  overlay.style.display = 'flex';
+
+  const client = new Sketchfab(document.getElementById('sketchfabFrame'));
+  client.init(modelId, {
+    success: function(api) {
+      api.start();
+      api.addEventListener('viewerready', function() {
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.style.display = 'none', 800);
+        document.getElementById('viewer').classList.add('revealed');
+        document.getElementById('bgAnim').classList.add('hidden');
+      });
+    },
+    autostart: 1,
+    autospin: 0.2,
+    ui_theme: 'dark',
+    ui_infos: 0,
+    ui_controls: 1,
+    ui_watermark: 1,
+  });
+}
+
+function resetAll() {
+  detectedSil = 'standard';
+  resetPhoto();
+  document.getElementById('viewer').classList.remove('revealed');
+  document.getElementById('bgAnim').classList.remove('hidden');
+  document.getElementById('measOverlay').classList.remove('visible');
+  document.getElementById('sketchfabFrame').src = '';
+  ['adjBust','adjWaist','adjHips'].forEach(id => { document.getElementById(id).value = 0; });
+  updateAdj();
+  goStep(1);
+}
 </script>
 </body>
 </html>

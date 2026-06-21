@@ -185,6 +185,17 @@
     .privacy-note { font-size: .68rem; color: var(--gray); margin-top: .55rem; line-height: 1.5; }
 
     /* ACTIONS */
+    .btn-tryon {
+      width: 100%; padding: .85rem; border-radius: 10px;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border: 1.5px solid #c8a96e;
+      color: #c8a96e; font-size: .9rem; font-weight: 700;
+      cursor: pointer; font-family: 'Inter', sans-serif;
+      margin-bottom: .75rem; transition: all .25s;
+      letter-spacing: .01em;
+    }
+    .btn-tryon:hover { background: #c8a96e; color: #080810; }
+
     .btn-cart {
       width: 100%; padding: .95rem; border-radius: 8px;
       background: var(--black); color: var(--white);
@@ -211,7 +222,15 @@
     .card-img { background: #f3f0eb; border-radius: 6px; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: .5rem; transition: transform .3s; }
     .card-img:hover { transform: scale(1.02); }
     .card-name { font-size: .82rem; font-weight: 500; }
-    .card-price { font-size: .82rem; color: var(--gray); }
+    .card-price { font-size: .82rem; color: var(--gray); margin-bottom: .4rem; }
+    .card-btn-tryon {
+      width: 100%; padding: .4rem; border-radius: 7px;
+      background: none; border: 1px solid #c8a96e;
+      color: #c8a96e; font-size: .72rem; font-weight: 600;
+      cursor: pointer; font-family: 'Inter', sans-serif;
+      transition: all .2s; margin-top: .35rem;
+    }
+    .card-btn-tryon:hover { background: #c8a96e; color: #080810; }
   </style>
 </head>
 <body>
@@ -408,6 +427,9 @@
         </div>
       </div>
 
+      <button class="btn-tryon" onclick="dmTryOn('Robe Midi Florale', 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80')">
+        👗 Essayer sur mon avatar
+      </button>
       <button class="btn-cart">Ajouter au panier</button>
       <button class="btn-wish">♡ Ajouter à ma liste</button>
 
@@ -422,10 +444,30 @@
   <div class="related">
     <h3>Vous aimerez aussi</h3>
     <div class="related-grid">
-      <div><div class="card-img">👘</div><div class="card-name">Kimono Lin</div><div class="card-price">89,00 €</div></div>
-      <div><div class="card-img">🧥</div><div class="card-name">Veste Bohème</div><div class="card-price">145,00 €</div></div>
-      <div><div class="card-img">👚</div><div class="card-name">Top Dentelle</div><div class="card-price">62,00 €</div></div>
-      <div><div class="card-img">🩱</div><div class="card-name">Robe Bain</div><div class="card-price">74,00 €</div></div>
+      <div>
+        <div class="card-img">👘</div>
+        <div class="card-name">Kimono Lin</div>
+        <div class="card-price">89,00 €</div>
+        <button class="card-btn-tryon" onclick="dmTryOn('Kimono Lin', 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&q=80')">👗 Essayer</button>
+      </div>
+      <div>
+        <div class="card-img">🧥</div>
+        <div class="card-name">Veste Bohème</div>
+        <div class="card-price">145,00 €</div>
+        <button class="card-btn-tryon" onclick="dmTryOn('Veste Bohème', 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80')">👗 Essayer</button>
+      </div>
+      <div>
+        <div class="card-img">👚</div>
+        <div class="card-name">Top Dentelle</div>
+        <div class="card-price">62,00 €</div>
+        <button class="card-btn-tryon" onclick="dmTryOn('Top Dentelle', 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80')">👗 Essayer</button>
+      </div>
+      <div>
+        <div class="card-img">🩱</div>
+        <div class="card-name">Robe Bain</div>
+        <div class="card-price">74,00 €</div>
+        <button class="card-btn-tryon" onclick="dmTryOn('Robe Bain', 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80')">👗 Essayer</button>
+      </div>
     </div>
   </div>
 
@@ -632,6 +674,231 @@
       document.getElementById('widgetBody').classList.add('open');
       document.getElementById('chevron').classList.add('open');
     }, 1200);
+  </script>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       DRESSIM — WIDGET MANNEQUIN FLOTTANT
+  ═══════════════════════════════════════════════════════════════ -->
+  <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
+
+  <style>
+    #dm-widget {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      z-index: 999;
+      width: 200px;
+      background: rgba(10,10,18,.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(200,169,110,.25);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,.35);
+      transition: all .4s cubic-bezier(.4,0,.2,1);
+      font-family: 'Inter', sans-serif;
+    }
+    #dm-widget.collapsed { width: 200px; }
+    #dm-widget.collapsed #dm-body { display: none; }
+
+    #dm-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .65rem .9rem;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    #dm-header-left { display: flex; align-items: center; gap: .5rem; }
+    #dm-header-logo { font-size: .75rem; font-weight: 700; color: #fff; }
+    #dm-header-logo span { color: #c8a96e; }
+    #dm-header-badge {
+      font-size: .6rem; background: #c8a96e; color: #080810;
+      padding: .1rem .4rem; border-radius: 20px; font-weight: 700;
+    }
+    #dm-toggle { font-size: .7rem; color: rgba(255,255,255,.4); transition: transform .3s; }
+    #dm-widget.collapsed #dm-toggle { transform: rotate(180deg); }
+
+    #dm-body { padding: 0; }
+
+    /* Mannequin iframe */
+    #dm-mannequin-wrap {
+      position: relative;
+      width: 100%;
+      height: 280px;
+      background: #0e0e18;
+      overflow: hidden;
+    }
+    #dm-iframe { width: 100%; height: 100%; border: none; display: block; }
+    #dm-loader {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; background: #0e0e18;
+      transition: opacity .6s;
+    }
+    #dm-loader .dm-spin {
+      width: 24px; height: 24px; border: 2px solid rgba(200,169,110,.2);
+      border-top-color: #c8a96e; border-radius: 50%;
+      animation: dmSpin .8s linear infinite; margin-bottom: .5rem;
+    }
+    #dm-loader p { font-size: .62rem; color: rgba(255,255,255,.3); text-align: center; }
+    @keyframes dmSpin { to { transform: rotate(360deg); } }
+
+    /* Garment overlay */
+    #dm-garment-overlay {
+      position: absolute; inset: 0;
+      display: none;
+      align-items: center; justify-content: center;
+      background: rgba(10,10,18,.6);
+      backdrop-filter: blur(4px);
+    }
+    #dm-garment-overlay.active { display: flex; }
+    #dm-garment-img {
+      max-width: 70%; max-height: 70%;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.5);
+      animation: dmFadeIn .4s ease;
+    }
+    @keyframes dmFadeIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
+
+    /* Info panel */
+    #dm-info {
+      padding: .75rem .9rem;
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    #dm-no-avatar {
+      text-align: center; padding: .75rem .9rem;
+    }
+    #dm-no-avatar p { font-size: .72rem; color: rgba(255,255,255,.5); margin-bottom: .6rem; line-height: 1.5; }
+    #dm-no-avatar a {
+      display: block; padding: .6rem; border-radius: 10px;
+      background: #c8a96e; color: #080810;
+      font-size: .75rem; font-weight: 700; text-decoration: none;
+      text-align: center; transition: opacity .2s;
+    }
+    #dm-no-avatar a:hover { opacity: .85; }
+
+    .dm-size-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: .4rem; }
+    .dm-size-lbl { font-size: .62rem; color: rgba(255,255,255,.4); }
+    .dm-size-val { font-size: 1.1rem; font-weight: 800; color: #c8a96e; }
+    .dm-product-name { font-size: .68rem; color: rgba(255,255,255,.6); margin-bottom: .5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dm-meas { display: flex; gap: .3rem; margin-bottom: .6rem; flex-wrap: wrap; }
+    .dm-meas-chip { font-size: .58rem; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 20px; padding: .15rem .45rem; color: rgba(255,255,255,.5); }
+    .dm-btn-reset { width: 100%; padding: .45rem; border-radius: 8px; background: none; border: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.4); font-size: .65rem; cursor: pointer; font-family: inherit; transition: all .2s; }
+    .dm-btn-reset:hover { border-color: rgba(255,255,255,.3); color: rgba(255,255,255,.7); }
+    #dm-default-msg { font-size: .68rem; color: rgba(255,255,255,.4); text-align: center; line-height: 1.5; padding: .25rem 0; }
+  </style>
+
+  <!-- Widget HTML -->
+  <div id="dm-widget">
+    <div id="dm-header" onclick="dmToggle()">
+      <div id="dm-header-left">
+        <span id="dm-header-logo">Dress<span>im</span></span>
+        <span id="dm-header-badge">Mon avatar</span>
+      </div>
+      <span id="dm-toggle">▲</span>
+    </div>
+    <div id="dm-body">
+
+      <!-- Sans avatar -->
+      <div id="dm-no-avatar" style="display:none;">
+        <p>Créez votre avatar pour voir les vêtements sur votre morphologie.</p>
+        <a href="/avatar.html">Créer mon avatar →</a>
+      </div>
+
+      <!-- Avec avatar -->
+      <div id="dm-with-avatar" style="display:none;">
+        <div id="dm-mannequin-wrap">
+          <iframe id="dm-iframe" title="Mon mannequin" allow="autoplay; fullscreen"></iframe>
+          <div id="dm-loader">
+            <div class="dm-spin"></div>
+            <p>Chargement<br/>de votre avatar…</p>
+          </div>
+          <div id="dm-garment-overlay">
+            <img id="dm-garment-img" src="" alt="Vêtement essayé"/>
+          </div>
+        </div>
+        <div id="dm-info">
+          <div id="dm-default-msg">Cliquez "Essayer" sur un vêtement</div>
+          <div id="dm-product-info" style="display:none;">
+            <div class="dm-product-name" id="dm-product-name"></div>
+            <div class="dm-size-row">
+              <span class="dm-size-lbl">Votre taille</span>
+              <span class="dm-size-val" id="dm-size-val">—</span>
+            </div>
+            <div class="dm-meas" id="dm-meas"></div>
+            <button class="dm-btn-reset" onclick="dmReset()">↩ Retirer le vêtement</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    const avatar = JSON.parse(localStorage.getItem('dressim_avatar') || 'null');
+    const widget = document.getElementById('dm-widget');
+
+    if (!avatar) {
+      document.getElementById('dm-no-avatar').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('dm-with-avatar').style.display = 'block';
+
+    // Charge le mannequin
+    const client = new Sketchfab(document.getElementById('dm-iframe'));
+    client.init(avatar.modelId, {
+      success: function(api) {
+        api.start();
+        api.addEventListener('viewerready', function() {
+          const loader = document.getElementById('dm-loader');
+          loader.style.opacity = '0';
+          setTimeout(() => loader.style.display = 'none', 600);
+        });
+      },
+      autostart: 1,
+      autospin: 0.25,
+      ui_theme: 'dark',
+      ui_infos: 0,
+      ui_controls: 0,
+      ui_watermark: 0,
+    });
+
+    // Toggle collapse
+    window.dmToggle = function() {
+      widget.classList.toggle('collapsed');
+    };
+
+    // Essayer un vêtement — appelé par les boutons produits
+    window.dmTryOn = function(productName, productImg, size) {
+      // Affiche overlay garment
+      document.getElementById('dm-garment-img').src = productImg;
+      document.getElementById('dm-garment-overlay').classList.add('active');
+
+      // Infos produit
+      document.getElementById('dm-default-msg').style.display = 'none';
+      document.getElementById('dm-product-info').style.display = 'block';
+      document.getElementById('dm-product-name').textContent = productName;
+      document.getElementById('dm-size-val').textContent = size || avatar.size;
+
+      const m = avatar.measures;
+      document.getElementById('dm-meas').innerHTML =
+        `<span class="dm-meas-chip">👙 ${m.bust} cm</span>
+         <span class="dm-meas-chip">⌛ ${m.waist} cm</span>
+         <span class="dm-meas-chip">🍑 ${m.hips} cm</span>`;
+
+      // Ouvre le widget si collapsed
+      widget.classList.remove('collapsed');
+    };
+
+    window.dmReset = function() {
+      document.getElementById('dm-garment-overlay').classList.remove('active');
+      document.getElementById('dm-garment-img').src = '';
+      document.getElementById('dm-product-info').style.display = 'none';
+      document.getElementById('dm-default-msg').style.display = 'block';
+    };
+
+  })();
   </script>
 
 </body>
