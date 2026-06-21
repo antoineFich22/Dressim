@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Élara Studio — Robe midi Madeleine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #FAFAF8;
+      --fg: #1A1A1A;
+      --muted: #6B6B6B;
+      --border: #E5E5E0;
+      --accent: #2C2C2C;
+      --price-color: #1A1A1A;
+      --btn-bg: #1A1A1A;
+      --btn-fg: #FFFFFF;
+      --dressim-purple: #7C3AED;
+      --dressim-purple-light: #EDE9FE;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+    }
+
+    /* ── Header boutique ── */
+    .store-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .store-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .store-nav {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .store-nav a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .store-nav a:hover { color: var(--fg); }
+    .store-header__right {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--fg);
+      font-size: 1.1rem;
+      padding: 4px;
+    }
+
+    /* ── Breadcrumb ── */
+    .breadcrumb {
+      padding: 14px 48px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb span { margin: 0 6px; }
+
+    /* ── Page produit ── */
+    .product-page {
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      gap: 0;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 48px 80px;
+    }
+
+    /* ── Galerie images ── */
+    .product-gallery {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 12px;
+      padding-right: 48px;
+    }
+    .thumb-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .thumb {
+      width: 72px;
+      height: 90px;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .thumb.active { border-color: var(--fg); }
+    .thumb-img {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+    /* Couleurs des visuels produit simulés */
+    .thumb:nth-child(1) .thumb-img { background: #F3EDE8; }
+    .thumb:nth-child(2) .thumb-img { background: #E8EEF3; }
+    .thumb:nth-child(3) .thumb-img { background: #F0ECF8; }
+
+    .main-image {
+      border-radius: 12px;
+      background: #F3EDE8;
+      aspect-ratio: 3/4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .main-image__emoji { font-size: 7rem; }
+    .main-image__label {
+      margin-top: 16px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+    .badge-new {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      background: var(--fg);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ── Infos produit ── */
+    .product-info {
+      padding-top: 8px;
+    }
+    .product-brand {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .product-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+    .product-ref {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .product-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .product-price-sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    /* Rating */
+    .product-rating {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .stars { color: #F59E0B; font-size: 0.9rem; }
+    .rating-count { font-size: 0.8rem; color: var(--muted); }
+    .rating-sep { color: var(--border); }
+
+    /* Séparateur */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+    /* Couleurs */
+    .section-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      color: var(--muted);
+    }
+    .color-options {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .color-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .color-dot.active { border-color: var(--fg); outline: 2px solid var(--bg); outline-offset: 2px; }
+
+    /* Tailles */
+    .size-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .size-guide { font-size: 0.78rem; color: var(--muted); text-decoration: underline; cursor: pointer; }
+    .size-options {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .size-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .size-btn:hover { border-color: var(--fg); }
+    .size-btn.active { background: var(--fg); color: #fff; border-color: var(--fg); }
+    .size-btn.out { color: var(--border); text-decoration: line-through; cursor: default; }
+
+    /* ── Widget Dressim ── */
+    .dressim-banner {
+      background: var(--dressim-purple-light);
+      border: 1.5px solid #C4B5FD;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .dressim-banner:hover {
+      background: #DDD6FE;
+      border-color: var(--dressim-purple);
+    }
+    .dressim-banner__left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .dressim-banner__icon {
+      width: 36px;
+      height: 36px;
+      background: var(--dressim-purple);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .dressim-banner__text strong {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #4C1D95;
+    }
+    .dressim-banner__text span {
+      font-size: 0.78rem;
+      color: #6D28D9;
+    }
+    .dressim-banner__cta {
+      background: var(--dressim-purple);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .dressim-banner__cta:hover { background: #6D28D9; }
+
+    /* CTA buttons */
+    .btn-add-cart {
+      width: 100%;
+      background: var(--btn-bg);
+      color: var(--btn-fg);
+      border: none;
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 10px;
+    }
+    .btn-add-cart:hover { background: #333; }
+
+    .btn-wishlist {
+      width: 100%;
+      background: transparent;
+      color: var(--fg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      margin-bottom: 24px;
+    }
+    .btn-wishlist:hover { border-color: var(--fg); }
+
+    /* Livraison */
+    .delivery-info {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .delivery-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .delivery-row .icon { font-size: 1rem; }
+
+    /* Description */
+    .product-description {
+      font-size: 0.875rem;
+      line-height: 1.7;
+      color: #444;
+    }
+
+    /* ── Overlay Dressim ── */
+    .dressim-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .dressim-overlay.visible {
+      pointer-events: all;
+      opacity: 1;
+    }
+    .dressim-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      cursor: pointer;
+    }
+    .dressim-panel {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 92vh;
+      background: #080810;
+      border-radius: 20px 20px 0 0;
+      overflow: hidden;
+      transform: translateY(100%);
+      transition: transform 0.45s cubic-bezier(0.32,0.72,0,1);
+      display: flex;
+      flex-direction: column;
+    }
+    .dressim-overlay.visible .dressim-panel {
+      transform: translateY(0);
+    }
+
+    .dressim-panel__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      flex-shrink: 0;
+    }
+    .dressim-panel__logo {
+      font-family: 'Playfair Display', serif;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dressim-panel__logo-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--dressim-purple);
+      border-radius: 50%;
+    }
+    .dressim-panel__context {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+    }
+    .dressim-panel__close {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #fff;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .dressim-panel__close:hover { background: rgba(255,255,255,0.2); }
+
+    .dressim-panel__iframe-wrap {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    .dressim-panel__iframe-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* ── Badge "Taille recommandée" dans la page produit ── */
+    .size-recommendation {
+      background: #F0FDF4;
+      border: 1.5px solid #86EFAC;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+    .size-recommendation.visible { display: flex; }
+    .size-recommendation__icon { font-size: 1.2rem; }
+    .size-recommendation__text {
+      font-size: 0.82rem;
+      color: #166534;
+    }
+    .size-recommendation__text strong { font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       HEADER BOUTIQUE
+  ══════════════════════════════════════ -->
+  <header class="store-header">
+    <div class="store-logo">Élara Studio</div>
+    <nav>
+      <ul class="store-nav">
+        <li><a href="#">Nouveautés</a></li>
+        <li><a href="#">Robes</a></li>
+        <li><a href="#">Hauts</a></li>
+        <li><a href="#">Pantalons</a></li>
+        <li><a href="#">Accessoires</a></li>
+      </ul>
+    </nav>
+    <div class="store-header__right">
+      <button class="icon-btn">🔍</button>
+      <button class="icon-btn">🤍</button>
+      <button class="icon-btn">🛒</button>
+    </div>
+  </header>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="#">Accueil</a><span>/</span>
+    <a href="#">Robes</a><span>/</span>
+    Robe midi Madeleine
+  </div>
+
+  <!-- ══════════════════════════════════════
+       PAGE PRODUIT
+  ══════════════════════════════════════ -->
+  <main class="product-page">
+
+    <!-- Galerie -->
+    <div class="product-gallery">
+      <div class="thumb-list">
+        <div class="thumb active" onclick="switchThumb(this, '#F3EDE8', '👗')">
+          <div class="thumb-img">👗</div>
+        </div>
+        <div class="thumb" onclick="switchThumb(this, '#E8EEF3', '👗')">
+          <div class="thumb-img">👗</div>
+        </div>
+        <div class="thumb" onclick="switchThumb(this, '#F0ECF8', '👗')">
+          <div class="thumb-img">👗</div>
+        </div>
+      </div>
+      <div class="main-image" id="mainImage">
+        <div class="badge-new">Nouveau</div>
+        <div class="main-image__emoji">👗</div>
+        <div class="main-image__label">Robe midi Madeleine — Taupe</div>
+      </div>
+    </div>
+
+    <!-- Infos produit -->
+    <div class="product-info">
+
+      <div class="product-brand">Élara Studio</div>
+      <h1 class="product-name">Robe midi Madeleine</h1>
+      <div class="product-ref">Réf. EL-2024-RMM-01 · 4 coloris</div>
+
+      <div class="product-rating">
+        <span class="stars">★★★★★</span>
+        <span style="font-size:0.85rem;font-weight:600;">4.8</span>
+        <span class="rating-sep">·</span>
+        <span class="rating-count">127 avis</span>
+      </div>
+
+      <div class="product-price">89,00 €</div>
+      <div class="product-price-sub">Livraison gratuite dès 60 € · Retours offerts 30 jours</div>
+
+      <hr class="divider" />
+
+      <!-- Couleurs -->
+      <div class="section-label">Couleur — <strong style="color:var(--fg);text-transform:none;letter-spacing:0">Taupe</strong></div>
+      <div class="color-options">
+        <div class="color-dot active" style="background:#C4AFA0;" title="Taupe"></div>
+        <div class="color-dot" style="background:#1E3A5F;" title="Marine"></div>
+        <div class="color-dot" style="background:#E879F9;" title="Lilas"></div>
+        <div class="color-dot" style="background:#1A1A1A;" title="Noir"></div>
+      </div>
+
+      <!-- Tailles -->
+      <div class="size-row">
+        <div class="section-label" style="margin:0">Taille</div>
+        <span class="size-guide">Guide des tailles</span>
+      </div>
+      <div class="size-options">
+        <button class="size-btn">XS</button>
+        <button class="size-btn active" id="selectedSize">S</button>
+        <button class="size-btn">M</button>
+        <button class="size-btn">L</button>
+        <button class="size-btn out">XL</button>
+      </div>
+
+      <!-- Badge recommandation Dressim (affiché après essayage) -->
+      <div class="size-recommendation" id="sizeRecommendation">
+        <div class="size-recommendation__icon">✅</div>
+        <div class="size-recommendation__text">
+          Dressim recommande la taille <strong id="recommendedSizeText">—</strong> pour votre profil.
+        </div>
+      </div>
+
+      <!-- ⭐ Widget Dressim ── POINT D'INTÉGRATION -->
+      <div class="dressim-banner" id="dressimTrigger">
+        <div class="dressim-banner__left">
+          <div class="dressim-banner__icon">🪞</div>
+          <div class="dressim-banner__text">
+            <strong>Essayez sur votre avatar 3D</strong>
+            <span>Créez votre profil en 30 sec, obtenez votre taille exacte</span>
+          </div>
+        </div>
+        <button class="dressim-banner__cta">Essayer →</button>
+      </div>
+
+      <!-- CTA panier -->
+      <button class="btn-add-cart" id="btnAddCart">Ajouter au panier — 89,00 €</button>
+      <button class="btn-wishlist">♡ Ajouter à ma liste</button>
+
+      <!-- Livraison -->
+      <div class="delivery-info">
+        <div class="delivery-row"><span class="icon">🚚</span> Livraison gratuite · Estimée 2-4 jours</div>
+        <div class="delivery-row"><span class="icon">↩️</span> Retours gratuits sous 30 jours</div>
+        <div class="delivery-row"><span class="icon">🔒</span> Paiement 100% sécurisé</div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Description -->
+      <p class="product-description">
+        La robe midi Madeleine allie élégance intemporelle et confort du quotidien.
+        Taillée dans une viscose douce au toucher, sa coupe ajustée suit les courbes
+        naturellement sans contraindre. Le col rond discret et les manches 3/4 en font
+        une pièce polyvalente, aussi bien en journée qu'en soirée.
+        <br/><br/>
+        Composition : 95% viscose, 5% élasthanne. Entretien : lavage délicat 30°.
+      </p>
+
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════
+       OVERLAY DRESSIM (widget flottant)
+  ══════════════════════════════════════ -->
+  <div class="dressim-overlay" id="dressimOverlay">
+    <div class="dressim-backdrop" id="dressimBackdrop"></div>
+    <div class="dressim-panel">
+      <div class="dressim-panel__header">
+        <div class="dressim-panel__logo">
+          <div class="dressim-panel__logo-dot"></div>
+          Dressim
+        </div>
+        <div class="dressim-panel__context">Robe midi Madeleine · Élara Studio</div>
+        <button class="dressim-panel__close" id="dressimClose">✕</button>
+      </div>
+      <div class="dressim-panel__iframe-wrap">
+        <iframe id="dressimFrame" src="about:blank" title="Dressim — Essayage virtuel"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Galerie : changement de photo ──
+    function switchThumb(thumb, bg, emoji) {
+      document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+      thumb.classList.add('active');
+      document.getElementById('mainImage').style.background = bg;
+    }
+
+    // ── Tailles : sélection ──
+    document.querySelectorAll('.size-btn:not(.out)').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // ── Couleurs : sélection ──
+    document.querySelectorAll('.color-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+
+    // ── Widget Dressim : ouverture ──
+    const overlay   = document.getElementById('dressimOverlay');
+    const frame     = document.getElementById('dressimFrame');
+    let widgetLoaded = false;
+
+    function openDressim() {
+      overlay.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+
+      // Charger l'iframe au premier clic seulement
+      if (!widgetLoaded) {
+        frame.src = 'landing.html';
+        widgetLoaded = true;
+      }
+    }
+
+    function closeDressim() {
+      overlay.classList.remove('visible');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('dressimTrigger').addEventListener('click', openDressim);
+    document.getElementById('dressimClose').addEventListener('click', closeDressim);
+    document.getElementById('dressimBackdrop').addEventListener('click', closeDressim);
+
+    // ── Communication iframe → page boutique ──
+    // Quand Dressim a calculé une recommandation, il peut envoyer un message
+    // à la page parente pour mettre en avant la bonne taille.
+    window.addEventListener('message', (e) => {
+      const trustedOrigin = window.location.origin;
+      if (e.origin !== trustedOrigin && e.origin !== 'http://localhost:3000') return;
+      if (e.data && e.data.type === 'dressim:recommendation') {
+        const { taille } = e.data;
+        // Mettre en surbrillance la taille recommandée
+        document.querySelectorAll('.size-btn').forEach(btn => {
+          btn.classList.remove('active');
+          if (btn.textContent.trim() === taille) btn.classList.add('active');
+        });
+        // Afficher le badge
+        document.getElementById('recommendedSizeText').textContent = taille;
+        document.getElementById('sizeRecommendation').classList.add('visible');
+        // Fermer l'overlay
+        closeDressim();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dressim — Essayage virtuel IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style-landing.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       ÉCRAN 1 — ACCUEIL
+  ══════════════════════════════════════ -->
+  <section class="screen" id="screen-welcome">
+    <div class="welcome__bg">
+      <div class="orb orb--1"></div>
+      <div class="orb orb--2"></div>
+      <div class="orb orb--3"></div>
+    </div>
+    <div class="welcome__content">
+      <div class="logo">Dressim</div>
+      <h1 class="welcome__title">
+        Essayez avant<br/>d'acheter.
+      </h1>
+      <p class="welcome__sub">
+        Créez votre avatar en 30 secondes.<br/>
+        Essayez tous les vêtements de la boutique sur vous.
+      </p>
+      <button class="btn-start" id="btnStart">
+        <span>Commencer</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       ÉCRAN 2 — FORMULAIRE
+  ══════════════════════════════════════ -->
+  <section class="screen hidden" id="screen-form">
+    <div class="form-screen">
+      <div class="form-screen__left">
+
+        <!-- ÉTAPE A : infos de base -->
+        <div id="stepA">
+          <div class="step-indicator">
+            <span class="step-dot active"></span>
+            <span class="step-dot"></span>
+            <span class="step-dot"></span>
+          </div>
+          <h2 class="form__title">Créons<br/>votre avatar</h2>
+          <p class="form__sub">Pas besoin de mètre ruban — juste deux informations que tout le monde connaît.</p>
+
+          <form id="profileForm">
+            <div class="field">
+              <label>Votre prénom</label>
+              <input type="text" id="inputPrenom" placeholder="Ex: Sophie" autocomplete="off" />
+            </div>
+
+            <div class="field">
+              <label>Genre</label>
+              <div class="toggle-group">
+                <button type="button" class="toggle-btn active" data-value="femme">Femme</button>
+                <button type="button" class="toggle-btn" data-value="homme">Homme</button>
+              </div>
+            </div>
+
+            <div class="fields-row">
+              <div class="field">
+                <label>Taille <span class="unit">cm</span></label>
+                <input type="number" id="inputTaille" placeholder="168" min="140" max="210" />
+              </div>
+              <div class="field">
+                <label>Poids <span class="unit">kg</span></label>
+                <input type="number" id="inputPoids" placeholder="62" min="40" max="150" />
+              </div>
+            </div>
+
+            <button type="submit" class="btn-generate">
+              <span>Continuer →</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- ÉTAPE B : morphologie -->
+        <div id="stepB" class="hidden">
+          <div class="step-indicator">
+            <span class="step-dot done"></span>
+            <span class="step-dot active"></span>
+            <span class="step-dot"></span>
+          </div>
+          <h2 class="form__title">Votre<br/>morphologie</h2>
+          <p class="form__sub">Choisissez la silhouette qui vous ressemble le plus.</p>
+
+          <!-- Arbre de questions -->
+          <div class="questions-flow" id="questionsFlow">
+
+            <div class="question-block active" id="q1">
+              <p class="question-text">Vos hanches sont-elles plus larges que vos épaules ?</p>
+              <div class="question-btns">
+                <button class="q-btn" data-q="q1" data-val="oui">Oui</button>
+                <button class="q-btn" data-q="q1" data-val="non">Non</button>
+              </div>
+            </div>
+
+            <div class="question-block" id="q2">
+              <p class="question-text">Avez-vous une taille marquée (cambrure visible) ?</p>
+              <div class="question-btns">
+                <button class="q-btn" data-q="q2" data-val="oui">Oui</button>
+                <button class="q-btn" data-q="q2" data-val="non">Non</button>
+              </div>
+            </div>
+
+            <div class="question-block" id="q3">
+              <p class="question-text">Votre ventre est-il la partie la plus large de votre corps ?</p>
+              <div class="question-btns">
+                <button class="q-btn" data-q="q3" data-val="oui">Oui</button>
+                <button class="q-btn" data-q="q3" data-val="non">Non</button>
+              </div>
+            </div>
+
+            <!-- Résultat morphologie -->
+            <div class="morpho-result hidden" id="morphoResult">
+              <div class="morpho-result__icon" id="morphoIcon"></div>
+              <div class="morpho-result__text">
+                <span class="morpho-result__label" id="morphoLabel"></span>
+                <span class="morpho-result__desc" id="morphoDesc"></span>
+              </div>
+              <button class="morpho-result__change" id="morphoChange">Modifier</button>
+            </div>
+
+          </div>
+
+          <button class="btn-generate hidden" id="btnGenerate">
+            <span>Générer mon avatar</span>
+            <div class="btn-loader hidden"></div>
+          </button>
+        </div>
+
+      </div>
+
+      <div class="form-screen__right">
+        <div class="preview-hint">
+          <div class="preview-hint__avatar">
+            <div class="silhouette"></div>
+          </div>
+          <p>Votre avatar apparaîtra ici</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       ÉCRAN 3 — AVATAR + VÊTEMENTS
+  ══════════════════════════════════════ -->
+  <section class="screen hidden" id="screen-avatar">
+    <div class="avatar-screen">
+
+      <!-- Sidebar vêtements -->
+      <aside class="clothes-panel" id="clothesPanel">
+        <div class="clothes-panel__header">
+          <span class="welcome-user" id="welcomeUser">Bonjour !</span>
+          <p class="clothes-panel__sub">Choisissez un vêtement à essayer</p>
+        </div>
+        <div class="clothes-list" id="clothesList">
+          <!-- Injecté par JS -->
+        </div>
+        <div class="clothes-panel__footer">
+          <button class="btn-recap" id="btnRecap">
+            Voir mon récapitulatif →
+          </button>
+        </div>
+      </aside>
+
+      <!-- Zone 3D -->
+      <div class="avatar-viewport" id="avatarViewport">
+        <canvas id="avatarCanvas"></canvas>
+        <div class="viewport-overlay">
+          <div class="size-badge" id="sizeBadge">
+            <span class="size-badge__label">Taille recommandée</span>
+            <span class="size-badge__value" id="sizeValue">—</span>
+          </div>
+        </div>
+        <div class="viewport-hint">Faites glisser pour tourner l'avatar</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       ÉCRAN 4 — RÉCAPITULATIF
+  ══════════════════════════════════════ -->
+  <section class="screen hidden" id="screen-recap">
+    <div class="recap-screen">
+
+      <div class="recap-header">
+        <button class="recap-back" id="recapBack">← Retour</button>
+        <h2 class="recap-title" id="recapTitle">Votre récapitulatif</h2>
+        <p class="recap-sub">Toutes vos tailles recommandées en un coup d'œil</p>
+      </div>
+
+      <!-- Profil estimé -->
+      <div class="recap-profile" id="recapProfile">
+        <!-- Injecté par JS -->
+      </div>
+
+      <!-- Liste des vêtements -->
+      <div class="recap-list" id="recapList">
+        <!-- Injecté par JS -->
+      </div>
+
+      <!-- CTA global -->
+      <div class="recap-cta">
+        <!-- Bouton retour boutique (visible seulement si ouvert en iframe) -->
+        <button class="btn-apply-boutique hidden" id="btnApplyBoutique">
+          <span>✓ Appliquer ma taille à la boutique</span>
+        </button>
+        <button class="btn-cart-all" id="btnCartAll">
+          <span>Ajouter toute la sélection au panier</span>
+          <span class="cart-icon">🛒</span>
+        </button>
+        <p class="recap-legal">Livraison gratuite · Retours offerts 30 jours</p>
+      </div>
+
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

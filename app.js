@@ -1,0 +1,187 @@
+require('dotenv').config();
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const helmet = require('helmet');
+const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+
+const app = express();
+
+const MOCK_MODE = process.env.MOCK_MODE === 'true' || !process.env.FASHN_API_KEY;
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(',');
+const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp'];
+const PREDICTION_TTL_MS = 15 * 60 * 1000; // 15 minutes
+
+// ── Security middleware ───────────────────────────────────────────────────────
+
+app.use(helmet());
+app.use(cors({ origin: ALLOWED_ORIGINS, methods: ['GET', 'POST'] }));
+
+const tryonLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: { error: 'Trop de requêtes, réessayez dans une minute.' },
+});
+
+// ── Multer ────────────────────────────────────────────────────────────────────
+
+const fileFilter = (_req, file, cb) => {
+  if (!ALLOWED_MIMES.includes(file.mimetype)) {
+    return cb(new Error(`Type de fichier non supporté: ${file.mimetype}`), false);
+  }
+  cb(null, true);
+};
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter,
+});
+
+// ── Static & body ─────────────────────────────────────────────────────────────
+
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
+
+// ── In-memory store with TTL ──────────────────────────────────────────────────
+
+const predictions = new Map();
+
+function setPrediction(id, data) {
+  predictions.set(id, data);
+  setTimeout(() => predictions.delete(id), PREDICTION_TTL_MS);
+}
+
+// ── Mock helpers ──────────────────────────────────────────────────────────────
+
+const MOCK_RESULTS = [
+  'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80',
+  'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&q=80',
+  'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80',
+  'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80',
+];
+
+function mockPrediction(id) {
+  setPrediction(id, { id, status: 'starting', output: null, error: null });
+
+  setTimeout(() => {
+    const p = predictions.get(id);
+    if (p) p.status = 'processing';
+  }, 1200);
+
+  setTimeout(() => {
+    const p = predictions.get(id);
+    if (p) {
+      p.status = 'completed';
+      p.output = [MOCK_RESULTS[Math.floor(Math.random() * MOCK_RESULTS.length)]];
+    }
+  }, 3500);
+}
+
+// ── Fetch with timeout ────────────────────────────────────────────────────────
+
+async function fetchWithTimeout(url, options, timeoutMs = 30000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// ── Routes ────────────────────────────────────────────────────────────────────
+
+app.post(
+  '/api/tryon',
+  tryonLimiter,
+  upload.fields([
+    { name: 'model_image', maxCount: 1 },
+    { name: 'garment_image', maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      const modelFile = req.files?.model_image?.[0];
+      const garmentFile = req.files?.garment_image?.[0];
+
+      if (!modelFile || !garmentFile) {
+        return res.status(400).json({ error: 'Both model_image and garment_image are required.' });
+      }
+
+      if (MOCK_MODE) {
+        const id = `mock_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        mockPrediction(id);
+        return res.json({ id });
+      }
+
+      const toBase64 = (buf, mime) => `data:${mime};base64,${buf.toString('base64')}`;
+
+      const payload = {
+        model_name: 'tryon-max',
+        inputs: {
+          model_image: toBase64(modelFile.buffer, modelFile.mimetype),
+          product_image: toBase64(garmentFile.buffer, garmentFile.mimetype),
+        },
+      };
+
+      const runRes = await fetchWithTimeout('https://api.fashn.ai/v1/run', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.FASHN_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!runRes.ok) {
+        const err = await runRes.json().catch(() => ({}));
+        return res.status(runRes.status).json({ error: err.message || 'Fashn.ai error' });
+      }
+
+      const { id } = await runRes.json();
+      setPrediction(id, { id, status: 'starting', output: null, error: null });
+      return res.json({ id });
+
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        return res.status(504).json({ error: 'Fashn.ai request timed out' });
+      }
+      console.error(err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+);
+
+app.get('/api/status/:id', async (req, res) => {
+  const { id } = req.params;
+
+  if (!/^[a-zA-Z0-9_-]{1,128}$/.test(id)) {
+    return res.status(400).json({ error: 'Invalid prediction ID' });
+  }
+
+  if (MOCK_MODE || id.startsWith('mock_')) {
+    const p = predictions.get(id);
+    if (!p) return res.status(404).json({ error: 'Prediction not found' });
+    return res.json(p);
+  }
+
+  try {
+    const statusRes = await fetchWithTimeout(`https://api.fashn.ai/v1/status/${id}`, {
+      headers: { Authorization: `Bearer ${process.env.FASHN_API_KEY}` },
+    });
+
+    if (!statusRes.ok) return res.status(statusRes.status).json({ error: 'Status check failed' });
+
+    const data = await statusRes.json();
+    setPrediction(id, data);
+    return res.json(data);
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      return res.status(504).json({ error: 'Status check timed out' });
+    }
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+module.exports = { app, predictions, MOCK_MODE, mockPrediction, MOCK_RESULTS };

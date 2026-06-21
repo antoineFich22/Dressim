@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dressim — Essayage virtuel 3D pour votre boutique</title>
+  <meta name="description" content="Dressim intègre un essayage virtuel 3D dans votre boutique. Vos clients créent leur avatar à partir de leurs mesures et visualisent vos articles sur leur propre corps." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #2563EB;
+      --blue-h:     #1d4ed8;
+      --blue-light: #EFF6FF;
+      --blue-mid:   #DBEAFE;
+      --navy:       #0f172a;
+      --slate:      #1e293b;
+      --muted:      #64748b;
+      --subtle:     #94a3b8;
+      --border:     #e2e8f0;
+      --bg:         #ffffff;
+      --bg-soft:    #F8FAFF;
+      --bg-gray:    #F1F5F9;
+      --green:      #16a34a;
+      --sh-sm: 0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+      --sh-md: 0 4px 16px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.05);
+      --sh-lg: 0 20px 40px rgba(0,0,0,.1),0 8px 16px rgba(0,0,0,.06);
+      --r-sm:8px; --r:12px; --r-lg:16px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg); color: var(--slate);
+      line-height: 1.6; -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; }
+
+    /* ── Utilities ── */
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 1.5rem; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: var(--blue-light); color: var(--blue);
+      font-size: .75rem; font-weight: 600; letter-spacing: .04em;
+      padding: .3rem .75rem; border-radius: 100px; margin-bottom: 1.25rem;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-family: 'Inter', sans-serif; font-weight: 600;
+      font-size: .875rem; cursor: pointer; text-decoration: none;
+      border: none; transition: all .18s; white-space: nowrap;
+    }
+    .btn-blue {
+      background: var(--blue); color: #fff;
+      padding: .7rem 1.4rem; border-radius: var(--r-sm);
+      box-shadow: 0 1px 2px rgba(37,99,235,.3);
+    }
+    .btn-blue:hover { background: var(--blue-h); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,.35); }
+    .btn-outline {
+      background: transparent; color: var(--slate);
+      border: 1.5px solid var(--border); padding: .7rem 1.4rem; border-radius: var(--r-sm);
+    }
+    .btn-outline:hover { border-color: var(--slate); }
+    .btn-xl { padding: 1rem 2rem; font-size: 1rem; }
+
+    /* ══════════════════════════════════════════
+       HEADER
+    ══════════════════════════════════════════ */
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,.92); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      transition: box-shadow .3s;
+    }
+    .site-header.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,.06); }
+    .header-inner {
+      display: flex; align-items: center; gap: 2rem;
+      padding: 1rem 1.5rem; max-width: 1120px; margin: 0 auto;
+    }
+    .site-logo { font-size: 1.25rem; font-weight: 800; color: var(--navy); text-decoration: none; letter-spacing: -.02em; flex-shrink: 0; }
+    .site-logo em { color: var(--blue); font-style: normal; }
+    .header-nav { display: flex; align-items: center; gap: 1.75rem; flex: 1; list-style: none; margin-left: 1.5rem; }
+    .header-nav a { font-size: .875rem; font-weight: 500; color: var(--muted); text-decoration: none; transition: color .15s; }
+    .header-nav a:hover { color: var(--slate); }
+    .header-actions { display: flex; align-items: center; gap: .75rem; margin-left: auto; flex-shrink: 0; }
+    .btn-connexion { font-size: .875rem; font-weight: 500; color: var(--muted); text-decoration: none; }
+    .btn-connexion:hover { color: var(--slate); }
+    .sep { width:1px; height:1.2rem; background:var(--border); }
+
+    /* ══════════════════════════════════════════
+       HERO — animated orbs background
+    ══════════════════════════════════════════ */
+    .hero {
+      padding: 5rem 0 4rem;
+      background: linear-gradient(180deg, #fff 0%, var(--bg-soft) 100%);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; border-radius: 50%; filter: blur(90px); opacity: .1;
+      width: 500px; height: 500px; background: var(--blue);
+      top: -150px; left: 15%;
+      animation: orb 9s ease-in-out infinite;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; border-radius: 50%; filter: blur(100px); opacity: .08;
+      width: 380px; height: 380px; background: #8b5cf6;
+      bottom: -80px; right: 10%;
+      animation: orb 11s ease-in-out infinite reverse;
+    }
+    @keyframes orb {
+      0%,100% { transform: translate(0,0) scale(1); }
+      33%      { transform: translate(40px,-30px) scale(1.05); }
+      66%      { transform: translate(-20px,25px) scale(0.95); }
+    }
+    .hero-inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: center;
+      position: relative; z-index: 1;
+    }
+    .hero-title {
+      font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 800;
+      color: var(--navy); line-height: 1.15; letter-spacing: -.03em; margin-bottom: 1.25rem;
+    }
+    .hero-sub { font-size: 1.05rem; color: var(--muted); line-height: 1.75; margin-bottom: 2rem; max-width: 44ch; }
+    .hero-actions { display: flex; gap: .75rem; flex-wrap: wrap; margin-bottom: 1.75rem; }
+    .trust-signals { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .trust-signal { display: flex; align-items: center; gap: .4rem; font-size: .8rem; color: var(--muted); }
+    .trust-signal .check { color: var(--green); font-size: .75rem; }
+
+    /* ── Browser mockup + float ── */
+    .browser-mock {
+      background: #fff; border-radius: var(--r-lg);
+      box-shadow: var(--sh-lg), 0 0 0 1px rgba(0,0,0,.06);
+      overflow: hidden;
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0) rotate(-0.3deg); }
+      50%      { transform: translateY(-10px) rotate(0.3deg); }
+    }
+    .browser-chrome {
+      background: #f1f3f5; border-bottom: 1px solid #e4e7eb;
+      padding: .6rem 1rem; display: flex; align-items: center; gap: .75rem;
+    }
+    .browser-dots { display: flex; gap: .35rem; }
+    .browser-dots span { width:10px; height:10px; border-radius:50%; }
+    .bd-r{background:#ff5f57;} .bd-y{background:#febc2e;} .bd-g{background:#28c840;}
+    .browser-url {
+      flex:1; background:#fff; border:1px solid #e4e7eb; border-radius:6px;
+      padding:.25rem .75rem; font-size:.72rem; color:#6b7280; font-family:monospace;
+    }
+    .browser-body { padding: 1.25rem; }
+    .mock-breadcrumb { font-size:.65rem; color:var(--subtle); margin-bottom:.6rem; }
+    .mock-title { font-size:1.1rem; font-weight:700; color:var(--navy); margin-bottom:1rem; }
+    .mock-product { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .mock-coat-wrap {
+      background:var(--bg-gray); border-radius:var(--r-sm);
+      display:flex; align-items:center; justify-content:center; min-height:160px; padding:1rem;
+    }
+    .mock-try-panel {
+      background:#fff; border:1px solid var(--border); border-radius:var(--r);
+      padding:1rem; display:flex; flex-direction:column; align-items:center; gap:.6rem;
+      box-shadow:var(--sh-sm);
+    }
+    .mock-try-label { font-size:.7rem; font-weight:600; color:var(--slate); }
+    .mock-try-btn {
+      background:var(--blue); color:#fff; border:none; border-radius:6px;
+      padding:.4rem .7rem; font-size:.65rem; font-weight:600; cursor:pointer; width:100%;
+    }
+
+    /* ── Proof bar ── */
+    .proof-bar {
+      background:var(--bg-soft); border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+      padding:2.5rem 0;
+    }
+    .proof-label { font-size:.75rem; font-weight:600; color:var(--subtle); letter-spacing:.06em; text-transform:uppercase; text-align:center; margin-bottom:1.5rem; }
+    .proof-logos { display:flex; align-items:center; justify-content:center; gap:3rem; flex-wrap:wrap; }
+    .proof-logo-item { font-size:.95rem; font-weight:700; color:#b0bac8; letter-spacing:-.01em; }
+
+    /* ══════════════════════════════════════════
+       SECTIONS
+    ══════════════════════════════════════════ */
+    section { padding: 6rem 0; }
+    .section-alt { background: var(--bg-soft); }
+    .s-title {
+      font-size: clamp(1.6rem,2.5vw,2.25rem); font-weight:800;
+      color:var(--navy); letter-spacing:-.03em; line-height:1.2; margin-bottom:1rem;
+    }
+    .s-sub { font-size:1rem; color:var(--muted); line-height:1.75; max-width:52ch; margin-bottom:1.5rem; }
+    .s-link { font-size:.9rem; font-weight:600; color:var(--blue); text-decoration:none; display:inline-flex; align-items:center; gap:.3rem; }
+    .s-link:hover { text-decoration:underline; }
+    .s-center { text-align:center; }
+    .s-center .s-sub { margin:0 auto 2.5rem; }
+
+    /* ── Steps ── */
+    .steps-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; margin-top:3.5rem; }
+    .step-card {
+      background:#fff; border:1px solid var(--border); border-radius:var(--r-lg);
+      padding:2rem; box-shadow:var(--sh-sm);
+      transition:transform .2s ease, box-shadow .2s ease;
+      transform-style:preserve-3d; will-change:transform;
+    }
+    .step-num {
+      width:36px; height:36px; border-radius:50%; background:var(--blue); color:#fff;
+      font-size:.8rem; font-weight:700; display:flex; align-items:center; justify-content:center;
+      margin-bottom:.75rem;
+    }
+    .step-title { font-size:1rem; font-weight:700; color:var(--navy); margin-bottom:.5rem; }
+    .step-desc { font-size:.875rem; color:var(--muted); line-height:1.7; }
+
+    /* ── Feature split ── */
+    .split { display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center; }
+    .split.reverse { direction:rtl; }
+    .split.reverse > * { direction:ltr; }
+    .split-text { display:flex; flex-direction:column; gap:1rem; }
+    .split-list { list-style:none; display:flex; flex-direction:column; gap:.6rem; margin-top:.5rem; }
+    .split-list li { display:flex; align-items:baseline; gap:.6rem; font-size:.9rem; color:var(--muted); line-height:1.6; }
+    .split-list li::before { content:'✓'; color:var(--green); font-weight:700; flex-shrink:0; }
+
+    /* ── Avatar mock card ── */
+    .avatar-mock {
+      background:#fff; border:1px solid var(--border); border-radius:var(--r-lg);
+      box-shadow:var(--sh-md); padding:1.75rem;
+      display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; align-items:start;
+    }
+    .avatar-form { display:flex; flex-direction:column; gap:1rem; }
+    .avatar-form-title { font-size:.95rem; font-weight:700; color:var(--navy); }
+    .form-field { display:flex; flex-direction:column; gap:.3rem; }
+    .form-label { font-size:.72rem; font-weight:500; color:var(--muted); }
+    .form-input { background:var(--bg-gray); border:1px solid var(--border); border-radius:6px; padding:.5rem .75rem; font-size:.82rem; color:var(--slate); }
+    .form-slider-wrap { display:flex; flex-direction:column; gap:.5rem; }
+    .slider-label { font-size:.72rem; color:var(--muted); }
+    .slider-track { width:100%; height:4px; background:var(--bg-gray); border-radius:2px; position:relative; margin-top:.2rem; }
+    .slider-fill { height:100%; background:var(--blue); border-radius:2px; position:relative; }
+    .slider-fill::after { content:''; position:absolute; right:-6px; top:-4px; width:12px; height:12px; border-radius:50%; background:#fff; border:2px solid var(--blue); box-shadow:0 1px 4px rgba(37,99,235,.3); }
+    .form-btn { background:var(--blue); color:#fff; border:none; border-radius:8px; padding:.65rem 1rem; font-size:.82rem; font-weight:600; cursor:pointer; margin-top:.25rem; transition:background .2s; }
+    .form-btn:hover { background:var(--blue-h); }
+    .avatar-figure { display:flex; align-items:center; justify-content:center; min-height:240px; padding:1rem 0; }
+    .avatar-3d-canvas { cursor:grab; border-radius:8px; }
+    .avatar-3d-canvas:active { cursor:grabbing; }
+
+    /* ── Widget mockup ── */
+    .widget-mock { background:var(--bg-gray); border-radius:var(--r-lg); padding:1.5rem; box-shadow:var(--sh-md); border:1px solid var(--border); }
+    .widget-inner { background:#fff; border-radius:var(--r); box-shadow:var(--sh-sm); overflow:hidden; }
+    .widget-nav { background:#fff; border-bottom:1px solid var(--border); padding:.6rem 1rem; display:flex; align-items:center; justify-content:space-between; }
+    .widget-brand { font-size:.82rem; font-weight:700; color:var(--navy); }
+    .widget-nav-links { display:flex; gap:1rem; }
+    .widget-nav-links span { font-size:.72rem; color:var(--muted); }
+    .widget-body { padding:1.25rem; display:grid; grid-template-columns:1.2fr 1fr; gap:1.25rem; align-items:start; }
+    .widget-p-title { font-size:.95rem; font-weight:700; color:var(--navy); }
+    .widget-p-price { font-size:1.1rem; font-weight:600; color:var(--slate); margin:.3rem 0; }
+    .widget-p-img { background:var(--bg-gray); border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; min-height:110px; padding:1rem; margin:.5rem 0; }
+    .widget-add-btn { background:var(--blue); color:#fff; border:none; border-radius:8px; padding:.65rem; font-size:.82rem; font-weight:600; width:100%; cursor:pointer; text-align:center; }
+    .widget-sizes { display:flex; gap:.4rem; flex-wrap:wrap; margin:.5rem 0; }
+    .widget-size { border:1px solid var(--border); border-radius:6px; padding:.3rem .6rem; font-size:.72rem; font-weight:600; color:var(--muted); }
+    .widget-size.active { border-color:var(--blue); color:var(--blue); background:var(--blue-light); }
+    .widget-tryon { display:flex; flex-direction:column; gap:.6rem; }
+    .widget-tryon-label { font-size:.72rem; font-weight:600; color:var(--muted); text-align:center; }
+    .widget-thumbs { display:flex; gap:.35rem; }
+    .widget-thumb { width:36px; height:36px; border-radius:6px; border:2px solid var(--border); overflow:hidden; cursor:pointer; transition:border-color .15s; }
+    .widget-thumb.active { border-color:var(--blue); }
+    .widget-thumb img { width:100%; height:100%; object-fit:cover; object-position:top; }
+    .widget-avatar-wrap { background:var(--bg-gray); border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; padding:.5rem; min-height:110px; }
+
+    /* ── Stats ── */
+    .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; margin-top:3rem; }
+    .stat-card {
+      background:#fff; border:1px solid var(--border); border-radius:var(--r-lg);
+      padding:2.5rem; text-align:center; box-shadow:var(--sh-sm);
+      transition:transform .2s, box-shadow .2s;
+    }
+    .stat-card:hover { transform:translateY(-3px); box-shadow:var(--sh-md); }
+    .stat-num { font-size:3rem; font-weight:800; color:var(--blue); letter-spacing:-.04em; line-height:1; margin-bottom:.5rem; }
+    .stat-desc { font-size:.875rem; color:var(--muted); line-height:1.6; }
+
+    /* ── Pricing ── */
+    .pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:3rem; align-items:start; }
+    .price-card {
+      background:#fff; border:1.5px solid var(--border); border-radius:var(--r-lg);
+      padding:2rem; box-shadow:var(--sh-sm);
+      display:flex; flex-direction:column; gap:1.25rem;
+      transition:transform .2s, box-shadow .2s;
+    }
+    .price-card:hover { transform:translateY(-3px); box-shadow:var(--sh-md); }
+    .price-card.featured {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px var(--blue-mid), var(--sh-md);
+      animation: rainbow-border 4s ease-in-out infinite;
+    }
+    @keyframes rainbow-border {
+      0%,100% { border-color:#2563eb; box-shadow:0 0 0 3px #2563eb28, var(--sh-md); }
+      33%      { border-color:#8b5cf6; box-shadow:0 0 0 3px #8b5cf628, var(--sh-md); }
+      66%      { border-color:#06b6d4; box-shadow:0 0 0 3px #06b6d428, var(--sh-md); }
+    }
+    .price-tag { display:inline-block; font-size:.7rem; font-weight:700; background:var(--blue); color:#fff; padding:.2rem .6rem; border-radius:100px; margin-bottom:.25rem; }
+    .price-tier { font-size:1.1rem; font-weight:700; color:var(--navy); }
+    .price-amount { font-size:2.2rem; font-weight:800; color:var(--navy); letter-spacing:-.03em; line-height:1; }
+    .price-period { font-size:.8rem; color:var(--muted); font-weight:400; }
+    .price-desc { font-size:.85rem; color:var(--muted); line-height:1.65; }
+    .price-features { list-style:none; display:flex; flex-direction:column; gap:.55rem; }
+    .price-features li { display:flex; align-items:baseline; gap:.5rem; font-size:.85rem; color:var(--muted); }
+    .price-features li::before { content:'✓'; color:var(--green); font-weight:700; flex-shrink:0; }
+    .price-features li.dim::before { content:'—'; color:var(--border); }
+    .price-features li.dim { color:var(--subtle); }
+
+    /* ── Final CTA ── */
+    .cta-final {
+      background:linear-gradient(135deg,#1e3a8a 0%,#2563EB 60%,#3b82f6 100%);
+      padding:6rem 0; text-align:center; color:#fff; position:relative; overflow:hidden;
+    }
+    .cta-final::before {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse at 30% 50%, rgba(139,92,246,.3) 0%, transparent 60%),
+                 radial-gradient(ellipse at 70% 50%, rgba(6,182,212,.2) 0%, transparent 60%);
+      animation:orb 8s ease-in-out infinite;
+    }
+    .cta-final-inner { position:relative; z-index:1; }
+    .cta-final-title { font-size:clamp(1.8rem,3vw,2.5rem); font-weight:800; letter-spacing:-.03em; margin-bottom:1rem; }
+    .cta-final-sub { font-size:1rem; opacity:.8; margin-bottom:2rem; }
+    .btn-white {
+      background:#fff; color:var(--blue); padding:.85rem 2rem; border-radius:var(--r-sm);
+      font-weight:700; font-size:.95rem; text-decoration:none;
+      display:inline-flex; align-items:center; gap:.4rem;
+      box-shadow:0 4px 16px rgba(0,0,0,.15);
+      transition:transform .15s, box-shadow .15s;
+    }
+    .btn-white:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.2); }
+
+    /* ── Footer ── */
+    .site-footer { background:var(--navy); color:rgba(255,255,255,.6); padding:3rem 0; }
+    .footer-inner { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1.5rem; }
+    .footer-logo { font-size:1.1rem; font-weight:800; color:#fff; }
+    .footer-logo em { color:#60a5fa; font-style:normal; }
+    .footer-links { display:flex; gap:1.75rem; }
+    .footer-links a { font-size:.8rem; color:rgba(255,255,255,.5); text-decoration:none; }
+    .footer-links a:hover { color:#fff; }
+    .footer-copy { font-size:.75rem; }
+
+    /* ── Scroll reveal ── */
+    [data-r] {
+      opacity:0; transform:translateY(22px);
+      transition:opacity .7s ease, transform .7s ease;
+    }
+    [data-r].on { opacity:1; transform:none; }
+    [data-r-d="1"]{transition-delay:.08s;}
+    [data-r-d="2"]{transition-delay:.16s;}
+    [data-r-d="3"]{transition-delay:.24s;}
+
+    /* ── Responsive ── */
+    @media(max-width:900px){
+      .hero-inner,.split{grid-template-columns:1fr;gap:2.5rem;}
+      .split.reverse{direction:ltr;}
+      .steps-grid,.stats-grid,.pricing-grid{grid-template-columns:1fr;}
+      .avatar-mock{grid-template-columns:1fr;}
+      .widget-body{grid-template-columns:1fr;}
+      .mock-product{grid-template-columns:1fr;}
+      .header-nav{display:none;}
+    }
+    @media(prefers-reduced-motion:reduce){
+      *{animation:none!important;transition:none!important;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════ HEADER ════ -->
+<header class="site-header" id="hdr">
+  <div class="header-inner">
+    <a class="site-logo" href="/">Dress<em>im</em></a>
+    <ul class="header-nav">
+      <li><a href="#fonctionnalites">Fonctionnalités</a></li>
+      <li><a href="#tarifs">Tarifs</a></li>
+      <li><a href="#about">À propos</a></li>
+    </ul>
+    <div class="header-actions">
+      <a href="#" class="btn-connexion">Connexion</a>
+      <div class="sep"></div>
+      <a href="#contact" class="btn btn-blue">Demander une démo</a>
+    </div>
+  </div>
+</header>
+
+<!-- ════ HERO ════ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+
+      <div>
+        <span class="eyebrow">✦ Essayage virtuel 3D</span>
+        <h1 class="hero-title">Et si vos clients pouvaient essayer vos vêtements avant de commander&nbsp;?</h1>
+        <p class="hero-sub">Dressim intègre un essayage virtuel 3D dans votre boutique. Vos clients créent leur avatar à partir de leurs mesures et visualisent vos articles sur leur propre corps.</p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn btn-blue btn-xl">Réserver une démo</a>
+          <a href="#fonctionnalites" class="btn btn-outline btn-xl">Voir comment ça marche →</a>
+        </div>
+        <div class="trust-signals">
+          <span class="trust-signal"><span class="check">✓</span> Sans engagement</span>
+          <span class="trust-signal"><span class="check">✓</span> Réponse sous 24h</span>
+          <span class="trust-signal"><span class="check">✓</span> Intégration en 48h</span>
+        </div>
+      </div>
+
+      <!-- Browser mockup -->
+      <div class="browser-mock" data-r>
+        <div class="browser-chrome">
+          <div class="browser-dots">
+            <span class="bd-r"></span><span class="bd-y"></span><span class="bd-g"></span>
+          </div>
+          <div class="browser-url">boutique-mode.fr/vestes/veste-laine-beige</div>
+        </div>
+        <div class="browser-body">
+          <div class="mock-breadcrumb">Accueil / Femme / Vestes</div>
+          <div class="mock-title">Veste en laine beige</div>
+          <div class="mock-product">
+            <div class="mock-coat-wrap">
+              <svg width="90" height="130" viewBox="0 0 90 130" fill="none">
+                <path d="M35 10C30 10 20 18 15 28L5 55L18 60L20 45L20 120H70V45L72 60L85 55L75 28C70 18 60 10 55 10L50 20C48 24 42 24 40 20Z" fill="#D4B896" stroke="#C4A07A" stroke-width="1.5"/>
+                <path d="M40 20L40 60M50 20L50 60" stroke="#C4A07A" stroke-width="1" stroke-dasharray="3 2"/>
+                <path d="M20 45L70 45" stroke="#C4A07A" stroke-width="1"/>
+                <rect x="42" y="65" width="6" height="6" rx="1" fill="#C4A07A" opacity=".6"/>
+                <rect x="42" y="78" width="6" height="6" rx="1" fill="#C4A07A" opacity=".6"/>
+                <rect x="42" y="91" width="6" height="6" rx="1" fill="#C4A07A" opacity=".6"/>
+              </svg>
+            </div>
+            <div class="mock-try-panel">
+              <div class="mock-try-label">Essayer sur mon avatar</div>
+              <div id="av-hero" style="width:56px;height:88px;" class="avatar-3d-canvas"></div>
+              <button class="mock-try-btn">Essayer →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════ PROOF ════ -->
+<div class="proof-bar">
+  <div class="container">
+    <p class="proof-label">Ils nous font confiance</p>
+    <div class="proof-logos">
+      <span class="proof-logo-item">Atelier Ninon</span>
+      <span class="proof-logo-item">Studio Lena</span>
+      <span class="proof-logo-item">Maison Rivière</span>
+      <span class="proof-logo-item">Les Éditions Mode</span>
+      <span class="proof-logo-item">Cercle Paris</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════ HOW IT WORKS ════ -->
+<section id="fonctionnalites">
+  <div class="container">
+    <div class="s-center" data-r>
+      <span class="eyebrow">Processus</span>
+      <h2 class="s-title">Trois étapes pour transformer votre boutique</h2>
+      <p class="s-sub">Du premier snippet de code à l'essayage de vos clients — conçu pour une intégration sans friction.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card js-tilt" data-r data-r-d="1">
+        <div class="step-num">1</div>
+        <div class="step-title">Intégrez le widget</div>
+        <p class="step-desc">Copiez-collez un snippet dans votre boutique Shopify, WooCommerce ou PrestaShop. Pas de refonte, pas de développement custom. En production en 48h.</p>
+      </div>
+      <div class="step-card js-tilt" data-r data-r-d="2">
+        <div class="step-num">2</div>
+        <div class="step-title">Vos clients créent leur avatar</div>
+        <p class="step-desc">À partir de leur taille, poids et quelques mesures, Dressim génère un avatar 3D personnalisé fidèle à leur morphologie réelle — en moins d'une minute.</p>
+      </div>
+      <div class="step-card js-tilt" data-r data-r-d="3">
+        <div class="step-num">3</div>
+        <div class="step-title">Ils essaient et commandent</div>
+        <p class="step-desc">Sur chaque fiche produit, vos clients visualisent le vêtement sur leur propre avatar. Moins d'hésitations, moins de retours.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ AVATAR FEATURE ════ -->
+<section class="section-alt">
+  <div class="container">
+    <div class="split">
+      <div data-r>
+        <div class="avatar-mock">
+          <div class="avatar-form">
+            <div class="avatar-form-title">Créer votre avatar</div>
+            <div class="form-field">
+              <div class="form-label">Taille</div>
+              <div class="form-input" id="f-taille">170 cm</div>
+            </div>
+            <div class="form-field">
+              <div class="form-label">Poids</div>
+              <div class="form-input" id="f-poids">65 kg</div>
+            </div>
+            <div class="form-field">
+              <div class="form-label">Morphologie</div>
+              <div class="form-slider-wrap">
+                <div>
+                  <div class="slider-label">Épaules</div>
+                  <div class="slider-track"><div class="slider-fill" style="width:55%"></div></div>
+                </div>
+                <div>
+                  <div class="slider-label">Taille</div>
+                  <div class="slider-track"><div class="slider-fill" style="width:42%"></div></div>
+                </div>
+                <div>
+                  <div class="slider-label">Hanches</div>
+                  <div class="slider-track"><div class="slider-fill" style="width:68%"></div></div>
+                </div>
+              </div>
+            </div>
+            <button class="form-btn" id="gen-btn">Générer l'avatar →</button>
+          </div>
+          <div class="avatar-figure">
+            <div id="av-main" style="width:130px;height:240px;" class="avatar-3d-canvas"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="split-text" data-r data-r-d="1">
+        <span class="eyebrow">Avatar personnalisé</span>
+        <h2 class="s-title">Un avatar fidèle à chaque morphologie</h2>
+        <p class="s-sub">Vos clients ne se projettent plus dans un mannequin standard taille 36. Ils voient vos vêtements sur leur propre corps — avec leurs épaules, leur taille, leurs hanches.</p>
+        <ul class="split-list">
+          <li>Généré à partir de 4 mesures simples</li>
+          <li>Rendu 3D fidèle aux textures et drapés</li>
+          <li>Mise à jour instantanée sur toutes les fiches produit</li>
+          <li>Compatible toutes tailles, de XS à 4XL</li>
+        </ul>
+        <a href="#contact" class="s-link">En savoir plus →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ WIDGET FEATURE ════ -->
+<section>
+  <div class="container">
+    <div class="split reverse">
+      <div class="split-text" data-r>
+        <span class="eyebrow">Intégration native</span>
+        <h2 class="s-title">Un widget qui s'intègre en un snippet de code</h2>
+        <p class="s-sub">Compatible Shopify, PrestaShop, WooCommerce et toute boutique custom. Vos équipes tech l'ont en production en 48h.</p>
+        <ul class="split-list">
+          <li>1 ligne de code à copier-coller dans votre thème</li>
+          <li>S'affiche automatiquement sur toutes vos fiches produit</li>
+          <li>Design adaptable à votre charte graphique</li>
+          <li>Analytics intégrés : taux d'essayage, conversion, retours</li>
+        </ul>
+        <a href="#contact" class="s-link">Voir la documentation →</a>
+      </div>
+
+      <div data-r data-r-d="1">
+        <div class="widget-mock">
+          <div class="widget-inner">
+            <div class="widget-nav">
+              <div class="widget-brand">MonStore</div>
+              <div class="widget-nav-links"><span>Femme</span><span>Homme</span><span>Nouveautés</span></div>
+            </div>
+            <div class="widget-body">
+              <div>
+                <div class="widget-p-title">Sweater en mérinos</div>
+                <div class="widget-p-price">€89</div>
+                <div class="widget-p-img">
+                  <svg width="65" height="85" viewBox="0 0 70 90" fill="none">
+                    <path d="M20 8Q14 12 10 22L4 44L14 47L15 34L15 84H55V34L56 47L66 44L60 22Q56 12 50 8L38 14C36 17 34 17 32 14Z" fill="#3b82f6"/>
+                    <path d="M15 34L55 34" stroke="#2563eb" stroke-width="1"/>
+                    <ellipse cx="35" cy="12" rx="4" ry="2.5" fill="#2563eb" opacity=".4"/>
+                  </svg>
+                </div>
+                <div class="widget-sizes">
+                  <div class="widget-size">XS</div><div class="widget-size">S</div>
+                  <div class="widget-size active">M</div><div class="widget-size">L</div><div class="widget-size">XL</div>
+                </div>
+                <div class="widget-add-btn">Ajouter au panier</div>
+              </div>
+              <div class="widget-tryon">
+                <div class="widget-tryon-label">Essayer sur mon avatar</div>
+                <div class="widget-thumbs">
+                  <div class="widget-thumb active"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&q=80" alt=""/></div>
+                  <div class="widget-thumb"><img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=60&q=80" alt=""/></div>
+                  <div class="widget-thumb"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=60&q=80" alt=""/></div>
+                </div>
+                <div class="widget-avatar-wrap">
+                  <div id="av-widget" style="width:66px;height:104px;" class="avatar-3d-canvas"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ STATS ════ -->
+<section class="section-alt">
+  <div class="container">
+    <div class="s-center" data-r>
+      <span class="eyebrow">Impact</span>
+      <h2 class="s-title">Un problème à 30 milliards d'euros</h2>
+      <p class="s-sub">Le retour est la première cause de perte en e-commerce mode. Dressim s'attaque à la source du problème.</p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card" data-r>
+        <div class="stat-num" data-count="30" data-suffix="%">0%</div>
+        <div class="stat-desc">des commandes mode sont retournées en Europe — principalement pour des problèmes de taille et de rendu</div>
+      </div>
+      <div class="stat-card" data-r data-r-d="1">
+        <div class="stat-num" data-count="40" data-prefix="−" data-suffix="%">−0%</div>
+        <div class="stat-desc">de taux de retour constaté chez les boutiques utilisant un essayage virtuel sur leurs fiches produit</div>
+      </div>
+      <div class="stat-card" data-r data-r-d="2">
+        <div class="stat-num" data-count="23" data-prefix="+" data-suffix="%">+0%</div>
+        <div class="stat-desc">de taux de conversion en moyenne quand un acheteur a pu visualiser le vêtement sur sa morphologie</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ PRICING ════ -->
+<section id="tarifs">
+  <div class="container">
+    <div class="s-center" data-r>
+      <span class="eyebrow">Tarifs</span>
+      <h2 class="s-title">Des formules adaptées à votre volume</h2>
+      <p class="s-sub">Tous nos plans incluent le widget, le support et les mises à jour. Sans engagement sur Starter et Growth.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card" data-r>
+        <div><div class="price-tier">Starter</div><div class="price-amount">€199 <span class="price-period">/ mois</span></div></div>
+        <div class="price-desc">Pour les boutiques en croissance qui veulent tester sans engagement fort.</div>
+        <ul class="price-features">
+          <li>500 essayages / mois</li><li>Widget sur 1 boutique</li><li>1 000 SKU catalogue</li><li>Support email</li>
+          <li class="dim">Analytics avancés</li><li class="dim">Multi-boutiques</li>
+        </ul>
+        <a href="#contact" class="btn btn-outline" style="width:100%;justify-content:center;">Commencer →</a>
+      </div>
+      <div class="price-card featured" data-r data-r-d="1">
+        <div><span class="price-tag">Populaire</span><div class="price-tier">Growth</div><div class="price-amount">€499 <span class="price-period">/ mois</span></div></div>
+        <div class="price-desc">Pour les marques qui veulent faire de l'essayage un avantage concurrentiel réel.</div>
+        <ul class="price-features">
+          <li>5 000 essayages / mois</li><li>3 boutiques</li><li>Catalogue illimité</li><li>Support prioritaire</li><li>Analytics avancés</li>
+          <li class="dim">Multi-boutiques illimité</li>
+        </ul>
+        <a href="#contact" class="btn btn-blue" style="width:100%;justify-content:center;">Commencer →</a>
+      </div>
+      <div class="price-card" data-r data-r-d="2">
+        <div><div class="price-tier">Enterprise</div><div class="price-amount" style="font-size:1.5rem;padding-top:.4rem;">Sur mesure</div></div>
+        <div class="price-desc">Pour les enseignes et marketplaces avec des besoins spécifiques.</div>
+        <ul class="price-features">
+          <li>Essayages illimités</li><li>Multi-boutiques illimité</li><li>API dédiée</li><li>Intégration custom</li><li>SLA garanti</li><li>Account manager dédié</li>
+        </ul>
+        <a href="#contact" class="btn btn-outline" style="width:100%;justify-content:center;">Nous contacter →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ CTA FINAL ════ -->
+<section class="cta-final" id="contact">
+  <div class="cta-final-inner container">
+    <h2 class="cta-final-title">Prêt à réduire vos retours&nbsp;?</h2>
+    <p class="cta-final-sub">Réservez une démo de 30 minutes. On vous montre le widget en action sur votre boutique.</p>
+    <a href="mailto:antoine@dressim.io" class="btn-white">Réserver une démo →</a>
+  </div>
+</section>
+
+<!-- ════ FOOTER ════ -->
+<footer class="site-footer" id="about">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">Dress<em>im</em></div>
+      <nav class="footer-links">
+        <a href="#fonctionnalites">Fonctionnalités</a>
+        <a href="#tarifs">Tarifs</a>
+        <a href="/demo">Démo</a>
+        <a href="mailto:antoine@dressim.io">Contact</a>
+        <a href="#">Mentions légales</a>
+      </nav>
+      <p class="footer-copy">© 2025 Dressim</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════════════════════════════════════
+     THREE.JS + ANIMATIONS
+════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+(function () {
+  /* ── Avatar profiles ────────────────────────── */
+  const PROFILES = {
+    main:   { skin:0xf4c2a1, hair:0x3d1a0a, top:0x4f46e5, bottom:0x1e293b, shoe:0x111827 },
+    hero:   { skin:0xc8956a, hair:0x0f0a05, top:0xef4444, bottom:0x1e293b, shoe:0x111827 },
+    widget: { skin:0xf4c2a1, hair:0x3d1a0a, top:0x3b82f6, bottom:0x1e293b, shoe:0x111827 },
+  };
+
+  /* ── Build humanoid figure ──────────────────── */
+  function buildAvatar(p) {
+    const g = new THREE.Group();
+
+    function mat(c, r=0.55, m=0) {
+      return new THREE.MeshStandardMaterial({ color:c, roughness:r, metalness:m });
+    }
+    function add(geo, mat, x=0, y=0, z=0, rx=0, ry=0, rz=0) {
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(x, y, z);
+      mesh.rotation.set(rx, ry, rz);
+      mesh.castShadow = true;
+      g.add(mesh);
+      return mesh;
+    }
+
+    const S = mat(p.skin, 0.55);
+    const H = mat(p.hair, 0.88);
+    const T = mat(p.top,  0.62);
+    const B = mat(p.bottom, 0.72);
+    const SH = mat(p.shoe, 0.38, 0.12);
+    const SOLE = mat(0x374151, 0.3);
+    const EYE = mat(0x1a1a2e, 0.9);
+    const LIP = mat(0xc07070, 0.6);
+
+    // ── HEAD ──
+    add(new THREE.SphereGeometry(0.32, 32, 32), S, 0, 2.44);
+    // hair dome
+    add(new THREE.SphereGeometry(0.335, 32, 16, 0, Math.PI*2, 0, Math.PI*0.58), H, 0, 2.45);
+    // side hair
+    add(new THREE.SphereGeometry(0.22, 16,12, 0, Math.PI, 0, Math.PI), H, -0.27, 2.39, 0, 0, Math.PI/2, 0.25);
+    add(new THREE.SphereGeometry(0.22, 16,12, 0, Math.PI, 0, Math.PI), H,  0.27, 2.39, 0, 0,-Math.PI/2,-0.25);
+    // eyes
+    add(new THREE.SphereGeometry(0.045, 12,12), EYE, -0.11, 2.52, 0.30);
+    add(new THREE.SphereGeometry(0.045, 12,12), EYE,  0.11, 2.52, 0.30);
+    // eye shine
+    add(new THREE.SphereGeometry(0.018, 8,8), mat(0xffffff,0.1), -0.10, 2.535, 0.34);
+    add(new THREE.SphereGeometry(0.018, 8,8), mat(0xffffff,0.1),  0.12, 2.535, 0.34);
+    // nose
+    add(new THREE.SphereGeometry(0.032, 10,10), mat(p.skin - 0x0a0804, 0.6), 0, 2.40, 0.315);
+    // mouth
+    add(new THREE.CapsuleGeometry(0.025, 0.08, 4, 8), LIP, 0, 2.31, 0.30, Math.PI/2, 0, 0);
+    // ears
+    add(new THREE.SphereGeometry(0.07, 10,10), S, -0.32, 2.43, 0, 0, 0, 0.3);
+    add(new THREE.SphereGeometry(0.07, 10,10), S,  0.32, 2.43, 0, 0, 0,-0.3);
+
+    // ── NECK ──
+    add(new THREE.CylinderGeometry(0.11, 0.13, 0.22, 16), S, 0, 2.01);
+
+    // ── TORSO ──
+    add(new THREE.BoxGeometry(0.66, 0.92, 0.40), T, 0, 1.54);
+    // collar
+    add(new THREE.CylinderGeometry(0.14, 0.16, 0.1, 16), T, 0, 1.99);
+
+    // ── SHOULDERS ──
+    add(new THREE.SphereGeometry(0.19, 16,16), T, -0.44, 1.89);
+    add(new THREE.SphereGeometry(0.19, 16,16), T,  0.44, 1.89);
+
+    // ── UPPER ARMS ──
+    add(new THREE.CylinderGeometry(0.13, 0.11, 0.70, 16), T, -0.49, 1.48, 0, 0,0,  0.13);
+    add(new THREE.CylinderGeometry(0.13, 0.11, 0.70, 16), T,  0.49, 1.48, 0, 0,0, -0.13);
+
+    // ── ELBOWS ──
+    add(new THREE.SphereGeometry(0.11, 12,12), S, -0.55, 1.11);
+    add(new THREE.SphereGeometry(0.11, 12,12), S,  0.55, 1.11);
+
+    // ── FOREARMS ──
+    add(new THREE.CylinderGeometry(0.10, 0.08, 0.54, 16), S, -0.57, 0.83, 0, 0,0, 0.08);
+    add(new THREE.CylinderGeometry(0.10, 0.08, 0.54, 16), S,  0.57, 0.83, 0, 0,0,-0.08);
+
+    // ── HANDS ──
+    add(new THREE.SphereGeometry(0.10, 12,12), S, -0.58, 0.55);
+    add(new THREE.SphereGeometry(0.10, 12,12), S,  0.58, 0.55);
+    // fingers (4 per hand)
+    for (let i=0; i<4; i++) {
+      const ox = 0.05 - i*0.035;
+      add(new THREE.CapsuleGeometry(0.018, 0.09, 4, 6), S, -0.47+ox, 0.44, 0.06, Math.PI/2,0,0);
+      add(new THREE.CapsuleGeometry(0.018, 0.09, 4, 6), S,  0.47-ox, 0.44, 0.06, Math.PI/2,0,0);
+    }
+    // thumbs
+    add(new THREE.CapsuleGeometry(0.018, 0.07, 4, 6), S, -0.64, 0.55, 0.04, Math.PI/2,0, 0.5);
+    add(new THREE.CapsuleGeometry(0.018, 0.07, 4, 6), S,  0.64, 0.55, 0.04, Math.PI/2,0,-0.5);
+
+    // ── PELVIS ──
+    add(new THREE.CylinderGeometry(0.30, 0.28, 0.22, 16), B, 0, 1.06);
+
+    // ── THIGHS ──
+    add(new THREE.CylinderGeometry(0.17, 0.14, 0.74, 16), B, -0.17, 0.64);
+    add(new THREE.CylinderGeometry(0.17, 0.14, 0.74, 16), B,  0.17, 0.64);
+
+    // ── KNEES ──
+    add(new THREE.SphereGeometry(0.13, 12,12), B, -0.17, 0.24);
+    add(new THREE.SphereGeometry(0.13, 12,12), B,  0.17, 0.24);
+
+    // ── CALVES ──
+    add(new THREE.CylinderGeometry(0.12, 0.09, 0.64, 16), B, -0.17,-0.10);
+    add(new THREE.CylinderGeometry(0.12, 0.09, 0.64, 16), B,  0.17,-0.10);
+
+    // ── ANKLES ──
+    add(new THREE.SphereGeometry(0.09, 10,10), S, -0.17,-0.45);
+    add(new THREE.SphereGeometry(0.09, 10,10), S,  0.17,-0.45);
+
+    // ── SHOES ──
+    add(new THREE.BoxGeometry(0.23, 0.13, 0.40), SH, -0.17,-0.53, 0.05);
+    add(new THREE.BoxGeometry(0.23, 0.13, 0.40), SH,  0.17,-0.53, 0.05);
+    add(new THREE.BoxGeometry(0.25, 0.04, 0.42), SOLE, -0.17,-0.61, 0.05);
+    add(new THREE.BoxGeometry(0.25, 0.04, 0.42), SOLE,  0.17,-0.61, 0.05);
+
+    return g;
+  }
+
+  /* ── Scene factory ──────────────────────────── */
+  function createScene(id, profileKey, camY, camZ, fov=42) {
+    const container = document.getElementById(id);
+    if (!container || typeof THREE === 'undefined') return;
+
+    const W = container.clientWidth  || 130;
+    const H = container.clientHeight || 240;
+
+    const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+    renderer.setSize(W, H);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    container.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(fov, W/H, 0.1, 100);
+    camera.position.set(0, camY, camZ);
+    camera.lookAt(0, 1, 0);
+
+    // Lighting
+    scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+    const key = new THREE.DirectionalLight(0xffeedd, 1.4);
+    key.position.set(2.5, 5, 3.5); key.castShadow = true;
+    key.shadow.mapSize.set(1024, 1024);
+    key.shadow.camera.near = 0.5; key.shadow.camera.far = 20;
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xaaddff, 0.55);
+    fill.position.set(-3, 2, 1); scene.add(fill);
+    const rim = new THREE.DirectionalLight(0xffd4a8, 0.45);
+    rim.position.set(0, 4, -4); scene.add(rim);
+
+    // Shadow plane
+    const ground = new THREE.Mesh(
+      new THREE.CircleGeometry(1.8, 32),
+      new THREE.ShadowMaterial({ opacity: 0.18 })
+    );
+    ground.rotation.x = -Math.PI/2;
+    ground.position.y = -0.64;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    const avatar = buildAvatar(PROFILES[profileKey]);
+    scene.add(avatar);
+
+    // Interaction
+    let vel = 0, dragging = false, lastX = 0;
+    container.addEventListener('mousedown',  e => { dragging=true; lastX=e.clientX; });
+    container.addEventListener('touchstart', e => { dragging=true; lastX=e.touches[0].clientX; }, {passive:true});
+    window.addEventListener('mouseup',   () => dragging=false);
+    window.addEventListener('touchend',  () => dragging=false);
+    window.addEventListener('mousemove', e => { if(dragging){ vel+=(e.clientX-lastX)*0.012; lastX=e.clientX; } });
+    window.addEventListener('touchmove', e => { if(dragging){ vel+=(e.touches[0].clientX-lastX)*0.012; lastX=e.touches[0].clientX; } }, {passive:true});
+
+    let t = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      t += 0.016;
+      if (!dragging) vel += (0.006 - vel) * 0.025;
+      vel *= 0.90;
+      avatar.rotation.y += vel;
+      avatar.scale.y = 1 + Math.sin(t * 1.1) * 0.007;   // breathing
+      avatar.position.y = Math.sin(t * 0.65) * 0.035;    // float
+      renderer.render(scene, camera);
+    }
+    animate();
+  }
+
+  // ── Init all 3 scenes ──
+  createScene('av-main',   'main',   1.1, 4.5);
+  createScene('av-hero',   'hero',   1.3, 7.0, 38);
+  createScene('av-widget', 'widget', 1.3, 6.5, 40);
+
+  /* ── Generate button animation ─────────────── */
+  const genBtn = document.getElementById('gen-btn');
+  if (genBtn) {
+    genBtn.addEventListener('click', function() {
+      this.textContent = '⟳ Génération…';
+      this.disabled = true;
+      setTimeout(() => {
+        this.textContent = '✓ Avatar prêt !';
+        this.style.background = '#16a34a';
+        setTimeout(() => {
+          this.textContent = 'Générer l\'avatar →';
+          this.style.background = '';
+          this.disabled = false;
+        }, 2000);
+      }, 1200);
+    });
+  }
+})();
+
+/* ── Scroll reveal ───────────────────────────── */
+const obsReveal = new IntersectionObserver(
+  es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('on'); obsReveal.unobserve(e.target); } }),
+  { threshold:0.1, rootMargin:'0px 0px -40px 0px' }
+);
+document.querySelectorAll('[data-r]').forEach(el => obsReveal.observe(el));
+
+/* ── Stats counter ───────────────────────────── */
+function countUp(el) {
+  const target = parseInt(el.dataset.count, 10);
+  const prefix = el.dataset.prefix || '';
+  const suffix = el.dataset.suffix || '';
+  const duration = 1600;
+  const start = Date.now();
+  function tick() {
+    const p = Math.min((Date.now()-start)/duration, 1);
+    const eased = 1 - Math.pow(1-p, 3);
+    el.textContent = prefix + Math.round(eased * target) + suffix;
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+const obsCount = new IntersectionObserver(
+  es => es.forEach(e => {
+    if (e.isIntersecting) {
+      countUp(e.target);
+      obsCount.unobserve(e.target);
+    }
+  }),
+  { threshold: 0.5 }
+);
+document.querySelectorAll('.stat-num[data-count]').forEach(el => obsCount.observe(el));
+
+/* ── Card 3D tilt ────────────────────────────── */
+document.querySelectorAll('.js-tilt').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width  - 0.5;
+    const y = (e.clientY - r.top)  / r.height - 0.5;
+    card.style.transform = `perspective(700px) rotateY(${x*9}deg) rotateX(${-y*9}deg) translateZ(6px)`;
+    card.style.boxShadow = `${-x*12}px ${-y*12}px 24px rgba(0,0,0,.1), 0 4px 16px rgba(0,0,0,.06)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+    card.style.boxShadow = '';
+  });
+});
+
+/* ── Header scroll shadow ────────────────────── */
+window.addEventListener('scroll', () => {
+  document.getElementById('hdr').classList.toggle('scrolled', scrollY > 60);
+}, {passive:true});
+</script>
+</body>
+</html>
