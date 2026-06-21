@@ -14,529 +14,472 @@
       --black: #1a1a1a;
       --gray: #6b7280;
       --border: #e5e7eb;
-      --bg: #fafaf9;
+      --bg: #f0f0f0;
       --white: #fff;
     }
     body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--black); -webkit-font-smoothing: antialiased; min-height: 100vh; }
-
-    /* NAV */
     nav { border-bottom: 1px solid var(--border); padding: .9rem 1.5rem; display: flex; align-items: center; justify-content: space-between; background: var(--white); }
-    .logo { font-size: 1.1rem; font-weight: 700; color: var(--black); text-decoration: none; }
+    .logo { font-size: 1.1rem; font-weight: 700; text-decoration: none; color: var(--black); }
     .logo span { color: var(--accent); }
     .back { font-size: .82rem; color: var(--gray); text-decoration: none; }
     .back:hover { color: var(--black); }
 
-    /* LAYOUT */
-    .shell { display: grid; grid-template-columns: 1fr 320px; min-height: calc(100vh - 57px); }
-    @media (max-width: 720px) { .shell { grid-template-columns: 1fr; } }
+    .shell { display: grid; grid-template-columns: 1fr 340px; min-height: calc(100vh - 57px); }
+    @media (max-width: 760px) { .shell { grid-template-columns: 1fr; } }
 
-    /* AVATAR PANEL */
-    .avatar-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--accent-bg); padding: 2rem; position: sticky; top: 57px; height: calc(100vh - 57px); }
-    .avatar-wrap { position: relative; }
-    #avatarSvg { transition: all .4s cubic-bezier(.4,0,.2,1); filter: drop-shadow(0 8px 24px rgba(0,0,0,.1)); }
-    .measure-tags { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
-    .measure-tag {
-      position: absolute; background: var(--white); border: 1px solid var(--border);
-      border-radius: 20px; padding: .2rem .6rem; font-size: .68rem; font-weight: 600;
-      color: var(--black); white-space: nowrap; display: flex; align-items: center; gap: .3rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,.06);
-    }
-    .measure-tag::before { content: ''; display: block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
-    #tagPoitrine { top: 28%; left: -80px; }
-    #tagTaille   { top: 48%; left: -72px; }
-    #tagHanches  { top: 62%; left: -76px; }
-    .avatar-name { margin-top: 1rem; font-size: .78rem; color: var(--gray); text-align: center; }
+    /* 3D PANEL */
+    .canvas-panel { background: #f0f0f0; display: flex; flex-direction: column; align-items: center; justify-content: center; position: sticky; top: 57px; height: calc(100vh - 57px); overflow: hidden; }
+    #threeCanvas { display: block; cursor: grab; }
+    #threeCanvas:active { cursor: grabbing; }
+    .canvas-hint { font-size: .72rem; color: #aaa; margin-top: .5rem; }
+    .measure-badges { display: flex; gap: .5rem; justify-content: center; margin-top: .75rem; flex-wrap: wrap; }
+    .mbadge { background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: .25rem .75rem; font-size: .72rem; font-weight: 600; display: flex; align-items: center; gap: .35rem; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    .mbadge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: block; }
 
     /* FORM PANEL */
     .form-panel { padding: 2rem 1.5rem; overflow-y: auto; background: var(--white); border-left: 1px solid var(--border); }
 
-    /* STEPS */
     .step { display: none; }
     .step.active { display: block; }
-    .step-indicator { display: flex; gap: .4rem; margin-bottom: 1.5rem; }
-    .step-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background .3s; }
-    .step-dot.active { background: var(--accent); }
+    .step-dots { display: flex; gap: .4rem; margin-bottom: 1.5rem; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
+    .dot.on { background: var(--accent); }
 
-    .step-title { font-size: 1.1rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: .3rem; }
+    .step-title { font-size: 1.1rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: .25rem; }
     .step-sub { font-size: .82rem; color: var(--gray); margin-bottom: 1.5rem; line-height: 1.5; }
 
-    /* GENDER */
-    .gender-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
-    .gender-btn {
-      border: 2px solid var(--border); border-radius: 12px; padding: 1.25rem .75rem;
-      text-align: center; cursor: pointer; background: none; transition: all .2s;
-      display: flex; flex-direction: column; align-items: center; gap: .5rem;
-    }
-    .gender-btn:hover { border-color: var(--accent); background: var(--accent-bg); }
-    .gender-btn.active { border-color: var(--accent); background: var(--accent-bg); }
-    .gender-btn .icon { font-size: 2.5rem; }
-    .gender-btn .label { font-size: .85rem; font-weight: 600; }
+    .gender-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-bottom: .5rem; }
+    .gbtn { border: 2px solid var(--border); border-radius: 12px; padding: 1.2rem .75rem; text-align: center; cursor: pointer; background: none; transition: all .2s; font-family: inherit; }
+    .gbtn:hover { border-color: var(--accent); }
+    .gbtn.active { border-color: var(--accent); background: var(--accent-bg); }
+    .gbtn .gi { font-size: 2.2rem; display: block; margin-bottom: .4rem; }
+    .gbtn .gl { font-size: .85rem; font-weight: 600; }
 
-    /* SILHOUETTE */
-    .sil-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-bottom: 1.5rem; }
-    .sil-btn {
-      border: 2px solid var(--border); border-radius: 10px; padding: .75rem .5rem;
-      text-align: center; cursor: pointer; background: none; transition: all .2s;
-    }
-    .sil-btn:hover { border-color: var(--accent); }
-    .sil-btn.active { border-color: var(--accent); background: var(--accent-bg); }
-    .sil-btn svg { display: block; margin: 0 auto .4rem; }
-    .sil-btn .sil-label { font-size: .72rem; font-weight: 600; }
-    .sil-btn .sil-desc  { font-size: .65rem; color: var(--gray); margin-top: .1rem; }
+    .sfield { margin-bottom: 1.25rem; }
+    .shead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .4rem; }
+    .slabel { font-size: .78rem; font-weight: 600; }
+    .sval { font-size: .95rem; font-weight: 700; color: var(--accent); }
+    input[type=range] { width: 100%; -webkit-appearance: none; height: 4px; background: var(--border); border-radius: 2px; outline: none; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid var(--white); box-shadow: 0 1px 4px rgba(0,0,0,.2); }
 
-    /* SLIDERS */
-    .slider-field { margin-bottom: 1.25rem; }
-    .slider-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .4rem; }
-    .slider-label { font-size: .78rem; font-weight: 600; }
-    .slider-value { font-size: .95rem; font-weight: 700; color: var(--accent); }
-    input[type=range] {
-      width: 100%; -webkit-appearance: none; height: 4px;
-      background: var(--border); border-radius: 2px; outline: none;
-    }
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
-      background: var(--accent); cursor: pointer; border: 2px solid var(--white);
-      box-shadow: 0 1px 4px rgba(0,0,0,.2);
-    }
+    .sil-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .6rem; margin-bottom: 1.25rem; }
+    .sbtn { border: 2px solid var(--border); border-radius: 10px; padding: .75rem .4rem; text-align: center; cursor: pointer; background: none; transition: all .2s; font-family: inherit; }
+    .sbtn:hover { border-color: var(--accent); }
+    .sbtn.active { border-color: var(--accent); background: var(--accent-bg); }
+    .sbtn .si { font-size: 1.6rem; display: block; margin-bottom: .3rem; }
+    .sbtn .sn { font-size: .72rem; font-weight: 600; display: block; }
+    .sbtn .sd { font-size: .62rem; color: var(--gray); display: block; margin-top: .1rem; }
 
-    /* RESULT */
     .result-card { background: var(--accent-bg); border: 1.5px solid var(--accent); border-radius: 12px; padding: 1.1rem; margin-bottom: 1rem; }
-    .result-size { font-size: 2.2rem; font-weight: 800; letter-spacing: -.04em; color: var(--black); }
-    .result-size-label { font-size: .68rem; color: var(--gray); margin-bottom: .25rem; }
-    .result-explain { font-size: .78rem; color: var(--gray); line-height: 1.6; margin-top: .6rem; border-top: 1px solid rgba(200,169,110,.3); padding-top: .6rem; }
+    .rs-label { font-size: .68rem; color: var(--gray); margin-bottom: .2rem; }
+    .rs-size { font-size: 2.4rem; font-weight: 800; letter-spacing: -.04em; }
+    .rs-explain { font-size: .78rem; color: var(--gray); line-height: 1.6; margin-top: .6rem; border-top: 1px solid rgba(200,169,110,.3); padding-top: .6rem; }
+    .meas-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .5rem; margin-bottom: 1rem; }
+    .mcell { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: .6rem; text-align: center; }
+    .mcell .mv { font-size: 1.1rem; font-weight: 700; }
+    .mcell .ml { font-size: .65rem; color: var(--gray); margin-top: .1rem; }
 
-    .measures-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; margin-bottom: 1rem; }
-    .measure-cell { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: .6rem; text-align: center; }
-    .measure-cell .val { font-size: 1.1rem; font-weight: 700; color: var(--black); }
-    .measure-cell .lbl { font-size: .65rem; color: var(--gray); margin-top: .1rem; }
-
-    /* BUTTONS */
-    .btn-next {
-      width: 100%; padding: .85rem; border-radius: 8px;
-      background: var(--black); color: var(--white);
-      font-size: .92rem; font-weight: 600; border: none; cursor: pointer;
-      transition: opacity .2s; margin-bottom: .6rem;
-    }
-    .btn-next:hover { opacity: .85; }
-    .btn-back-step {
-      width: 100%; padding: .75rem; border-radius: 8px;
-      background: none; border: 1.5px solid var(--border);
-      font-size: .88rem; cursor: pointer; color: var(--gray); transition: all .2s;
-    }
-    .btn-back-step:hover { border-color: var(--black); color: var(--black); }
-    .btn-tryon {
-      width: 100%; padding: .85rem; border-radius: 8px;
-      background: var(--accent); color: var(--white);
-      font-size: .92rem; font-weight: 600; border: none; cursor: pointer;
-      transition: opacity .2s; margin-bottom: .6rem;
-    }
-    .btn-tryon:hover { opacity: .9; }
+    .btn-primary { width: 100%; padding: .85rem; border-radius: 8px; background: var(--black); color: var(--white); font-size: .92rem; font-weight: 600; border: none; cursor: pointer; transition: opacity .2s; margin-bottom: .6rem; font-family: inherit; }
+    .btn-primary:hover { opacity: .85; }
+    .btn-secondary { width: 100%; padding: .75rem; border-radius: 8px; background: none; border: 1.5px solid var(--border); font-size: .88rem; cursor: pointer; color: var(--gray); transition: all .2s; font-family: inherit; }
+    .btn-secondary:hover { border-color: var(--black); color: var(--black); }
+    .btn-gold { width: 100%; padding: .85rem; border-radius: 8px; background: var(--accent); color: var(--white); font-size: .92rem; font-weight: 600; border: none; cursor: pointer; transition: opacity .2s; margin-bottom: .6rem; font-family: inherit; }
+    .btn-gold:hover { opacity: .9; }
   </style>
 </head>
 <body>
 
 <nav>
   <a href="/" class="logo">Dress<span>im</span></a>
-  <a href="/boutique.html" class="back">← Retour à la boutique</a>
+  <a href="/boutique.html" class="back">← Boutique démo</a>
 </nav>
 
 <div class="shell">
 
-  <!-- AVATAR PANEL -->
-  <div class="avatar-panel">
-    <div class="avatar-wrap">
-      <svg id="avatarSvg" viewBox="0 0 200 480" width="180" height="432" xmlns="http://www.w3.org/2000/svg">
-        <!-- Fond dégradé -->
-        <defs>
-          <linearGradient id="skinGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#f5deb3"/>
-            <stop offset="100%" stop-color="#deb887"/>
-          </linearGradient>
-          <linearGradient id="clothGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#c8a96e"/>
-            <stop offset="100%" stop-color="#a07840"/>
-          </linearGradient>
-        </defs>
-
-        <!-- Tête -->
-        <ellipse id="avHead" cx="100" cy="44" rx="26" ry="30" fill="url(#skinGrad)" />
-        <!-- Cheveux -->
-        <ellipse id="avHair" cx="100" cy="26" rx="27" ry="18" fill="#5a3e2b" />
-        <!-- Cou -->
-        <rect id="avNeck" x="91" y="72" width="18" height="18" rx="4" fill="url(#skinGrad)" />
-        <!-- Corps -->
-        <path id="avBody" d="" fill="url(#clothGrad)" />
-        <!-- Bras gauche -->
-        <path id="avArmL" d="" fill="url(#skinGrad)" />
-        <!-- Bras droit -->
-        <path id="avArmR" d="" fill="url(#skinGrad)" />
-        <!-- Jambe gauche -->
-        <path id="avLegL" d="" fill="#3a3a3a" />
-        <!-- Jambe droite -->
-        <path id="avLegR" d="" fill="#3a3a3a" />
-        <!-- Pied gauche -->
-        <ellipse id="avFootL" cx="82" cy="462" rx="14" ry="7" fill="#2a2a2a" />
-        <!-- Pied droit -->
-        <ellipse id="avFootR" cx="118" cy="462" rx="14" ry="7" fill="#2a2a2a" />
-        <!-- Visage -->
-        <ellipse cx="92" cy="48" rx="3" ry="3.5" fill="#5a3e2b" opacity=".6"/>
-        <ellipse cx="108" cy="48" rx="3" ry="3.5" fill="#5a3e2b" opacity=".6"/>
-        <path d="M 93 58 Q 100 63 107 58" stroke="#5a3e2b" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      </svg>
-
-      <!-- Tags mensurations -->
-      <div class="measure-tags">
-        <div class="measure-tag" id="tagPoitrine">— cm</div>
-        <div class="measure-tag" id="tagTaille">— cm</div>
-        <div class="measure-tag" id="tagHanches">— cm</div>
-      </div>
+  <!-- 3D PANEL -->
+  <div class="canvas-panel" id="canvasPanel">
+    <canvas id="threeCanvas"></canvas>
+    <div class="canvas-hint">Cliquez et faites glisser pour pivoter</div>
+    <div class="measure-badges">
+      <div class="mbadge" id="badgePoitrine">— cm</div>
+      <div class="mbadge" id="badgeTaille">— cm</div>
+      <div class="mbadge" id="badgeHanches">— cm</div>
     </div>
-    <div class="avatar-name" id="avatarName">Votre avatar apparaîtra ici</div>
   </div>
 
   <!-- FORM PANEL -->
   <div class="form-panel">
 
-    <!-- ÉTAPE 1 : Genre -->
+    <!-- Step 1 -->
     <div class="step active" id="step1">
-      <div class="step-indicator">
-        <div class="step-dot active"></div>
-        <div class="step-dot"></div>
-        <div class="step-dot"></div>
-      </div>
-      <div class="step-title">Bonjour ! 👋</div>
-      <div class="step-sub">Commençons par votre genre pour adapter les proportions de votre avatar.</div>
+      <div class="step-dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="step-title">Bonjour 👋</div>
+      <div class="step-sub">Choisissez votre genre pour adapter les proportions du mannequin.</div>
       <div class="gender-grid">
-        <button class="gender-btn" data-genre="femme" onclick="selectGenre(this)">
-          <span class="icon">👩</span>
-          <span class="label">Femme</span>
-        </button>
-        <button class="gender-btn" data-genre="homme" onclick="selectGenre(this)">
-          <span class="icon">👨</span>
-          <span class="label">Homme</span>
-        </button>
+        <button class="gbtn" data-g="femme" onclick="pickGenre(this)"><span class="gi">👩</span><span class="gl">Femme</span></button>
+        <button class="gbtn" data-g="homme" onclick="pickGenre(this)"><span class="gi">👨</span><span class="gl">Homme</span></button>
       </div>
     </div>
 
-    <!-- ÉTAPE 2 : Taille / Poids -->
+    <!-- Step 2 -->
     <div class="step" id="step2">
-      <div class="step-indicator">
-        <div class="step-dot"></div>
-        <div class="step-dot active"></div>
-        <div class="step-dot"></div>
+      <div class="step-dots"><div class="dot"></div><div class="dot on"></div><div class="dot"></div></div>
+      <div class="step-title">Taille &amp; Poids</div>
+      <div class="step-sub">Ces deux infos suffisent — le reste est calculé automatiquement.</div>
+      <div class="sfield">
+        <div class="shead"><span class="slabel">Taille</span><span class="sval"><span id="vT">165</span> cm</span></div>
+        <input type="range" id="sT" min="145" max="205" value="165" oninput="onSlide()" />
       </div>
-      <div class="step-title">Deux infos simples</div>
-      <div class="step-sub">Tout le monde connaît sa taille et son poids — c'est tout ce dont on a besoin.</div>
-
-      <div class="slider-field">
-        <div class="slider-header">
-          <span class="slider-label">Taille</span>
-          <span class="slider-value"><span id="valTaille">165</span> cm</span>
-        </div>
-        <input type="range" id="sliderTaille" min="145" max="205" value="165" oninput="onSlider()" />
+      <div class="sfield">
+        <div class="shead"><span class="slabel">Poids</span><span class="sval"><span id="vP">62</span> kg</span></div>
+        <input type="range" id="sP" min="40" max="130" value="62" oninput="onSlide()" />
       </div>
-
-      <div class="slider-field">
-        <div class="slider-header">
-          <span class="slider-label">Poids</span>
-          <span class="slider-value"><span id="valPoids">62</span> kg</span>
-        </div>
-        <input type="range" id="sliderPoids" min="40" max="130" value="62" oninput="onSlider()" />
-      </div>
-
-      <button class="btn-next" onclick="goStep(3)">Continuer →</button>
-      <button class="btn-back-step" onclick="goStep(1)">← Retour</button>
+      <button class="btn-primary" onclick="goStep(3)">Continuer →</button>
+      <button class="btn-secondary" onclick="goStep(1)">← Retour</button>
     </div>
 
-    <!-- ÉTAPE 3 : Silhouette -->
+    <!-- Step 3 -->
     <div class="step" id="step3">
-      <div class="step-indicator">
-        <div class="step-dot"></div>
-        <div class="step-dot"></div>
-        <div class="step-dot active"></div>
-      </div>
+      <div class="step-dots"><div class="dot"></div><div class="dot"></div><div class="dot on"></div></div>
       <div class="step-title">Votre silhouette</div>
-      <div class="step-sub">Choisissez la silhouette qui vous ressemble le plus — pas besoin d'être précis(e).</div>
-
-      <div class="sil-grid" id="silGrid">
-
-        <button class="sil-btn" data-sil="slim" onclick="selectSil(this)">
-          <svg width="40" height="70" viewBox="0 0 40 70">
-            <ellipse cx="20" cy="10" rx="8" ry="9" fill="#c8a96e"/>
-            <path d="M10 22 Q6 38 8 48 Q14 52 20 52 Q26 52 32 48 Q34 38 30 22 Q26 20 20 20 Q14 20 10 22Z" fill="#c8a96e"/>
-            <rect x="14" y="52" width="5" height="16" rx="2" fill="#888"/>
-            <rect x="21" y="52" width="5" height="16" rx="2" fill="#888"/>
-          </svg>
-          <div class="sil-label">Slim</div>
-          <div class="sil-desc">Silhouette fine</div>
-        </button>
-
-        <button class="sil-btn active" data-sil="standard" onclick="selectSil(this)">
-          <svg width="40" height="70" viewBox="0 0 40 70">
-            <ellipse cx="20" cy="10" rx="8" ry="9" fill="#c8a96e"/>
-            <path d="M8 22 Q4 38 7 50 Q14 55 20 55 Q26 55 33 50 Q36 38 32 22 Q26 20 20 20 Q14 20 8 22Z" fill="#c8a96e"/>
-            <rect x="13" y="55" width="5" height="13" rx="2" fill="#888"/>
-            <rect x="22" y="55" width="5" height="13" rx="2" fill="#888"/>
-          </svg>
-          <div class="sil-label">Standard</div>
-          <div class="sil-desc">Proportions moyennes</div>
-        </button>
-
-        <button class="sil-btn" data-sil="curvy" onclick="selectSil(this)">
-          <svg width="40" height="70" viewBox="0 0 40 70">
-            <ellipse cx="20" cy="10" rx="8" ry="9" fill="#c8a96e"/>
-            <path d="M6 22 Q2 36 5 50 Q13 58 20 58 Q27 58 35 50 Q38 36 34 22 Q26 19 20 19 Q14 19 6 22Z" fill="#c8a96e"/>
-            <rect x="12" y="58" width="5" height="11" rx="2" fill="#888"/>
-            <rect x="23" y="58" width="5" height="11" rx="2" fill="#888"/>
-          </svg>
-          <div class="sil-label">Curvy</div>
-          <div class="sil-desc">Formes marquées</div>
-        </button>
-
+      <div class="step-sub">Choisissez la silhouette qui vous ressemble le plus.</div>
+      <div class="sil-grid">
+        <button class="sbtn" data-s="slim" onclick="pickSil(this)"><span class="si">🕴</span><span class="sn">Slim</span><span class="sd">Silhouette fine</span></button>
+        <button class="sbtn active" data-s="standard" onclick="pickSil(this)"><span class="si">🧍</span><span class="sn">Standard</span><span class="sd">Proportions moyennes</span></button>
+        <button class="sbtn" data-s="curvy" onclick="pickSil(this)"><span class="si">🙋</span><span class="sn" id="curvyLbl">Curvy</span><span class="sd" id="curvyDesc">Formes marquées</span></button>
       </div>
-
-      <button class="btn-next" onclick="goResult()">Créer mon avatar →</button>
-      <button class="btn-back-step" onclick="goStep(2)">← Retour</button>
+      <button class="btn-primary" onclick="showResult()">Créer mon avatar →</button>
+      <button class="btn-secondary" onclick="goStep(2)">← Retour</button>
     </div>
 
-    <!-- ÉTAPE 4 : Résultat -->
+    <!-- Step 4 -->
     <div class="step" id="step4">
-      <div class="step-title" style="margin-bottom:.25rem">Votre avatar ✅</div>
-      <div class="step-sub">Mensurations estimées à partir de vos informations.</div>
-
-      <div class="measures-grid">
-        <div class="measure-cell">
-          <div class="val" id="resPoitrine">—</div>
-          <div class="lbl">Poitrine cm</div>
-        </div>
-        <div class="measure-cell">
-          <div class="val" id="resTaille">—</div>
-          <div class="lbl">Taille cm</div>
-        </div>
-        <div class="measure-cell">
-          <div class="val" id="resHanches">—</div>
-          <div class="lbl">Hanches cm</div>
-        </div>
+      <div class="step-title" style="margin-bottom:.25rem">Votre mannequin ✅</div>
+      <div class="step-sub">Mensurations estimées à partir de votre profil.</div>
+      <div class="meas-grid">
+        <div class="mcell"><div class="mv" id="rPoitrine">—</div><div class="ml">Poitrine cm</div></div>
+        <div class="mcell"><div class="mv" id="rTaille">—</div><div class="ml">Taille cm</div></div>
+        <div class="mcell"><div class="mv" id="rHanches">—</div><div class="ml">Hanches cm</div></div>
       </div>
-
       <div class="result-card">
-        <div class="result-size-label">Taille recommandée pour ce vêtement</div>
-        <div class="result-size" id="resSize">—</div>
-        <div class="result-explain" id="resExplain"></div>
+        <div class="rs-label">Taille recommandée pour ce vêtement</div>
+        <div class="rs-size" id="rSize">—</div>
+        <div class="rs-explain" id="rExplain"></div>
       </div>
-
-      <button class="btn-tryon" onclick="window.location.href='/boutique.html'">
-        👗 Essayer virtuellement sur ma photo
-      </button>
-      <button class="btn-back-step" onclick="goStep(3)">← Modifier ma silhouette</button>
+      <button class="btn-gold" onclick="window.location.href='/boutique.html'">👗 Essayer sur ma photo →</button>
+      <button class="btn-secondary" onclick="goStep(3)">← Modifier ma silhouette</button>
     </div>
 
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
-  let genre = 'femme';
-  let silhouette = 'standard';
-  let currentStep = 1;
+// ── State ──────────────────────────────────────────────
+let genre = 'femme', sil = 'standard';
 
-  // ── Sizing tables ──────────────────────────────────────
-  const SIZING_F = [
-    { size:'XS', bust:[78,83], waist:[58,63] },
-    { size:'S',  bust:[84,89], waist:[64,69] },
-    { size:'M',  bust:[90,95], waist:[70,75] },
-    { size:'L',  bust:[96,101],waist:[76,81] },
-    { size:'XL', bust:[102,108],waist:[82,88] },
-  ];
-  const SIZING_M = [
-    { size:'S',  chest:[86,91], waist:[72,77] },
-    { size:'M',  chest:[92,97], waist:[78,83] },
-    { size:'L',  chest:[98,103],waist:[84,89] },
-    { size:'XL', chest:[104,109],waist:[90,95] },
-    { size:'XXL',chest:[110,118],waist:[96,104] },
-  ];
+// ── Renderer ───────────────────────────────────────────
+const canvas  = document.getElementById('threeCanvas');
+const cpanel  = document.getElementById('canvasPanel');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  // ── Anthropometric formulas ────────────────────────────
-  function calcMeasures(h, w, g, sil) {
-    const bmi = w / Math.pow(h / 100, 2);
-    let bust, waist, hips;
+const scene  = new THREE.Scene();
+scene.background = new THREE.Color(0xf0f0f0);
 
-    if (g === 'femme') {
-      bust  = 90  + (h - 165) * 0.30 + (bmi - 22) * 1.5;
-      waist = 72  + (h - 165) * 0.18 + (bmi - 22) * 1.8;
-      hips  = 96  + (h - 165) * 0.35 + (bmi - 22) * 2.0;
-      if (sil === 'slim')   { bust -= 3; waist -= 5; hips -= 6; }
-      if (sil === 'curvy')  { bust += 6; waist += 3; hips += 10; }
-    } else {
-      bust  = 96  + (h - 175) * 0.35 + (bmi - 23) * 1.5;
-      waist = 84  + (h - 175) * 0.20 + (bmi - 23) * 2.0;
-      hips  = 98  + (h - 175) * 0.30 + (bmi - 23) * 1.8;
-      if (sil === 'slim')     { bust -= 4; waist -= 6; hips -= 4; }
-      if (sil === 'athletic') { bust += 8; waist -= 4; hips += 2; }
-    }
+const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+camera.position.set(0, 0.9, 4.2);
+camera.lookAt(0, 0.9, 0);
 
-    return { bust: Math.round(bust), waist: Math.round(waist), hips: Math.round(hips) };
+// Lights — studio setup matching the mannequin reference photos
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const key = new THREE.DirectionalLight(0xffffff, 1.1);
+key.position.set(2, 4, 3); key.castShadow = true; scene.add(key);
+const fill = new THREE.DirectionalLight(0xffffff, 0.35);
+fill.position.set(-2, 3, 2); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xffffff, 0.2);
+rim.position.set(0, 1, -3); scene.add(rim);
+
+// Floor
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(5,5), new THREE.ShadowMaterial({ opacity: 0.1 }));
+floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
+
+// Material — matte white like mannequins
+const mat = new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.9, metalness: 0 });
+
+// ── Mannequin ──────────────────────────────────────────
+const mannequin = new THREE.Group();
+scene.add(mannequin);
+
+function clamp(v,lo,hi) { return Math.max(lo,Math.min(hi,v)); }
+
+function mkMesh(geo) {
+  const m = new THREE.Mesh(geo, mat);
+  m.castShadow = true; m.receiveShadow = true;
+  mannequin.add(m); return m;
+}
+
+function buildMannequin(p) {
+  while (mannequin.children.length) mannequin.remove(mannequin.children[0]);
+
+  const { headR, neckR, neckH, shW, shR,
+          bustW, waistW, hipW,
+          torsoH, waistH, hipH,
+          thighR, thighH, calfR, calfH,
+          uArmR, uArmH, lArmR, lArmH } = p;
+
+  // Helpers
+  const cap = (r,h) => new THREE.CapsuleGeometry(r, h, 5, 12);
+
+  // === Legs (bottom up) ===
+  let y = 0;
+  // Feet
+  [-1,1].forEach(side => {
+    const f = mkMesh(new THREE.CapsuleGeometry(0.048, 0.04, 4, 8));
+    f.position.set(side * thighR * 0.95, 0.08, 0.04);
+    f.rotation.x = -0.3;
+  });
+  y = 0.08;
+  // Calves
+  [-1,1].forEach(side => {
+    const c = mkMesh(cap(calfR, calfH));
+    c.position.set(side * thighR * 0.9, y + calfH/2 + calfR, 0);
+  });
+  y += calfH + calfR*2 - 0.04;
+  // Thighs
+  [-1,1].forEach(side => {
+    const t = mkMesh(cap(thighR, thighH));
+    t.position.set(side * thighR * 0.8, y + thighH/2 + thighR*0.6, 0);
+  });
+  y += thighH + thighR*1.5;
+
+  const crotchY = y;
+
+  // === Torso — lathe geometry for natural curves ===
+  // Hips
+  const hipPts = [];
+  for (let i=0; i<=12; i++) {
+    const t = i/12;
+    const r = waistW/2 + (hipW/2 - waistW/2) * Math.sin(t * Math.PI * 0.95);
+    hipPts.push(new THREE.Vector2(r, hipH * t));
   }
+  const hipM = mkMesh(new THREE.LatheGeometry(hipPts, 32));
+  hipM.position.y = crotchY;
 
-  // ── Size recommendation ────────────────────────────────
-  function recommendSize(measures, g) {
-    const table = g === 'femme' ? SIZING_F : SIZING_M;
-    const bustKey = g === 'femme' ? 'bust' : 'chest';
+  y = crotchY + hipH;
 
-    let idxB = table.findIndex(s => measures.bust  >= s[bustKey][0] && measures.bust  <= s[bustKey][1]);
-    let idxW = table.findIndex(s => measures.waist >= s.waist[0]    && measures.waist <= s.waist[1]);
-    if (idxB < 0) idxB = measures.bust  > table[table.length-1][bustKey][1] ? table.length-1 : 0;
-    if (idxW < 0) idxW = measures.waist > table[table.length-1].waist[1]    ? table.length-1 : 0;
-    const idx = Math.max(idxB, idxW);
-    return table[Math.min(idx, table.length-1)].size;
+  // Waist (slight hourglass)
+  const waistPts = [];
+  for (let i=0; i<=8; i++) {
+    waistPts.push(new THREE.Vector2(waistW/2 + 0.005, waistH * i/8));
   }
+  const waistM = mkMesh(new THREE.LatheGeometry(waistPts, 32));
+  waistM.position.y = y;
+  y += waistH;
 
-  // ── Avatar SVG update ──────────────────────────────────
-  function updateAvatar(h, w, g, sil) {
-    const measures = calcMeasures(h, w, g, sil);
-    const scale = h / 168;
-
-    // Map measurements to SVG units (viewBox 200x480)
-    const cx = 100;
-    const sW = clamp((measures.bust  / 2) * 0.58, 32, 60);
-    const wW = clamp((measures.waist / 2) * 0.50, 22, 48);
-    const hW = clamp((measures.hips  / 2) * 0.60, 34, 62);
-    const legSep = hW * 0.48;
-
-    // Vertical positions (scaled by height)
-    const shoulderY = 92;
-    const waistY    = 195 + (scale - 1) * 10;
-    const hipY      = 245 + (scale - 1) * 12;
-    const crotchY   = 290 + (scale - 1) * 14;
-    const kneeY     = 365 + (scale - 1) * 16;
-    const ankleY    = 450 + (scale - 1) * 14;
-
-    // Body silhouette
-    const body = `
-      M ${cx - sW} ${shoulderY}
-      C ${cx - sW - 6} ${waistY - 40} ${cx - wW - 4} ${waistY - 10} ${cx - wW} ${waistY}
-      C ${cx - hW + 2} ${hipY - 12} ${cx - hW} ${hipY - 4} ${cx - hW} ${hipY}
-      L ${cx - legSep} ${crotchY}
-      L ${cx + legSep} ${crotchY}
-      L ${cx + hW} ${hipY}
-      C ${cx + hW} ${hipY - 4} ${cx + hW - 2} ${hipY - 12} ${cx + wW} ${waistY}
-      C ${cx + sW + 6} ${waistY - 10} ${cx + sW + 6} ${waistY - 40} ${cx + sW} ${shoulderY}
-      Z`;
-
-    // Arms
-    const armTopY = shoulderY + 2;
-    const armBotY = waistY + 18;
-    const armOuterL = cx - sW - 6;
-    const armOuterR = cx + sW + 6;
-    const armWrist = 9;
-
-    const armL = `M ${cx - sW - 2} ${armTopY} C ${armOuterL - 8} ${armTopY + 30} ${armOuterL - 6} ${armBotY - 20} ${cx - sW - 4} ${armBotY} L ${cx - sW + armWrist} ${armBotY} C ${cx - sW + 2} ${armBotY - 10} ${cx - sW} ${armTopY + 10} Z`;
-    const armR = `M ${cx + sW + 2} ${armTopY} C ${armOuterR + 8} ${armTopY + 30} ${armOuterR + 6} ${armBotY - 20} ${cx + sW + 4} ${armBotY} L ${cx + sW - armWrist} ${armBotY} C ${cx + sW - 2} ${armBotY - 10} ${cx + sW} ${armTopY + 10} Z`;
-
-    // Legs
-    const legW = legSep * 0.85;
-    const legL = `M ${cx - legSep} ${crotchY} C ${cx - legSep - 4} ${kneeY - 20} ${cx - legSep - 2} ${kneeY} ${cx - legSep} ${kneeY} L ${cx - legSep + legW} ${kneeY} C ${cx - legSep + legW + 2} ${kneeY - 20} ${cx - legSep + legW + 4} ${crotchY} Z
-      M ${cx - legSep} ${kneeY + 2} C ${cx - legSep - 4} ${ankleY - 20} ${cx - legSep - 2} ${ankleY} ${cx - legSep + 2} ${ankleY} L ${cx - legSep + legW - 2} ${ankleY} C ${cx - legSep + legW + 2} ${ankleY} ${cx - legSep + legW + 4} ${kneeY + 2} Z`;
-    const legR = `M ${cx + legSep} ${crotchY} C ${cx + legSep + 4} ${kneeY - 20} ${cx + legSep + 2} ${kneeY} ${cx + legSep} ${kneeY} L ${cx + legSep - legW} ${kneeY} C ${cx + legSep - legW - 2} ${kneeY - 20} ${cx + legSep - legW - 4} ${crotchY} Z
-      M ${cx + legSep} ${kneeY + 2} C ${cx + legSep + 4} ${ankleY - 20} ${cx + legSep + 2} ${ankleY} ${cx + legSep - 2} ${ankleY} L ${cx + legSep - legW + 2} ${ankleY} C ${cx + legSep - legW - 2} ${ankleY} ${cx + legSep - legW - 4} ${kneeY + 2} Z`;
-
-    // Cheveux
-    const hairRx = g === 'femme' ? 28 : 27;
-    const hairRy = g === 'femme' ? 20 : 16;
-
-    document.getElementById('avBody').setAttribute('d', body);
-    document.getElementById('avArmL').setAttribute('d', armL);
-    document.getElementById('avArmR').setAttribute('d', armR);
-    document.getElementById('avLegL').setAttribute('d', legL);
-    document.getElementById('avLegR').setAttribute('d', legR);
-    document.getElementById('avHair').setAttribute('rx', hairRx);
-    document.getElementById('avHair').setAttribute('ry', hairRy);
-    document.getElementById('avFootL').setAttribute('cx', cx - legSep + legW * 0.1);
-    document.getElementById('avFootR').setAttribute('cx', cx + legSep - legW * 0.1);
-    document.getElementById('avFootL').setAttribute('cy', ankleY + 8);
-    document.getElementById('avFootR').setAttribute('cy', ankleY + 8);
-
-    // Tags
-    const bustTagY    = ((shoulderY + waistY) / 2) / 480 * 100;
-    const waistTagY   = (waistY) / 480 * 100;
-    const hipsTagY    = (hipY) / 480 * 100;
-    document.getElementById('tagPoitrine').style.top = bustTagY + '%';
-    document.getElementById('tagTaille').style.top   = waistTagY + '%';
-    document.getElementById('tagHanches').style.top  = hipsTagY + '%';
-    document.getElementById('tagPoitrine').innerHTML = `<span style="background:var(--accent);width:6px;height:6px;border-radius:50%;display:inline-block"></span> ${measures.bust} cm`;
-    document.getElementById('tagTaille').innerHTML   = `<span style="background:var(--accent);width:6px;height:6px;border-radius:50%;display:inline-block"></span> ${measures.waist} cm`;
-    document.getElementById('tagHanches').innerHTML  = `<span style="background:var(--accent);width:6px;height:6px;border-radius:50%;display:inline-block"></span> ${measures.hips} cm`;
-
-    document.getElementById('avatarName').textContent = `${h} cm · ${w} kg`;
-    return measures;
+  // Torso/Chest
+  const torsoPts = [];
+  for (let i=0; i<=14; i++) {
+    const t = i/14;
+    const r = waistW/2 + (bustW/2 - waistW/2) * Math.sin(t * Math.PI * 0.88) + 0.005;
+    torsoPts.push(new THREE.Vector2(r, torsoH * t));
   }
+  const torsoM = mkMesh(new THREE.LatheGeometry(torsoPts, 32));
+  torsoM.position.y = y;
+  y += torsoH;
 
-  function clamp(val, min, max) { return Math.min(Math.max(val, min), max); }
+  const shoulderBaseY = y;
 
-  // ── Navigation ─────────────────────────────────────────
-  function goStep(n) {
-    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-    document.getElementById('step' + n).classList.add('active');
-    currentStep = n;
-    if (n >= 2) {
-      const h = parseInt(document.getElementById('sliderTaille').value);
-      const w = parseInt(document.getElementById('sliderPoids').value);
-      updateAvatar(h, w, genre, silhouette);
-    }
+  // Shoulders bar
+  const shBar = mkMesh(new THREE.CapsuleGeometry(shR, shW, 5, 12));
+  shBar.rotation.z = Math.PI/2;
+  shBar.position.y = shoulderBaseY + shR * 0.7;
+
+  // Neck
+  const neck = mkMesh(cap(neckR, neckH));
+  neck.position.y = shoulderBaseY + neckH/2 + shR * 0.6;
+
+  // Head
+  const head = mkMesh(new THREE.SphereGeometry(headR, 20, 16));
+  head.position.y = shoulderBaseY + neckH + headR * 1.4 + shR * 0.5;
+
+  // Arms
+  [-1,1].forEach(side => {
+    const armX = side * (shW/2 + uArmR * 0.7);
+    const armY = shoulderBaseY + shR * 0.7 - uArmH * 0.1;
+    const ua = mkMesh(cap(uArmR, uArmH));
+    ua.position.set(armX, armY, 0);
+    ua.rotation.z = side * 0.18;
+
+    const elbowY = armY - uArmH/2 - uArmR;
+    const la = mkMesh(cap(lArmR, lArmH));
+    la.position.set(armX + side * 0.02, elbowY - lArmH/2 - lArmR * 0.3, 0);
+    la.rotation.z = side * 0.12;
+
+    // Hand
+    const hand = mkMesh(new THREE.CapsuleGeometry(lArmR*0.9, 0.06, 4, 8));
+    hand.position.set(armX + side * 0.03, elbowY - lArmH - lArmR * 1.2, 0);
+  });
+
+  // Center vertically
+  const totalH = shoulderBaseY + neckH + headR * 2.8 + shR * 0.5;
+  mannequin.position.y = -totalH * 0.48;
+}
+
+// ── Anthropometric → params ────────────────────────────
+function calcMeasures(h, w, g, sl) {
+  const bmi = w / Math.pow(h/100, 2);
+  let bust, waist, hips;
+  if (g === 'femme') {
+    bust  = 90  + (h-165)*0.30 + (bmi-22)*1.5;
+    waist = 72  + (h-165)*0.18 + (bmi-22)*1.8;
+    hips  = 96  + (h-165)*0.35 + (bmi-22)*2.0;
+    if (sl==='slim')  { bust-=3; waist-=5; hips-=6; }
+    if (sl==='curvy') { bust+=6; waist+=3; hips+=10; }
+  } else {
+    bust  = 96  + (h-175)*0.35 + (bmi-23)*1.5;
+    waist = 84  + (h-175)*0.20 + (bmi-23)*2.0;
+    hips  = 98  + (h-175)*0.30 + (bmi-23)*1.8;
+    if (sl==='slim')     { bust-=4; waist-=6; hips-=4; }
+    if (sl==='athletic') { bust+=8; waist-=4; hips+=2; }
   }
+  return { bust:Math.round(bust), waist:Math.round(waist), hips:Math.round(hips) };
+}
 
-  function selectGenre(btn) {
-    document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    genre = btn.dataset.genre;
-    // Update silhouette labels for homme
-    if (genre === 'homme') {
-      document.querySelector('[data-sil="curvy"] .sil-label').textContent = 'Athletic';
-      document.querySelector('[data-sil="curvy"] .sil-desc').textContent = 'Musculature marquée';
-    } else {
-      document.querySelector('[data-sil="curvy"] .sil-label').textContent = 'Curvy';
-      document.querySelector('[data-sil="curvy"] .sil-desc').textContent = 'Formes marquées';
-    }
-    goStep(2);
-  }
+function toParams(h, m, g) {
+  const s  = h / 170;
+  const bR = m.bust  / 200;
+  const wR = m.waist / 200;
+  const hR = m.hips  / 200;
+  const isF = g === 'femme';
+  return {
+    headR:   clamp(0.092*s, 0.078, 0.115),
+    neckR:   clamp(0.036*s, 0.028, 0.045),
+    neckH:   clamp(0.06*s,  0.045, 0.08),
+    shW:     clamp(bR*1.25, 0.18,  0.32),
+    shR:     0.038*s,
+    bustW:   clamp(bR*1.9,  0.13,  0.30),
+    waistW:  clamp(wR*1.9,  0.10,  0.26),
+    hipW:    clamp(hR*1.9,  0.14,  0.36),
+    torsoH:  clamp(0.19*s,  0.14,  0.25),
+    waistH:  clamp(0.09*s,  0.06,  0.13),
+    hipH:    clamp(0.12*s,  0.08,  0.17),
+    thighR:  clamp(hR*0.52, 0.055, 0.115),
+    thighH:  clamp(0.26*s,  0.20,  0.33),
+    calfR:   clamp(hR*0.35, 0.038, 0.078),
+    calfH:   clamp(0.23*s,  0.17,  0.29),
+    uArmR:   isF ? clamp(0.038*s,0.03,0.05) : clamp(0.046*s,0.036,0.06),
+    uArmH:   0.18*s,
+    lArmR:   isF ? 0.030*s : 0.038*s,
+    lArmH:   0.16*s,
+  };
+}
 
-  function selectSil(btn) {
-    document.querySelectorAll('.sil-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    silhouette = btn.dataset.sil;
-    const h = parseInt(document.getElementById('sliderTaille').value);
-    const w = parseInt(document.getElementById('sliderPoids').value);
-    updateAvatar(h, w, genre, silhouette);
-  }
+function updateMannequin() {
+  const h = parseInt(document.getElementById('sT').value);
+  const w = parseInt(document.getElementById('sP').value);
+  const m = calcMeasures(h, w, genre, sil);
+  buildMannequin(toParams(h, m, genre));
+  document.getElementById('badgePoitrine').textContent = `${m.bust} cm poitrine`;
+  document.getElementById('badgeTaille').textContent   = `${m.waist} cm taille`;
+  document.getElementById('badgeHanches').textContent  = `${m.hips} cm hanches`;
+}
 
-  function onSlider() {
-    const h = parseInt(document.getElementById('sliderTaille').value);
-    const w = parseInt(document.getElementById('sliderPoids').value);
-    document.getElementById('valTaille').textContent = h;
-    document.getElementById('valPoids').textContent = w;
-    updateAvatar(h, w, genre, silhouette);
-  }
+// ── Orbit (manual) ─────────────────────────────────────
+let drag=false, lx=0, ly=0, rotY=0.2, rotX=0.04;
+canvas.addEventListener('mousedown', e=>{drag=true;lx=e.clientX;ly=e.clientY;});
+window.addEventListener('mouseup',   ()=>drag=false);
+window.addEventListener('mousemove', e=>{
+  if(!drag) return;
+  rotY += (e.clientX-lx)*0.012; lx=e.clientX;
+  rotX += (e.clientY-ly)*0.008; rotX=clamp(rotX,-0.4,0.5); ly=e.clientY;
+});
+canvas.addEventListener('touchstart',e=>{drag=true;lx=e.touches[0].clientX;},{passive:true});
+window.addEventListener('touchend',()=>drag=false);
+window.addEventListener('touchmove',e=>{
+  if(!drag)return;
+  rotY+=(e.touches[0].clientX-lx)*0.015; lx=e.touches[0].clientX;
+},{passive:true});
 
-  function goResult() {
-    const h = parseInt(document.getElementById('sliderTaille').value);
-    const w = parseInt(document.getElementById('sliderPoids').value);
-    const measures = updateAvatar(h, w, genre, silhouette);
-    const size = recommendSize(measures, genre);
+// ── Resize ─────────────────────────────────────────────
+function resize() {
+  const w = cpanel.clientWidth;
+  const h = Math.max(cpanel.clientHeight - 90, 200);
+  renderer.setSize(w, h);
+  camera.aspect = w/h;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', () => { resize(); });
+resize();
 
-    document.getElementById('resPoitrine').textContent = measures.bust;
-    document.getElementById('resTaille').textContent   = measures.waist;
-    document.getElementById('resHanches').textContent  = measures.hips;
-    document.getElementById('resSize').textContent     = size;
+// ── Loop ───────────────────────────────────────────────
+(function loop() {
+  requestAnimationFrame(loop);
+  mannequin.rotation.y = rotY;
+  mannequin.rotation.x = rotX;
+  renderer.render(scene, camera);
+})();
 
-    const bmi = w / Math.pow(h / 100, 2).toFixed(1);
-    document.getElementById('resExplain').innerHTML =
-      `Sur la base de votre poitrine estimée (<strong>${measures.bust} cm</strong>) et de votre tour de taille estimé (<strong>${measures.waist} cm</strong>), nous vous recommandons le <strong>${size}</strong>. Cette robe est en coupe <strong>ajustée</strong>, viscose non extensible — nous avons pris une marge de confort.`;
+// ── UI ─────────────────────────────────────────────────
+function goStep(n) {
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  if (n >= 2) updateMannequin();
+}
 
-    goStep(4);
-  }
+function pickGenre(btn) {
+  document.querySelectorAll('.gbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  genre = btn.dataset.g;
+  if (genre==='homme') { document.getElementById('curvyLbl').textContent='Athletic'; document.getElementById('curvyDesc').textContent='Musculature marquée'; }
+  else                 { document.getElementById('curvyLbl').textContent='Curvy';    document.getElementById('curvyDesc').textContent='Formes marquées'; }
+  goStep(2);
+}
 
-  // Init avatar
-  updateAvatar(165, 62, 'femme', 'standard');
+function pickSil(btn) {
+  document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  sil = btn.dataset.s;
+  updateMannequin();
+}
+
+function onSlide() {
+  document.getElementById('vT').textContent = document.getElementById('sT').value;
+  document.getElementById('vP').textContent = document.getElementById('sP').value;
+  updateMannequin();
+}
+
+const SIZING = [
+  {size:'XS',bust:[78,83], waist:[58,63]},
+  {size:'S', bust:[84,89], waist:[64,69]},
+  {size:'M', bust:[90,95], waist:[70,75]},
+  {size:'L', bust:[96,101],waist:[76,81]},
+  {size:'XL',bust:[102,108],waist:[82,88]},
+];
+
+function showResult() {
+  const h = parseInt(document.getElementById('sT').value);
+  const w = parseInt(document.getElementById('sP').value);
+  const m = calcMeasures(h, w, genre, sil);
+  document.getElementById('rPoitrine').textContent = m.bust;
+  document.getElementById('rTaille').textContent   = m.waist;
+  document.getElementById('rHanches').textContent  = m.hips;
+  let iB = SIZING.findIndex(s=>m.bust>=s.bust[0]&&m.bust<=s.bust[1]);
+  let iW = SIZING.findIndex(s=>m.waist>=s.waist[0]&&m.waist<=s.waist[1]);
+  if(iB<0) iB = m.bust>108?4:0;
+  if(iW<0) iW = m.waist>88?4:0;
+  const idx = Math.min(Math.max(iB,iW),4);
+  const sz = SIZING[idx].size;
+  document.getElementById('rSize').textContent = sz;
+  document.getElementById('rExplain').innerHTML =
+    `Poitrine estimée <strong>${m.bust} cm</strong>, tour de taille <strong>${m.waist} cm</strong>. Robe coupe ajustée, viscose — taille <strong>${sz}</strong> recommandée.`;
+  goStep(4);
+}
+
+// Init
+updateMannequin();
 </script>
-
 </body>
 </html>
