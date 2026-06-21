@@ -295,34 +295,53 @@
 
         <div class="widget-body" id="widgetBody">
 
-          <!-- ÉTAPE 1 : Mensurations -->
+          <!-- ÉTAPE 1 : Profil rapide -->
           <div id="stateMeasure">
-            <div style="font-size:.78rem;font-weight:600;margin-bottom:.75rem;color:var(--black);">Vos mensurations</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.75rem;">
+            <!-- Genre -->
+            <div style="font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--gray);margin-bottom:.5rem;">Genre</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.9rem;">
+              <button class="wg-btn active" id="gFemme" onclick="setGenre('femme',this)" style="border:1.5px solid var(--accent);background:var(--accent-bg);border-radius:7px;padding:.5rem;font-size:.8rem;font-weight:600;cursor:pointer;">👩 Femme</button>
+              <button class="wg-btn" id="gHomme" onclick="setGenre('homme',this)" style="border:1.5px solid var(--border);background:none;border-radius:7px;padding:.5rem;font-size:.8rem;font-weight:600;cursor:pointer;">👨 Homme</button>
+            </div>
+
+            <!-- Taille / Poids -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.9rem;">
               <div>
-                <label style="font-size:.68rem;color:var(--gray);display:block;margin-bottom:.25rem;">Taille (cm)</label>
-                <input id="mTaille" type="number" placeholder="168" min="140" max="210"
-                  style="width:100%;padding:.5rem .6rem;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;outline:none;font-family:inherit;" />
+                <div style="display:flex;justify-content:space-between;margin-bottom:.3rem;">
+                  <label style="font-size:.68rem;color:var(--gray);font-weight:600;">Taille</label>
+                  <span style="font-size:.78rem;font-weight:700;color:var(--accent);"><span id="wValTaille">165</span> cm</span>
+                </div>
+                <input type="range" id="wSliderTaille" min="145" max="205" value="165" oninput="onWidgetSlider()" style="width:100%;accent-color:var(--accent);" />
               </div>
               <div>
-                <label style="font-size:.68rem;color:var(--gray);display:block;margin-bottom:.25rem;">Poids (kg)</label>
-                <input id="mPoids" type="number" placeholder="62" min="40" max="150"
-                  style="width:100%;padding:.5rem .6rem;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;outline:none;font-family:inherit;" />
-              </div>
-              <div>
-                <label style="font-size:.68rem;color:var(--gray);display:block;margin-bottom:.25rem;">Poitrine (cm)</label>
-                <input id="mPoitrine" type="number" placeholder="90" min="60" max="140"
-                  style="width:100%;padding:.5rem .6rem;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;outline:none;font-family:inherit;" />
-              </div>
-              <div>
-                <label style="font-size:.68rem;color:var(--gray);display:block;margin-bottom:.25rem;">Tour de taille (cm)</label>
-                <input id="mTourTaille" type="number" placeholder="70" min="50" max="130"
-                  style="width:100%;padding:.5rem .6rem;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;outline:none;font-family:inherit;" />
+                <div style="display:flex;justify-content:space-between;margin-bottom:.3rem;">
+                  <label style="font-size:.68rem;color:var(--gray);font-weight:600;">Poids</label>
+                  <span style="font-size:.78rem;font-weight:700;color:var(--accent);"><span id="wValPoids">62</span> kg</span>
+                </div>
+                <input type="range" id="wSliderPoids" min="40" max="130" value="62" oninput="onWidgetSlider()" style="width:100%;accent-color:var(--accent);" />
               </div>
             </div>
+
+            <!-- Silhouette -->
+            <div style="font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--gray);margin-bottom:.5rem;">Silhouette</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.35rem;margin-bottom:.9rem;" id="wSilGrid">
+              <button class="ws-btn" data-sil="slim" onclick="setSil(this)" style="border:1.5px solid var(--border);border-radius:7px;padding:.5rem .3rem;font-size:.7rem;cursor:pointer;background:none;">
+                <div style="font-size:1.3rem;margin-bottom:.2rem;">🕴</div><strong>Slim</strong><div style="font-size:.62rem;color:var(--gray)">Silhouette fine</div>
+              </button>
+              <button class="ws-btn active" data-sil="standard" onclick="setSil(this)" style="border:1.5px solid var(--accent);background:var(--accent-bg);border-radius:7px;padding:.5rem .3rem;font-size:.7rem;cursor:pointer;">
+                <div style="font-size:1.3rem;margin-bottom:.2rem;">🧍</div><strong>Standard</strong><div style="font-size:.62rem;color:var(--gray)">Moyenne</div>
+              </button>
+              <button class="ws-btn" data-sil="curvy" onclick="setSil(this)" style="border:1.5px solid var(--border);border-radius:7px;padding:.5rem .3rem;font-size:.7rem;cursor:pointer;background:none;">
+                <div style="font-size:1.3rem;margin-bottom:.2rem;">🙋</div><strong id="wCurvyLabel">Curvy</strong><div style="font-size:.62rem;color:var(--gray)">Formes marquées</div>
+              </button>
+            </div>
+
             <button onclick="analyzeSize()" class="btn-result btn-share" style="width:100%;padding:.65rem;">
               Trouver ma taille →
             </button>
+            <div style="text-align:center;margin-top:.5rem;">
+              <a href="/avatar.html" style="font-size:.7rem;color:var(--gray);text-decoration:none;">Voir mon avatar 3D complet ↗</a>
+            </div>
           </div>
 
           <!-- ÉTAPE 2 : Recommandation -->
@@ -421,44 +440,78 @@
     const GARMENT = { coupe: 'ajustée', matiere: 'viscose (non extensible)', longueur: 'midi' };
 
     let currentRecoSize = '';
+    let wGenre = 'femme';
+    let wSil   = 'standard';
+
+    // ── Anthropometric estimation ────────────────────────
+    function estimateMeasures(h, w, g, sil) {
+      const bmi = w / Math.pow(h / 100, 2);
+      let bust, waist;
+      if (g === 'femme') {
+        bust  = 90  + (h - 165) * 0.30 + (bmi - 22) * 1.5;
+        waist = 72  + (h - 165) * 0.18 + (bmi - 22) * 1.8;
+        if (sil === 'slim')  { bust -= 3; waist -= 5; }
+        if (sil === 'curvy') { bust += 6; waist += 3; }
+      } else {
+        bust  = 96  + (h - 175) * 0.35 + (bmi - 23) * 1.5;
+        waist = 84  + (h - 175) * 0.20 + (bmi - 23) * 2.0;
+        if (sil === 'slim')     { bust -= 4; waist -= 6; }
+        if (sil === 'athletic') { bust += 8; waist -= 4; }
+      }
+      return { bust: Math.round(bust), waist: Math.round(waist) };
+    }
+
+    // ── Widget controls ──────────────────────────────────
+    function setGenre(g, btn) {
+      wGenre = g;
+      document.querySelectorAll('.wg-btn').forEach(b => {
+        b.style.borderColor = 'var(--border)';
+        b.style.background = 'none';
+      });
+      btn.style.borderColor = 'var(--accent)';
+      btn.style.background = 'var(--accent-bg)';
+      if (g === 'homme') document.getElementById('wCurvyLabel').textContent = 'Athletic';
+      else               document.getElementById('wCurvyLabel').textContent = 'Curvy';
+    }
+
+    function setSil(btn) {
+      wSil = btn.dataset.sil;
+      document.querySelectorAll('.ws-btn').forEach(b => {
+        b.style.borderColor = 'var(--border)';
+        b.style.background = 'none';
+        b.classList.remove('active');
+      });
+      btn.style.borderColor = 'var(--accent)';
+      btn.style.background = 'var(--accent-bg)';
+    }
+
+    function onWidgetSlider() {
+      document.getElementById('wValTaille').textContent = document.getElementById('wSliderTaille').value;
+      document.getElementById('wValPoids').textContent  = document.getElementById('wSliderPoids').value;
+    }
 
     function analyzeSize() {
-      const taille    = parseInt(document.getElementById('mTaille').value);
-      const poids     = parseInt(document.getElementById('mPoids').value);
-      const poitrine  = parseInt(document.getElementById('mPoitrine').value);
-      const tourTaille= parseInt(document.getElementById('mTourTaille').value);
+      const h = parseInt(document.getElementById('wSliderTaille').value);
+      const w = parseInt(document.getElementById('wSliderPoids').value);
+      const m = estimateMeasures(h, w, wGenre, wSil);
 
-      if (!poitrine || !tourTaille) {
-        alert('Veuillez entrer au minimum votre tour de poitrine et votre tour de taille.');
-        return;
-      }
-
-      // Trouver la taille selon poitrine
-      let matchPoitrine = SIZING.find(s => poitrine >= s.poitrine[0] && poitrine <= s.poitrine[1]);
-      let matchTaille   = SIZING.find(s => tourTaille >= s.tourTaille[0] && tourTaille <= s.tourTaille[1]);
-
-      // Prendre la plus grande des deux (coupe ajustée)
+      // Match sizing table
       const sizes = ['XS','S','M','L','XL'];
-      let idxP = matchPoitrine ? sizes.indexOf(matchPoitrine.size) : -1;
-      let idxT = matchTaille   ? sizes.indexOf(matchTaille.size)   : -1;
-
+      let idxP = SIZING.findIndex(s => m.bust  >= s.poitrine[0]  && m.bust  <= s.poitrine[1]);
+      let idxT = SIZING.findIndex(s => m.waist >= s.tourTaille[0] && m.waist <= s.tourTaille[1]);
+      if (idxP < 0) idxP = m.bust  > 108 ? 4 : 0;
+      if (idxT < 0) idxT = m.waist > 88  ? 4 : 0;
       let idxFinal = Math.max(idxP, idxT);
-      if (idxFinal === -1) idxFinal = poitrine > 108 ? 4 : 0;
 
-      // Coupe ajustée → taille au-dessus si aux limites hautes
+      // Coupe ajustée → monter d'une taille si en limite haute
       const s = SIZING[idxFinal];
-      if (s && poitrine >= s.poitrine[1] - 1 && idxFinal < 4) idxFinal++;
+      if (s && m.bust >= s.poitrine[1] - 1 && idxFinal < 4) idxFinal++;
 
-      currentRecoSize = sizes[idxFinal];
+      currentRecoSize = sizes[Math.min(idxFinal, 4)];
 
-      // Construire l'explication
-      const explications = [];
-      if (poitrine) explications.push(`tour de poitrine ${poitrine} cm → zone ${matchPoitrine ? matchPoitrine.size : 'XL+'}`);
-      if (tourTaille) explications.push(`tour de taille ${tourTaille} cm → zone ${matchTaille ? matchTaille.size : 'XL+'}`);
-
-      let conseil = `Sur la base de vos mensurations (${explications.join(', ')}), nous vous recommandons le <strong>${currentRecoSize}</strong>.`;
-      if (GARMENT.coupe === 'ajustée') conseil += ` Cette robe est en coupe <strong>ajustée</strong> et en <strong>${GARMENT.matiere}</strong> — nous avons pris en compte le manque d'extensibilité du tissu.`;
-      if (taille && taille < 162) conseil += ` Pour votre taille (${taille} cm), la longueur midi tombera légèrement plus bas que prévu — parfait pour un effet élégant.`;
+      let conseil = `Sur la base de votre profil (${h} cm, ${w} kg, silhouette ${wSil}), vos mensurations estimées sont <strong>${m.bust} cm</strong> de poitrine et <strong>${m.waist} cm</strong> de tour de taille.`;
+      conseil += ` Nous vous recommandons le <strong>${currentRecoSize}</strong>. Cette robe est en coupe <strong>ajustée</strong>, viscose non extensible.`;
+      if (h < 162) conseil += ` La longueur midi tombera élégamment pour votre taille.`;
 
       document.getElementById('recoSize').textContent = currentRecoSize;
       document.getElementById('recoExplain').innerHTML = conseil;
