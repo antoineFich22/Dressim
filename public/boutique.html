@@ -427,7 +427,7 @@
         </div>
       </div>
 
-      <button class="btn-tryon" onclick="dmTryOn('Robe Midi Florale', 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80')">
+      <button class="btn-tryon" onclick="dmTryOn('Robe Midi Florale', 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80', null, event)">
         👗 Essayer sur mon avatar
       </button>
       <button class="btn-cart">Ajouter au panier</button>
@@ -448,25 +448,25 @@
         <div class="card-img">👘</div>
         <div class="card-name">Kimono Lin</div>
         <div class="card-price">89,00 €</div>
-        <button class="card-btn-tryon" onclick="dmTryOn('Kimono Lin', 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&q=80')">👗 Essayer</button>
+        <button class="card-btn-tryon" onclick="dmTryOn('Kimono Lin', 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&q=80', null, event)">👗 Essayer</button>
       </div>
       <div>
         <div class="card-img">🧥</div>
         <div class="card-name">Veste Bohème</div>
         <div class="card-price">145,00 €</div>
-        <button class="card-btn-tryon" onclick="dmTryOn('Veste Bohème', 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80')">👗 Essayer</button>
+        <button class="card-btn-tryon" onclick="dmTryOn('Veste Bohème', 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80', null, event)">👗 Essayer</button>
       </div>
       <div>
         <div class="card-img">👚</div>
         <div class="card-name">Top Dentelle</div>
         <div class="card-price">62,00 €</div>
-        <button class="card-btn-tryon" onclick="dmTryOn('Top Dentelle', 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80')">👗 Essayer</button>
+        <button class="card-btn-tryon" onclick="dmTryOn('Top Dentelle', 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80', null, event)">👗 Essayer</button>
       </div>
       <div>
         <div class="card-img">🩱</div>
         <div class="card-name">Robe Bain</div>
         <div class="card-price">74,00 €</div>
-        <button class="card-btn-tryon" onclick="dmTryOn('Robe Bain', 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80')">👗 Essayer</button>
+        <button class="card-btn-tryon" onclick="dmTryOn('Robe Bain', 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80', null, event)">👗 Essayer</button>
       </div>
     </div>
   </div>
@@ -869,26 +869,65 @@
       widget.classList.toggle('collapsed');
     };
 
+    // Animation vêtement qui vole vers le widget
+    function flyGarment(productImg, triggerEl, callback) {
+      const from = triggerEl.closest('.product-card, .related-card, [class*="card"]') || triggerEl;
+      const fromRect = from.getBoundingClientRect();
+      const widgetRect = widget.getBoundingClientRect();
+
+      const img = document.createElement('img');
+      img.src = productImg;
+      img.style.cssText = `
+        position:fixed;
+        left:${fromRect.left + fromRect.width/2 - 40}px;
+        top:${fromRect.top + fromRect.height/2 - 50}px;
+        width:80px; height:100px;
+        object-fit:cover; border-radius:10px;
+        box-shadow:0 0 24px rgba(200,169,110,.6);
+        z-index:9999; pointer-events:none;
+        transition:all .65s cubic-bezier(.4,0,.2,1);
+        opacity:1;
+      `;
+      document.body.appendChild(img);
+
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const tx = widgetRect.left + widgetRect.width/2 - 40;
+        const ty = widgetRect.top + widgetRect.height/2 - 50;
+        img.style.left = tx + 'px';
+        img.style.top  = ty + 'px';
+        img.style.width  = '36px';
+        img.style.height = '46px';
+        img.style.opacity = '0';
+        img.style.borderRadius = '6px';
+      }));
+
+      // Flash doré sur le widget à l'arrivée
+      setTimeout(() => {
+        widget.style.boxShadow = '0 0 40px rgba(200,169,110,.8), 0 8px 40px rgba(0,0,0,.35)';
+        setTimeout(() => { widget.style.boxShadow = ''; }, 400);
+        img.remove();
+        callback();
+      }, 680);
+    }
+
     // Essayer un vêtement — appelé par les boutons produits
-    window.dmTryOn = function(productName, productImg, size) {
-      // Affiche overlay garment
-      document.getElementById('dm-garment-img').src = productImg;
-      document.getElementById('dm-garment-overlay').classList.add('active');
+    window.dmTryOn = function(productName, productImg, size, event) {
+      const trigger = event?.currentTarget || document.activeElement || document.body;
 
-      // Infos produit
-      document.getElementById('dm-default-msg').style.display = 'none';
-      document.getElementById('dm-product-info').style.display = 'block';
-      document.getElementById('dm-product-name').textContent = productName;
-      document.getElementById('dm-size-val').textContent = size || avatar.size;
-
-      const m = avatar.measures;
-      document.getElementById('dm-meas').innerHTML =
-        `<span class="dm-meas-chip">👙 ${m.bust} cm</span>
-         <span class="dm-meas-chip">⌛ ${m.waist} cm</span>
-         <span class="dm-meas-chip">🍑 ${m.hips} cm</span>`;
-
-      // Ouvre le widget si collapsed
-      widget.classList.remove('collapsed');
+      flyGarment(productImg, trigger, () => {
+        document.getElementById('dm-garment-img').src = productImg;
+        document.getElementById('dm-garment-overlay').classList.add('active');
+        document.getElementById('dm-default-msg').style.display = 'none';
+        document.getElementById('dm-product-info').style.display = 'block';
+        document.getElementById('dm-product-name').textContent = productName;
+        document.getElementById('dm-size-val').textContent = size || avatar.size;
+        const m = avatar.measures;
+        document.getElementById('dm-meas').innerHTML =
+          `<span class="dm-meas-chip">👙 ${m.bust} cm</span>
+           <span class="dm-meas-chip">⌛ ${m.waist} cm</span>
+           <span class="dm-meas-chip">🍑 ${m.hips} cm</span>`;
+        widget.classList.remove('collapsed');
+      });
     };
 
     window.dmReset = function() {
