@@ -3,1257 +3,422 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dressim — Essayage virtuel pour votre boutique</title>
-  <meta name="description" content="Intégrez l'essayage virtuel IA dans votre boutique en une ligne de code. Réduisez vos retours, augmentez vos conversions." />
-  <!-- Google Analytics -->
+  <title>Dressim — L'essayage virtuel IA pour votre boutique</title>
+  <meta name="description" content="Vos clients essaient vos vêtements grâce à l'IA, directement sur votre site. Moins de retours, plus de ventes. Intégration en une ligne de code." />
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-YXQSR53XGE"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YXQSR53XGE');</script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --violet:#7c3aed; --indigo:#6366f1; --fuchsia:#ec4899; --coral:#fb7185;
+      --orange:#f97316; --cyan:#06b6d4;
+      --ink:#160f2e; --muted:#6b6480; --line:#ece8f5;
+      --bg:#fbfaff; --white:#fff;
+      --grad:linear-gradient(120deg,#7c3aed 0%,#ec4899 55%,#fb7185 100%);
+      --grad-cool:linear-gradient(120deg,#6366f1,#06b6d4);
+      --grad-warm:linear-gradient(120deg,#f97316,#ec4899);
+      --radius:18px;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;letter-spacing:-.02em}
+    a{text-decoration:none;color:inherit}
+    .wrap{max-width:1160px;margin:0 auto;padding:0 1.5rem}
+    .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;z-index:0;pointer-events:none;animation:float 20s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(50px,-40px) scale(1.12)}66%{transform:translate(-40px,30px) scale(.94)}}
+    .reveal{opacity:0;transform:translateY(30px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+    .reveal.in{opacity:1;transform:none}
 
-    :root {
-      --black:   #1a1220;
-      --dark:    #2d2438;
-      --gray:    #6b7280;
-      --border:  #e5e7eb;
-      --bg:      #ffffff;
-      --white:   #ffffff;
-      --warm:    #c8a96e;
-      --warm-l:  #fef9f0;
-      --plum:    #3d2b5e;
-      --plum-l:  #f4f0f9;
-    }
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:50;transition:all .3s}
+    nav.scrolled{background:rgba(251,250,255,.8);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+    nav .inner{display:flex;align-items:center;justify-content:space-between;padding:1rem 0}
+    .logo{font-family:'Space Grotesk';font-weight:700;font-size:1.4rem}
+    .logo .dot{color:var(--fuchsia)}
+    .navlinks{display:flex;align-items:center;gap:2rem}
+    .navlinks a{font-size:.9rem;font-weight:500;color:var(--muted);transition:color .2s}
+    .navlinks a:hover{color:var(--ink)}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;font-weight:600;border-radius:12px;cursor:pointer;border:none;font-family:inherit;transition:transform .2s,box-shadow .2s;font-size:.95rem}
+    .btn-grad{background:var(--grad);color:#fff;padding:.7rem 1.4rem;box-shadow:0 8px 26px rgba(236,72,153,.38)}
+    .btn-grad:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(236,72,153,.5)}
+    .btn-ghost{background:rgba(124,58,237,.08);color:var(--violet);padding:.7rem 1.4rem}
+    .btn-ghost:hover{background:rgba(124,58,237,.14)}
+    .btn-lg{padding:.95rem 2rem;font-size:1.05rem;border-radius:14px}
+    @media(max-width:780px){.navlinks .hide-m{display:none}}
 
-    html { scroll-behavior: smooth; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--black); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    /* HERO */
+    .hero{position:relative;padding:9rem 0 5rem;overflow:hidden}
+    .hero .b1{width:480px;height:480px;background:#7c3aed;top:-120px;left:-120px}
+    .hero .b2{width:420px;height:420px;background:#ec4899;top:40px;right:-100px;animation-delay:-7s}
+    .hero .b3{width:360px;height:360px;background:#06b6d4;bottom:-160px;left:30%;animation-delay:-13s;opacity:.35}
+    .hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:3rem;align-items:center}
+    @media(max-width:880px){.hero-grid{grid-template-columns:1fr;gap:2.5rem}}
+    .badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.75);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:30px;padding:.4rem .9rem;font-size:.8rem;font-weight:600;color:var(--violet);margin-bottom:1.4rem}
+    .badge .pulse{width:8px;height:8px;border-radius:50%;background:var(--fuchsia);box-shadow:0 0 0 0 rgba(236,72,153,.6);animation:pulse 2s infinite}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(236,72,153,.55)}70%{box-shadow:0 0 0 10px rgba(236,72,153,0)}100%{box-shadow:0 0 0 0 rgba(236,72,153,0)}}
+    .hero h1{font-size:clamp(2.4rem,5.2vw,4rem);font-weight:700;line-height:1.05;margin-bottom:1.3rem}
+    .hero .sub{font-size:1.15rem;color:var(--muted);max-width:520px;margin-bottom:2rem}
+    .hero-ctas{display:flex;gap:1rem;flex-wrap:wrap}
+    .hero-mini{display:flex;gap:1.5rem;margin-top:2.2rem;flex-wrap:wrap}
+    .hero-mini div{font-size:.85rem;color:var(--muted)}
+    .hero-mini b{display:block;font-family:'Space Grotesk';font-size:1.5rem;color:var(--ink);font-weight:700}
 
-    .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+    /* HERO PREVIEW CARD */
+    .preview{position:relative;justify-self:center;width:100%;max-width:380px;aspect-ratio:3/4;border-radius:26px;overflow:hidden;box-shadow:0 30px 80px rgba(124,58,237,.28);border:6px solid #fff;background:#0f0a1f}
+    .preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .8s ease}
+    .preview .tag{position:absolute;left:14px;bottom:14px;z-index:3;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border-radius:12px;padding:.5rem .8rem;display:flex;align-items:center;gap:.5rem;font-size:.8rem;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.15)}
+    .preview .tag .sz{background:var(--grad);color:#fff;border-radius:7px;padding:.1rem .5rem;font-weight:700}
+    .chip{position:absolute;z-index:4;width:62px;height:78px;border-radius:14px;object-fit:cover;border:3px solid #fff;box-shadow:0 10px 28px rgba(0,0,0,.22);animation:float 9s ease-in-out infinite}
+    .chip.c1{top:8%;right:-26px}
+    .chip.c2{bottom:18%;left:-26px;animation-delay:-3s}
 
-    /* ── NAV ── */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(255,255,255,.92); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: .9rem 0;
-    }
-    nav .inner { display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 1.25rem; font-weight: 700; letter-spacing: -.02em; color: var(--black); text-decoration: none; }
-    .logo span { color: var(--warm); }
-    .nav-links { display: flex; align-items: center; gap: 2rem; }
-    .nav-links a { font-size: .875rem; color: var(--gray); text-decoration: none; transition: color .2s; }
-    .nav-links a:hover { color: var(--black); }
-    .btn-nav { background: var(--plum); color: var(--white); padding: .5rem 1.1rem; border-radius: 6px; font-size: .875rem; font-weight: 500; text-decoration: none; transition: opacity .2s; }
-    .btn-nav:hover { opacity: .85; color: var(--white); }
+    /* SECTIONS */
+    section{position:relative}
+    .sec{padding:5.5rem 0}
+    .eyebrow{display:inline-block;font-weight:700;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:.8rem}
+    .sec h2{font-size:clamp(1.8rem,3.6vw,2.7rem);font-weight:700;line-height:1.12;margin-bottom:.8rem}
+    .sec .lead{font-size:1.08rem;color:var(--muted);max-width:560px}
+    .center{text-align:center}
+    .center .lead{margin:0 auto}
 
-    /* ── HERO ── */
-    .hero {
-      padding: 6rem 0 5rem;
-      text-align: center;
-    }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: .4rem;
-      background: var(--warm-l); color: var(--warm);
-      border: 1px solid rgba(200,169,110,.3);
-      font-size: .75rem; font-weight: 600; letter-spacing: .04em;
-      padding: .3rem .8rem; border-radius: 20px; margin-bottom: 1.5rem;
-    }
-    .hero h1 {
-      font-size: clamp(2.2rem, 5vw, 3.8rem);
-      font-weight: 800; line-height: 1.1;
-      letter-spacing: -.03em; color: var(--black);
-      max-width: 760px; margin: 0 auto 1.25rem;
-    }
-    .hero h1 em { font-style: normal; color: var(--warm); }
-    .hero p {
-      font-size: 1.125rem; color: var(--gray);
-      max-width: 520px; margin: 0 auto 2.5rem;
-    }
-    .hero-ctas { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-    .btn-primary {
-      background: var(--plum); color: var(--white);
-      padding: .85rem 2rem; border-radius: 8px;
-      font-size: 1rem; font-weight: 600;
-      text-decoration: none; transition: opacity .2s;
-      display: inline-flex; align-items: center; gap: .5rem;
-    }
-    .btn-primary:hover { opacity: .85; }
-    .btn-secondary {
-      background: transparent; color: var(--black);
-      padding: .85rem 2rem; border-radius: 8px;
-      font-size: 1rem; font-weight: 500;
-      text-decoration: none; border: 1.5px solid var(--border);
-      transition: border-color .2s;
-    }
-    .btn-secondary:hover { border-color: var(--black); }
+    /* STATS band */
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;margin-top:1rem}
+    @media(max-width:780px){.stats{grid-template-columns:repeat(2,1fr)}}
+    .stat{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:1.6rem;text-align:center;box-shadow:0 10px 30px rgba(124,58,237,.05)}
+    .stat b{font-family:'Space Grotesk';font-size:2.2rem;font-weight:700;display:block;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .stat span{font-size:.85rem;color:var(--muted)}
 
-    /* ── STATS ── */
-    .stats {
-      display: flex; justify-content: center;
-      gap: 3rem; flex-wrap: wrap;
-      margin-top: 4rem;
-      padding-top: 3rem;
-      border-top: 1px solid var(--border);
-    }
-    .stat-item { text-align: center; }
-    .stat-num { font-size: 2rem; font-weight: 800; letter-spacing: -.03em; color: var(--black); }
-    .stat-label { font-size: .8rem; color: var(--gray); margin-top: .2rem; }
+    /* STEPS */
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:3rem}
+    @media(max-width:820px){.steps{grid-template-columns:1fr}}
+    .step{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:2rem;position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s}
+    .step:hover{transform:translateY(-6px);box-shadow:0 24px 50px rgba(124,58,237,.14)}
+    .step .ic{width:54px;height:54px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1.1rem;color:#fff}
+    .step h3{font-size:1.2rem;font-weight:600;margin-bottom:.5rem}
+    .step p{font-size:.92rem;color:var(--muted)}
+    .step .n{position:absolute;top:1.2rem;right:1.4rem;font-family:'Space Grotesk';font-weight:700;font-size:2.4rem;color:var(--line)}
 
-    /* ── SECTION TITLES ── */
-    .section { padding: 5rem 0; }
-    .section-tag {
-      display: inline-block;
-      font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-      color: var(--warm); background: var(--warm-l);
-      padding: .25rem .7rem; border-radius: 4px; margin-bottom: 1rem;
-    }
-    .section-title {
-      font-size: clamp(1.6rem, 3vw, 2.4rem);
-      font-weight: 800; letter-spacing: -.03em;
-      max-width: 560px; line-height: 1.15;
-    }
-    .section-sub {
-      font-size: 1rem; color: var(--gray);
-      max-width: 480px; margin-top: .75rem;
-    }
+    /* DEMO */
+    .demo{background:linear-gradient(180deg,#fbfaff, #f4f0ff);overflow:hidden}
+    .demo-card{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:center;background:rgba(255,255,255,.7);backdrop-filter:blur(16px);border:1px solid #fff;border-radius:28px;padding:2.2rem;box-shadow:0 30px 70px rgba(124,58,237,.13)}
+    @media(max-width:820px){.demo-card{grid-template-columns:1fr;gap:1.6rem}}
+    .demo-stage{position:relative;aspect-ratio:3/4;border-radius:20px;overflow:hidden;background:#0f0a1f;box-shadow:0 16px 44px rgba(0,0,0,.22)}
+    .demo-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .55s ease}
+    .demo-stage .flash{position:absolute;inset:0;box-shadow:inset 0 0 0 rgba(236,72,153,0);transition:box-shadow .4s;pointer-events:none}
+    .gtoggle{display:inline-flex;background:#f1edfb;border-radius:12px;padding:.25rem;margin-bottom:1.2rem}
+    .gtoggle button{border:none;background:none;padding:.45rem 1rem;border-radius:9px;font-family:inherit;font-weight:600;font-size:.85rem;color:var(--muted);cursor:pointer;transition:all .2s}
+    .gtoggle button.on{background:#fff;color:var(--violet);box-shadow:0 3px 10px rgba(124,58,237,.15)}
+    .garments{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem;margin:1.2rem 0}
+    .garments button{border:2px solid transparent;background:#fff;border-radius:14px;padding:0;overflow:hidden;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+    .garments button:hover{transform:translateY(-3px)}
+    .garments button.on{border-color:var(--fuchsia);box-shadow:0 8px 22px rgba(236,72,153,.28)}
+    .garments img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+    .demo-size{display:flex;align-items:center;gap:.6rem;font-size:.95rem;color:var(--muted);margin-top:.4rem}
+    .demo-size .v{background:var(--grad);color:#fff;font-weight:700;border-radius:9px;padding:.15rem .7rem;font-family:'Space Grotesk'}
 
-    /* ── HOW IT WORKS ── */
-    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; margin-top: 3rem; }
-    .step {
-      background: var(--white); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.75rem;
-    }
-    .step-num {
-      width: 36px; height: 36px; border-radius: 8px;
-      background: var(--warm-l); color: var(--warm);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: .9rem; margin-bottom: 1rem;
-    }
-    .step h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; }
-    .step p { font-size: .875rem; color: var(--gray); line-height: 1.5; }
+    /* FEATURES */
+    .feats{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3rem;margin-top:3rem}
+    @media(max-width:820px){.feats{grid-template-columns:1fr 1fr}}
+    @media(max-width:540px){.feats{grid-template-columns:1fr}}
+    .feat{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:1.7rem;transition:transform .3s,box-shadow .3s}
+    .feat:hover{transform:translateY(-5px);box-shadow:0 22px 46px rgba(124,58,237,.12)}
+    .feat .ic{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1rem;color:#fff}
+    .feat h3{font-size:1.05rem;font-weight:600;margin-bottom:.35rem}
+    .feat p{font-size:.88rem;color:var(--muted)}
 
-    /* ── CODE SNIPPET ── */
-    .code-block {
-      background: var(--dark); border-radius: 10px;
-      padding: 1.5rem 1.75rem; margin-top: 2rem;
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: .82rem; line-height: 1.8;
-      overflow-x: auto;
-    }
-    .code-block .c-tag { color: #6ee7b7; }
-    .code-block .c-attr { color: #93c5fd; }
-    .code-block .c-val { color: #fbbf24; }
-    .code-block .c-comment { color: #6b7280; }
+    /* PRICING */
+    .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:3rem;align-items:stretch}
+    @media(max-width:820px){.plans{grid-template-columns:1fr}}
+    .plan{background:#fff;border:1px solid var(--line);border-radius:22px;padding:2rem;display:flex;flex-direction:column;transition:transform .3s}
+    .plan:hover{transform:translateY(-5px)}
+    .plan.hot{background:var(--grad);color:#fff;box-shadow:0 26px 60px rgba(236,72,153,.35);border:none}
+    .plan .pname{font-weight:700;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;opacity:.8;margin-bottom:.8rem}
+    .plan .price{font-family:'Space Grotesk';font-size:2.6rem;font-weight:700;line-height:1}
+    .plan .price small{font-size:.9rem;font-weight:500;opacity:.7}
+    .plan ul{list-style:none;margin:1.4rem 0;display:flex;flex-direction:column;gap:.6rem;flex:1}
+    .plan li{font-size:.9rem;display:flex;gap:.5rem;align-items:flex-start}
+    .plan li::before{content:'✓';font-weight:800}
+    .plan.hot li::before{color:#fff}
+    .plan:not(.hot) li::before{color:var(--fuchsia)}
+    .plan .btn{justify-content:center;width:100%}
+    .plan.hot .btn{background:#fff;color:var(--violet)}
+    .plan .ptag{display:inline-block;background:rgba(255,255,255,.22);font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.2rem .6rem;border-radius:20px;margin-bottom:.8rem;width:fit-content}
 
-    /* ── CUSTOMIZATION ── */
-    .custom-section { background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    .custom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-    @media (max-width: 700px) { .custom-grid { grid-template-columns: 1fr; } }
+    /* CTA */
+    .cta{position:relative;overflow:hidden;border-radius:30px;margin:4rem 1.5rem;padding:4.5rem 2rem;text-align:center;background:var(--grad);color:#fff}
+    .cta .b1{width:340px;height:340px;background:#fff;opacity:.18;top:-120px;left:-60px}
+    .cta .b2{width:300px;height:300px;background:#06b6d4;opacity:.3;bottom:-140px;right:-40px;animation-delay:-6s}
+    .cta h2{position:relative;z-index:2;font-size:clamp(1.9rem,4vw,3rem);font-weight:700;margin-bottom:.8rem}
+    .cta p{position:relative;z-index:2;opacity:.92;max-width:520px;margin:0 auto 2rem;font-size:1.1rem}
+    .cta .btn{position:relative;z-index:2;background:#fff;color:var(--violet)}
 
-    .custom-preview {
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 12px; padding: 2rem; position: relative;
-    }
-    .preview-bar {
-      display: flex; gap: .4rem; margin-bottom: 1.5rem;
-    }
-    .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .preview-dot:nth-child(1) { background: #ff5f57; }
-    .preview-dot:nth-child(2) { background: #febc2e; }
-    .preview-dot:nth-child(3) { background: #28c840; }
-    .preview-store { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-    .preview-store-header { padding: .75rem 1rem; display: flex; align-items: center; justify-content: space-between; transition: background .4s; }
-    .preview-store-logo { font-weight: 700; font-size: .9rem; transition: color .4s; }
-    .preview-widget {
-      margin: 1rem; border-radius: 8px; padding: 1rem;
-      display: flex; align-items: center; gap: .75rem;
-      transition: background .4s, border-color .4s;
-      border: 1px solid transparent;
-    }
-    .widget-icon { width: 40px; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: background .4s; }
-    .widget-text { font-size: .8rem; }
-    .widget-text strong { display: block; font-size: .85rem; margin-bottom: .1rem; transition: color .4s; }
-    .widget-text span { color: var(--gray); }
-    .color-picker { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1.5rem; }
-    .color-swatch {
-      width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
-      border: 2px solid transparent; transition: transform .2s, border-color .2s;
-    }
-    .color-swatch:hover, .color-swatch.active { transform: scale(1.2); border-color: var(--black); }
+    footer{border-top:1px solid var(--line);padding:2.5rem 0}
+    footer .inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+    footer p{font-size:.85rem;color:var(--muted)}
+    footer .fl{display:flex;gap:1.5rem}
+    footer .fl a{font-size:.85rem;color:var(--muted)}
+    footer .fl a:hover{color:var(--ink)}
 
-    /* ── PRICING ── */
-    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
-    .plan {
-      background: var(--white); border: 1px solid var(--border);
-      border-radius: 14px; padding: 2rem;
-      position: relative;
-    }
-    .plan.featured { border-color: var(--plum); }
-    .plan-badge {
-      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-      background: var(--plum); color: var(--white);
-      font-size: .65rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-      padding: .25rem .8rem; border-radius: 20px;
-    }
-    .plan-name { font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--gray); margin-bottom: .75rem; }
-    .plan-price { font-size: 2.5rem; font-weight: 800; letter-spacing: -.04em; color: var(--black); }
-    .plan-price sup { font-size: 1.2rem; vertical-align: super; font-weight: 600; }
-    .plan-price span { font-size: .9rem; font-weight: 400; color: var(--gray); }
-    .plan-desc { font-size: .85rem; color: var(--gray); margin: .5rem 0 1.5rem; }
-    .plan-divider { border: none; border-top: 1px solid var(--border); margin-bottom: 1.5rem; }
-    .plan-features { list-style: none; margin-bottom: 2rem; }
-    .plan-features li { font-size: .875rem; padding: .4rem 0; color: var(--dark); display: flex; gap: .6rem; align-items: flex-start; }
-    .plan-features li::before { content: '✓'; color: var(--warm); font-weight: 700; font-size: .8rem; flex-shrink: 0; margin-top: .15rem; }
-    .plan-features li.off { color: var(--gray); }
-    .plan-features li.off::before { content: '—'; color: var(--border); }
-    .btn-plan {
-      display: block; text-align: center;
-      padding: .75rem; border-radius: 8px;
-      font-size: .9rem; font-weight: 600; text-decoration: none;
-      transition: all .2s;
-    }
-    .btn-plan-outline { border: 1.5px solid var(--border); color: var(--black); }
-    .btn-plan-outline:hover { border-color: var(--black); }
-    .btn-plan-dark { background: var(--plum); color: var(--white); }
-    .btn-plan-dark:hover { opacity: .85; }
-
-    /* ── FAQ ── */
-    .faq-list { margin-top: 2.5rem; max-width: 680px; }
-    .faq-item { border-bottom: 1px solid var(--border); padding: 1.25rem 0; }
-    .faq-item summary {
-      font-weight: 600; font-size: .95rem; cursor: pointer;
-      list-style: none; display: flex; justify-content: space-between; align-items: center;
-    }
-    .faq-item summary::-webkit-details-marker { display: none; }
-    .faq-item summary::after { content: '+'; font-size: 1.2rem; color: var(--gray); transition: transform .2s; }
-    .faq-item[open] summary::after { transform: rotate(45deg); }
-    .faq-item p { font-size: .9rem; color: var(--gray); margin-top: .75rem; line-height: 1.6; }
-
-    /* ── ABOUT (Qu'est-ce que Dressim) ── */
-    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
-    @media (max-width: 700px) { .about-grid { grid-template-columns: 1fr; gap: 2.5rem; } }
-    .about-points { display: flex; flex-direction: column; gap: 1.5rem; margin-top: 2.5rem; }
-    .about-point { display: flex; align-items: flex-start; gap: 1rem; }
-    .about-point-icon {
-      width: 40px; height: 40px; border-radius: 10px;
-      background: var(--plum-l); color: var(--plum);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem; flex-shrink: 0;
-    }
-    .about-point-text h4 { font-size: .9rem; font-weight: 700; color: var(--black); margin-bottom: .2rem; }
-    .about-point-text p { font-size: .85rem; color: var(--gray); line-height: 1.5; }
-    .about-right { border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-    .about-right-header {
-      background: var(--plum); color: #fff;
-      padding: 1.5rem 1.75rem;
-    }
-    .about-right-header h3 { font-size: 1rem; font-weight: 700; margin-bottom: .25rem; }
-    .about-right-header p { font-size: .82rem; color: rgba(255,255,255,.6); }
-    .about-steps { list-style: none; padding: 1.5rem 1.75rem; display: flex; flex-direction: column; gap: 1.25rem; background: #fff; }
-    .about-step { display: flex; align-items: center; gap: 1rem; }
-    .about-step-num {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: var(--plum); color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-size: .75rem; font-weight: 700; flex-shrink: 0;
-    }
-    .about-step span { font-size: .875rem; color: var(--dark); font-weight: 500; }
-
-    /* ── FEATURES ── */
-    .features-section { background: var(--plum); color: #fff; }
-    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; margin-top: 3rem; background: rgba(255,255,255,.1); border-radius: 16px; overflow: hidden; }
-    .feat-card { background: rgba(255,255,255,.04); padding: 1.75rem; }
-    .feat-card:hover { background: rgba(255,255,255,.08); }
-    .feat-card .fc-icon { font-size: 1.5rem; margin-bottom: .75rem; }
-    .feat-card h4 { font-size: .9rem; font-weight: 700; margin-bottom: .35rem; color: #fff; }
-    .feat-card p { font-size: .82rem; color: rgba(255,255,255,.5); line-height: 1.5; }
-    .features-section .section-tag { background: rgba(200,169,110,.18); color: #c8a96e; }
-    .features-section .section-title { color: #fff; }
-    .features-section .section-sub { color: rgba(255,255,255,.5); }
-
-    /* ── CTA FINAL ── */
-    .cta-final {
-      background: linear-gradient(135deg, #2d1f4e 0%, #1a1228 100%);
-      color: var(--white);
-      text-align: center; padding: 5rem 1.5rem;
-      border-radius: 20px; margin: 0 1.5rem 5rem;
-      position: relative; overflow: hidden;
-    }
-    .cta-final::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%, rgba(200,169,110,.18) 0%, transparent 60%); pointer-events:none; }
-    .cta-final h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -.03em; margin-bottom: 1rem; position:relative; }
-    .cta-final p { color: rgba(255,255,255,.6); margin-bottom: 2rem; position:relative; }
-    .btn-white { background: var(--white); color: var(--plum); padding: .9rem 2rem; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 1rem; display: inline-block; transition: opacity .2s; }
-    .btn-white:hover { opacity: .9; }
-
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 2rem 0;
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 1rem;
-    }
-    footer .logo { font-size: 1rem; }
-    footer p { font-size: .8rem; color: var(--gray); }
-    footer a { font-size: .8rem; color: var(--gray); text-decoration: none; }
-    footer a:hover { color: var(--black); }
+    .bg-violet{background:linear-gradient(135deg,#7c3aed,#a855f7)}
+    .bg-pink{background:linear-gradient(135deg,#ec4899,#f472b6)}
+    .bg-coral{background:linear-gradient(135deg,#fb7185,#f97316)}
+    .bg-cyan{background:linear-gradient(135deg,#06b6d4,#22d3ee)}
+    .bg-indigo{background:linear-gradient(135deg,#6366f1,#818cf8)}
+    .bg-lime{background:linear-gradient(135deg,#10b981,#34d399)}
   </style>
 </head>
 <body>
 
   <!-- NAV -->
-  <nav>
-    <div class="container inner">
-      <a href="/" class="logo">Dress<span>im</span></a>
-      <div class="nav-links">
-        <a href="#how">Comment ça marche</a>
-        <a href="#pricing">Tarifs</a>
-        <a href="contact.html">Contact</a>
-        <a href="avatar.html" class="btn-nav">Voir la démo →</a>
+  <nav id="nav">
+    <div class="wrap inner">
+      <a href="#" class="logo">Dressim<span class="dot">.</span></a>
+      <div class="navlinks">
+        <a href="#how" class="hide-m">Comment ça marche</a>
+        <a href="#demo" class="hide-m">Démo</a>
+        <a href="#pricing" class="hide-m">Tarifs</a>
+        <a href="#demo" class="btn btn-grad">Essayer la démo</a>
       </div>
     </div>
   </nav>
 
-  <!-- HERO 3D interactif -->
-  <section id="heroSection" style="position:relative;height:100vh;overflow:hidden;background:#0d0820;">
-    <canvas id="heroCanvas" style="position:absolute;inset:0;width:100%;height:100%;cursor:pointer;"></canvas>
-
-    <!-- Hint clic -->
-    <div id="dmHint" style="position:absolute;bottom:6rem;left:50%;transform:translateX(-50%);z-index:3;text-align:center;pointer-events:none;transition:opacity .5s;">
-      <div style="color:rgba(200,169,110,.7);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;animation:heroBounce 2s infinite;">Appuyez sur le téléphone</div>
-      <div style="color:rgba(255,255,255,.3);font-size:1.2rem;margin-top:.3rem;animation:heroBounce 2s .3s infinite;">↓</div>
-    </div>
-
-    <!-- Cartes flottantes (cachées au départ) -->
-    <div id="dmCards" style="position:absolute;inset:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;justify-content:center;gap:1rem;padding:2rem 2.5rem;opacity:0;transition:opacity .5s;">
-      <div class="dmCard" style="--d:0ms">
-        <div class="dmCardIcon">📱</div>
-        <div>
-          <div class="dmCardTitle">Intégration en 1 ligne</div>
-          <div class="dmCardText">Un simple script sur votre site e-commerce</div>
+  <!-- HERO -->
+  <header class="hero">
+    <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+    <div class="wrap hero-grid">
+      <div>
+        <span class="badge"><span class="pulse"></span> Essayage virtuel propulsé par l'IA</span>
+        <h1>Vos clients <span class="grad-text">essaient en vrai</span>, avant d'acheter.</h1>
+        <p class="sub">Dressim intègre l'essayage virtuel IA et la recommandation de taille directement sur votre boutique. Moins de retours, plus de ventes, des clients confiants.</p>
+        <div class="hero-ctas">
+          <a href="#demo" class="btn btn-grad btn-lg">✨ Essayer la démo</a>
+          <a href="#pricing" class="btn btn-ghost btn-lg">Voir les tarifs</a>
+        </div>
+        <div class="hero-mini">
+          <div><b>−40%</b>de retours</div>
+          <div><b>+28%</b>de conversion</div>
+          <div><b>5 min</b>d'intégration</div>
         </div>
       </div>
-      <div class="dmCard" style="--d:120ms">
-        <div class="dmCardIcon">🧍</div>
-        <div>
-          <div class="dmCardTitle">Avatar personnalisé</div>
-          <div class="dmCardText">Le client crée son avatar en 30 secondes</div>
-        </div>
-      </div>
-      <div class="dmCard" style="--d:240ms">
-        <div class="dmCardIcon">👗</div>
-        <div>
-          <div class="dmCardTitle">Essayage IA</div>
-          <div class="dmCardText">Il essaie vos vêtements avant d'acheter</div>
-        </div>
-      </div>
-      <div class="dmCard" style="--d:360ms">
-        <div class="dmCardIcon">📉</div>
-        <div>
-          <div class="dmCardTitle">-30% de retours</div>
-          <div class="dmCardText">Moins d'incertitude = moins de retours</div>
-        </div>
+      <div class="preview" id="heroPrev">
+        <img id="heroImgA" src="tryon/femme-robe.png" alt="Essayage virtuel" style="opacity:1">
+        <img id="heroImgB" src="tryon/femme-veste.png" alt="" style="opacity:0">
+        <img class="chip c1" src="garments/veste.jpg" alt="">
+        <img class="chip c2" src="garments/robe.jpg" alt="">
+        <div class="tag">👗 Essayage IA <span class="sz">Taille M</span></div>
       </div>
     </div>
-
-    <!-- Bouton essayer (caché au départ) -->
-    <div id="dmTryBtn" style="position:absolute;right:5%;top:50%;transform:translateY(-50%);z-index:4;opacity:0;pointer-events:none;transition:opacity .6s .4s;text-align:center;">
-      <button onclick="openAvatarOverlay()" style="display:block;padding:1rem 1.8rem;border-radius:12px;background:#c8a96e;color:#080810;font-weight:800;font-size:1rem;border:none;cursor:pointer;box-shadow:0 0 30px rgba(200,169,110,.4);letter-spacing:-.01em;font-family:inherit;">Essayer maintenant →</button>
-      <div style="color:rgba(255,255,255,.35);font-size:.75rem;margin-top:.6rem;">Gratuit · Sans inscription</div>
-    </div>
-
-    <!-- Flèche bas -->
-    <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.2);font-size:.75rem;z-index:2;animation:heroBounce 2s infinite;">↓ Découvrir</div>
-    <style>
-      @keyframes heroBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
-      @keyframes dmSlideIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
-      .dmCard{
-        display:flex;align-items:center;gap:.9rem;
-        background:rgba(255,255,255,.06);
-        border:1px solid rgba(200,169,110,.2);
-        backdrop-filter:blur(12px);
-        border-radius:12px;padding:.8rem 1.1rem;
-        opacity:0;transform:translateX(-30px);
-        max-width:280px;
-      }
-      .dmCard.visible{animation:dmSlideIn .4s ease forwards;animation-delay:var(--d);}
-      .dmCardIcon{font-size:1.4rem;flex-shrink:0;}
-      .dmCardTitle{color:#fff;font-weight:700;font-size:.88rem;margin-bottom:.2rem;}
-      .dmCardText{color:rgba(255,255,255,.5);font-size:.78rem;line-height:1.4;}
-    </style>
-  </section>
-
-  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
-  <script>
-  (function() {
-    const canvas = document.getElementById('heroCanvas');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x0d0820, 1);
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 0.4, 5.5);
-
-    // ── Lumières ──
-    scene.add(new THREE.AmbientLight(0x223355, 3));
-    const goldLight = new THREE.PointLight(0xc8a96e, 120, 14);
-    goldLight.position.set(1.5, 3, 2);
-    scene.add(goldLight);
-    const blueLight = new THREE.PointLight(0x4488ff, 60, 10);
-    blueLight.position.set(-2, 0, 3);
-    scene.add(blueLight);
-    const frontLight = new THREE.DirectionalLight(0xffffff, 1.2);
-    frontLight.position.set(0, 2, 4);
-    scene.add(frontLight);
-
-    // ── Matériaux ──
-    const skinMat = new THREE.MeshStandardMaterial({ color: 0x1a1a2e, metalness: .3, roughness: .65 });
-    const phoneMat = new THREE.MeshStandardMaterial({ color: 0x111122, metalness: .95, roughness: .08 });
-    const edgeMat  = new THREE.MeshStandardMaterial({ color: 0x222244, metalness: .99, roughness: .04 });
-
-    // ── Main ──
-    const hand = new THREE.Group();
-    const palm = new THREE.Mesh(new THREE.BoxGeometry(.58, .48, .15), skinMat);
-    hand.add(palm);
-
-    // 4 doigts
-    [-.2, -.065, .07, .2].forEach((x, i) => {
-      const len = [.32, .38, .36, .28][i];
-      const f = new THREE.Mesh(new THREE.CapsuleGeometry(.058, len, 4, 8), skinMat);
-      f.position.set(x, .24 + len / 2, 0);
-      hand.add(f);
-    });
-    // Pouce
-    const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(.062, .25, 4, 8), skinMat);
-    thumb.rotation.z = 1.1;
-    thumb.position.set(-.38, -.04, .02);
-    hand.add(thumb);
-
-    hand.rotation.x = -.2;
-    hand.position.set(.1, -.65, .4);
-    scene.add(hand);
-
-    // ── Texture écran avec Canvas ──
-    const sc = document.createElement('canvas');
-    sc.width = 256; sc.height = 512;
-    const ctx2d = sc.getContext('2d');
-    const grad = ctx2d.createLinearGradient(0, 0, 0, 512);
-    grad.addColorStop(0, '#08081a');
-    grad.addColorStop(1, '#0d1130');
-    ctx2d.fillStyle = grad;
-    ctx2d.fillRect(0, 0, 256, 512);
-    // Logo Dressim
-    ctx2d.fillStyle = '#c8a96e';
-    ctx2d.font = 'bold 46px Arial';
-    ctx2d.textAlign = 'center';
-    ctx2d.fillText('Dressim', 128, 195);
-    // Barre déco
-    ctx2d.fillStyle = 'rgba(200,169,110,.35)';
-    ctx2d.fillRect(68, 210, 120, 2);
-    // Sous-titre
-    ctx2d.fillStyle = 'rgba(255,255,255,.55)';
-    ctx2d.font = '18px Arial';
-    ctx2d.fillText('Essayage virtuel IA', 128, 248);
-    // Hint
-    ctx2d.fillStyle = 'rgba(200,169,110,.5)';
-    ctx2d.font = '14px Arial';
-    ctx2d.fillText('▼ Appuyez ici', 128, 470);
-    const screenTex = new THREE.CanvasTexture(sc);
-
-    // ── Téléphone ──
-    const phoneGroup = new THREE.Group();
-    const chassis = new THREE.Mesh(new THREE.BoxGeometry(.5, 1.02, .05), phoneMat);
-    phoneGroup.add(chassis);
-
-    // Contours latéraux
-    [[0,.52,0,.5,.04,.055],[0,-.52,0,.5,.04,.055],[.26,0,0,.04,1.02,.055],[-.26,0,0,.04,1.02,.055]]
-      .forEach(([x,y,z,w,h,d]) => {
-        const e = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), edgeMat);
-        e.position.set(x,y,z);
-        phoneGroup.add(e);
-      });
-
-    // Écran avec texture
-    const screenMesh = new THREE.Mesh(
-      new THREE.BoxGeometry(.44, .94, .002),
-      new THREE.MeshStandardMaterial({ map: screenTex, emissiveMap: screenTex, emissive: 0xffffff, emissiveIntensity: .25 })
-    );
-    screenMesh.position.set(0, 0, .027);
-    phoneGroup.add(screenMesh);
-
-    // Encoche
-    const notch = new THREE.Mesh(new THREE.BoxGeometry(.1,.02,.003),
-      new THREE.MeshStandardMaterial({ color: 0x050510 }));
-    notch.position.set(0, .44, .028);
-    phoneGroup.add(notch);
-
-    // Bouton volume
-    const volBtn = new THREE.Mesh(new THREE.BoxGeometry(.008,.07,.04), edgeMat);
-    volBtn.position.set(-.265, .12, 0);
-    phoneGroup.add(volBtn);
-
-    phoneGroup.rotation.x = -.15;
-    phoneGroup.rotation.y = -.1;
-    phoneGroup.position.set(.1, .9, .4);
-    scene.add(phoneGroup);
-
-    // Lueur écran
-    const phoneGlow = new THREE.PointLight(0x5599ff, 18, 2.5);
-    phoneGlow.position.set(.1, .9, 1.1);
-    scene.add(phoneGlow);
-
-    // ── Particules fond ──
-    const N = 250;
-    const pPos = new Float32Array(N * 3);
-    for (let i = 0; i < N; i++) {
-      pPos[i*3]   = (Math.random() - .5) * 10;
-      pPos[i*3+1] = (Math.random() - .5) * 8;
-      pPos[i*3+2] = (Math.random() - .5) * 6 - 2;
-    }
-    const pGeo = new THREE.BufferGeometry();
-    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-    scene.add(new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0xc8a96e, size: .018, transparent: true, opacity: .5 })));
-
-    // ── Raycaster clic sur téléphone ──
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    let clicked = false;
-
-    canvas.addEventListener('click', e => {
-      const r = canvas.getBoundingClientRect();
-      mouse.x = ((e.clientX - r.left) / r.width) * 2 - 1;
-      mouse.y = -((e.clientY - r.top) / r.height) * 2 + 1;
-      raycaster.setFromCamera(mouse, camera);
-      if (raycaster.intersectObjects(phoneGroup.children, true).length > 0 && !clicked) {
-        clicked = true;
-        // Afficher les cartes
-        const cards = document.getElementById('dmCards');
-        cards.style.opacity = '1';
-        cards.style.pointerEvents = 'none';
-        cards.querySelectorAll('.dmCard').forEach(c => c.classList.add('visible'));
-        // Afficher bouton
-        const tryBtn = document.getElementById('dmTryBtn');
-        tryBtn.style.opacity = '1';
-        tryBtn.style.pointerEvents = 'all';
-        // Cacher hint
-        document.getElementById('dmHint').style.opacity = '0';
-        // Déplacer téléphone vers la droite
-        phoneTargetX = 1.4;
-      }
-    });
-
-    // ── Animation ──
-    let t = 0, mouseX = 0, mouseY = 0;
-    let phoneTargetX = .1;
-
-    window.addEventListener('mousemove', e => {
-      mouseX = (e.clientX / window.innerWidth - .5) * 2;
-      mouseY = (e.clientY / window.innerHeight - .5) * 2;
-    });
-
-    function animate() {
-      requestAnimationFrame(animate);
-      t += .012;
-
-      // Téléphone flotte + glisse vers droite si cliqué
-      phoneGroup.position.x += (phoneTargetX - phoneGroup.position.x) * .04;
-      phoneGroup.position.y = .9 + Math.sin(t * .8) * .06;
-      phoneGroup.rotation.y = -.1 + Math.sin(t * .35) * .12 + mouseX * .06;
-      phoneGlow.position.x = phoneGroup.position.x;
-      phoneGlow.position.y = phoneGroup.position.y;
-
-      // Main suit le téléphone
-      hand.position.x = phoneGroup.position.x + .02;
-      hand.position.y = -.65 + Math.sin(t * .8) * .05;
-
-      // Lumière dorée pulse
-      goldLight.intensity = 80 + Math.sin(t * 1.2) * 18;
-
-      // Parallaxe caméra
-      camera.position.x += (mouseX * .15 - camera.position.x) * .04;
-      camera.position.y += (-mouseY * .1 + .4 - camera.position.y) * .04;
-      camera.lookAt(phoneGroup.position.x * .5, .55, 0);
-
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-  })();
-  </script>
-
-  <!-- ══ ESSAYAGE OVERLAY ══ -->
-  <div id="dmAvatarOverlay" style="position:fixed;inset:0;z-index:100;background:#080810;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .45s;font-family:'Inter',sans-serif;">
-
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;">
-      <div style="font-size:1rem;font-weight:700;color:#fff;">Mon avatar <span style="color:#c8a96e;">Dressim</span></div>
-      <button onclick="closeAvatarOverlay()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:.85rem;padding:.4rem .9rem;border-radius:8px;cursor:pointer;font-family:inherit;">✕ Fermer</button>
-    </div>
-
-    <!-- Body -->
-    <div id="dmAvaBody" style="display:flex;flex:1;overflow:hidden;">
-
-      <!-- Mannequin (photo réaliste) -->
-      <div id="dmModelStage" style="flex:1;position:relative;background:radial-gradient(ellipse at 50% 35%, #1a1430 0%, #0a0a16 75%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
-        <img id="dmModelBase" alt="Mannequin Dressim" style="position:absolute;inset:0;margin:auto;max-height:92%;max-width:88%;object-fit:contain;transition:opacity .55s ease;opacity:0;filter:drop-shadow(0 20px 50px rgba(0,0,0,.5));">
-        <img id="dmModelTryon" alt="Essayage" style="position:absolute;inset:0;margin:auto;max-height:92%;max-width:88%;object-fit:contain;transition:opacity .55s ease;opacity:0;filter:drop-shadow(0 20px 50px rgba(0,0,0,.5));">
-        <div id="dmSfLoader" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;transition:opacity .6s;">
-          <div style="width:40px;height:40px;border:3px solid rgba(200,169,110,.2);border-top-color:#c8a96e;border-radius:50%;animation:dmSpin .9s linear infinite;margin-bottom:1rem;"></div>
-          <div style="color:rgba(255,255,255,.4);font-size:.8rem;">Chargement du mannequin…</div>
-        </div>
-        <div id="dmModelBadge" style="position:absolute;left:50%;bottom:1.1rem;transform:translateX(-50%);background:rgba(8,8,18,.7);backdrop-filter:blur(8px);border:1px solid rgba(200,169,110,.25);color:#c8a96e;font-size:.72rem;font-weight:600;padding:.35rem .9rem;border-radius:20px;white-space:nowrap;z-index:3;">Mannequin de démonstration</div>
-      </div>
-
-      <!-- Panneau sliders -->
-      <div id="dmSliderPanel" style="width:300px;min-width:300px;padding:1.4rem 1.2rem;overflow-y:auto;border-left:1px solid rgba(255,255,255,.06);background:rgba(8,8,18,.95);display:flex;flex-direction:column;gap:1.1rem;">
-
-        <!-- Genre -->
-        <div>
-          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);margin-bottom:.6rem;">Genre</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
-            <button id="dmGF" onclick="setGender('femme')" class="dmGBtn active">👩 Femme</button>
-            <button id="dmGH" onclick="setGender('homme')" class="dmGBtn">👨 Homme</button>
-          </div>
-        </div>
-
-        <!-- Taille -->
-        <div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;">
-            <span style="font-size:.78rem;color:rgba(255,255,255,.6);">Taille</span>
-            <span id="dmHVal" style="font-size:.78rem;font-weight:700;color:#c8a96e;">165 cm</span>
-          </div>
-          <input id="dmHeight" type="range" min="145" max="210" value="165" oninput="updateMeasures()" style="width:100%;">
-        </div>
-
-        <!-- Poids -->
-        <div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;">
-            <span style="font-size:.78rem;color:rgba(255,255,255,.6);">Poids</span>
-            <span id="dmWVal" style="font-size:.78rem;font-weight:700;color:#c8a96e;">65 kg</span>
-          </div>
-          <input id="dmWeight" type="range" min="40" max="140" value="65" oninput="updateMeasures()" style="width:100%;">
-        </div>
-
-        <!-- Mesures calculées -->
-        <div style="background:rgba(200,169,110,.07);border:1px solid rgba(200,169,110,.2);border-radius:12px;padding:.9rem;display:flex;flex-direction:column;gap:.5rem;">
-          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#c8a96e;margin-bottom:.2rem;">Mensurations estimées</div>
-          <div style="display:flex;justify-content:space-between;">
-            <span style="font-size:.78rem;color:rgba(255,255,255,.5);">👙 Poitrine</span>
-            <span id="dmBust" style="font-size:.78rem;font-weight:700;color:#fff;">90 cm</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;">
-            <span style="font-size:.78rem;color:rgba(255,255,255,.5);">⌛ Taille</span>
-            <span id="dmWaist" style="font-size:.78rem;font-weight:700;color:#fff;">72 cm</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;">
-            <span style="font-size:.78rem;color:rgba(255,255,255,.5);">🍑 Hanches</span>
-            <span id="dmHips" style="font-size:.78rem;font-weight:700;color:#fff;">96 cm</span>
-          </div>
-        </div>
-
-        <!-- Affiner -->
-        <div>
-          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);margin-bottom:.8rem;">Affiner</div>
-          <div style="display:flex;flex-direction:column;gap:.8rem;">
-            <div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:.3rem;">
-                <span style="font-size:.75rem;color:rgba(255,255,255,.5);">Poitrine ±</span>
-                <span id="dmABLbl" style="font-size:.75rem;color:#c8a96e;">0 cm</span>
-              </div>
-              <input id="dmABust" type="range" min="-10" max="10" value="0" oninput="updateMeasures()" style="width:100%;">
-            </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:.3rem;">
-                <span style="font-size:.75rem;color:rgba(255,255,255,.5);">Taille ±</span>
-                <span id="dmAWLbl" style="font-size:.75rem;color:#c8a96e;">0 cm</span>
-              </div>
-              <input id="dmAWaist" type="range" min="-10" max="10" value="0" oninput="updateMeasures()" style="width:100%;">
-            </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:.3rem;">
-                <span style="font-size:.75rem;color:rgba(255,255,255,.5);">Hanches ±</span>
-                <span id="dmAHLbl" style="font-size:.75rem;color:#c8a96e;">0 cm</span>
-              </div>
-              <input id="dmAHips" type="range" min="-10" max="10" value="0" oninput="updateMeasures()" style="width:100%;">
-            </div>
-          </div>
-        </div>
-
-        <!-- Bouton confirmer -->
-        <button onclick="goToClothes()" style="margin-top:auto;padding:1rem;border-radius:12px;background:#c8a96e;color:#080810;font-weight:800;font-size:.95rem;border:none;cursor:pointer;font-family:inherit;letter-spacing:-.01em;">Choisir un vêtement →</button>
-      </div>
-
-      <!-- Panneau vêtements (phase 2) -->
-      <div id="dmClothesPanel" style="width:320px;min-width:320px;padding:1.4rem 1.2rem;overflow-y:auto;border-left:1px solid rgba(255,255,255,.06);background:rgba(8,8,18,.95);display:none;flex-direction:column;gap:1rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);">Garde-robe</div>
-          <button onclick="backToMeasure()" style="background:none;border:none;color:#c8a96e;font-size:.75rem;cursor:pointer;font-family:inherit;padding:0;">← Mensurations</button>
-        </div>
-        <div style="font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.5;">Cliquez sur un article : il s'enfile sur votre mannequin grâce à l'IA.</div>
-        <div id="dmGarmentGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem;"></div>
-        <div id="dmTryonInfo" style="display:none;background:rgba(200,169,110,.07);border:1px solid rgba(200,169,110,.2);border-radius:12px;padding:.9rem;">
-          <div id="dmTryonName" style="font-size:.88rem;font-weight:700;color:#fff;margin-bottom:.35rem;"></div>
-          <div style="font-size:.78rem;color:rgba(255,255,255,.55);">Taille recommandée : <span id="dmTryonSize" style="color:#c8a96e;font-weight:800;"></span></div>
-        </div>
-        <button id="dmAddCart" style="display:none;padding:.9rem;border-radius:12px;background:#c8a96e;color:#080810;font-weight:800;font-size:.9rem;border:none;cursor:pointer;font-family:inherit;">Ajouter au panier</button>
-      </div>
-    </div>
-  </div>
-
-  <style>
-    @keyframes dmSpin { to { transform: rotate(360deg); } }
-    .dmGBtn { padding:.65rem .5rem;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-size:.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s; }
-    .dmGBtn.active { border-color:#c8a96e;background:rgba(200,169,110,.15);color:#c8a96e; }
-    #dmAvatarOverlay input[type=range] { -webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:rgba(255,255,255,.12);outline:none; }
-    #dmAvatarOverlay input[type=range]::-webkit-slider-thumb { -webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#c8a96e;cursor:pointer;border:2px solid #080810;box-shadow:0 0 8px rgba(200,169,110,.5); }
-    .dmGarmentCard { display:flex;flex-direction:column;gap:.45rem;padding:.5rem;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#fff;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s; }
-    .dmGarmentCard:hover { border-color:rgba(200,169,110,.5);background:rgba(255,255,255,.07); }
-    .dmGarmentCard.active { border-color:#c8a96e;background:rgba(200,169,110,.15); }
-    .dmGarmentCard img { width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px;display:block; }
-    .dmGarmentCard span { font-size:.76rem;font-weight:600;color:rgba(255,255,255,.85);line-height:1.3; }
-    @media (max-width: 640px) {
-      #dmAvaBody { flex-direction: column; }
-      #dmSliderPanel, #dmClothesPanel { width: 100% !important; min-width: unset !important; border-left: none !important; border-top: 1px solid rgba(255,255,255,.06); max-height: 55vh; }
-      #dmModelStage { min-height: 40vh; }
-    }
-  </style>
-
-  <script>
-    // ── Mannequins préfaits (photos locales auto-hébergées) ──
-    const MODELS_IMG = {
-      femme: 'models/femme.jpg',
-      homme: 'models/homme.jpg',
-    };
-
-    // ── Garde-robe de démo (adaptée au genre) ──
-    const GARMENTS = {
-      femme: [
-        { id:'robe',   name:'Robe Rouge',      thumb:'garments/robe.jpg' },
-        { id:'blouse', name:'Blouse Fleurie',  thumb:'garments/blouse.jpg' },
-        { id:'veste',  name:'Veste Cuir',      thumb:'garments/veste.jpg' },
-        { id:'tshirt', name:'T-shirt Imprimé', thumb:'garments/tshirt.jpg' },
-      ],
-      homme: [
-        { id:'veste',  name:'Veste Cuir',      thumb:'garments/veste.jpg' },
-        { id:'tshirt', name:'T-shirt Imprimé', thumb:'garments/tshirt.jpg' },
-      ],
-    };
-    function garmentsFor(g) { return GARMENTS[g] || []; }
-
-    // ── Essayages pré-générés (Hugging Face Kolors Virtual Try-On) ──
-    const TRYON = {
-      femme: {
-        robe:   'tryon/femme-robe.png',
-        blouse: 'tryon/femme-blouse.png',
-        veste:  'tryon/femme-veste.png',
-        tshirt: 'tryon/femme-tshirt.png',
-      },
-      homme: {
-        veste:  'tryon/homme-veste.png',
-        tshirt: 'tryon/homme-tshirt.png',
-      },
-    };
-
-    let dmGender = 'femme';
-    let dmModelLoaded = {};
-
-    function openAvatarOverlay() {
-      const ov = document.getElementById('dmAvatarOverlay');
-      ov.style.opacity = '1';
-      ov.style.pointerEvents = 'all';
-      loadModel(dmGender);
-      buildGarments();
-      updateMeasures();
-    }
-
-    function closeAvatarOverlay() {
-      const ov = document.getElementById('dmAvatarOverlay');
-      ov.style.opacity = '0';
-      ov.style.pointerEvents = 'none';
-    }
-
-    function setGender(g) {
-      dmGender = g;
-      document.getElementById('dmGF').classList.toggle('active', g === 'femme');
-      document.getElementById('dmGH').classList.toggle('active', g === 'homme');
-      document.getElementById('dmHeight').value = g === 'femme' ? 165 : 175;
-      document.getElementById('dmWeight').value = g === 'femme' ? 65 : 78;
-      loadModel(g);
-      resetTryon();
-      buildGarments();
-      updateMeasures();
-    }
-
-    function loadModel(gender) {
-      const base = document.getElementById('dmModelBase');
-      const loader = document.getElementById('dmSfLoader');
-      resetTryon();
-      base.style.opacity = '0';
-      loader.style.opacity = '1';
-      base.onload = () => { base.style.opacity = '1'; loader.style.opacity = '0'; dmModelLoaded[gender] = true; };
-      base.onerror = () => { loader.style.opacity = '0'; };
-      base.src = MODELS_IMG[gender];
-    }
-
-    function resetTryon() {
-      const tryon = document.getElementById('dmModelTryon');
-      tryon.style.opacity = '0';
-      document.getElementById('dmModelBase').style.opacity = '1';
-      document.getElementById('dmTryonInfo').style.display = 'none';
-      document.getElementById('dmAddCart').style.display = 'none';
-      document.querySelectorAll('.dmGarmentCard').forEach(c => c.classList.remove('active'));
-    }
-
-    function buildGarments() {
-      const grid = document.getElementById('dmGarmentGrid');
-      grid.innerHTML = garmentsFor(dmGender).map(g => `
-        <button class="dmGarmentCard" data-id="${g.id}" onclick="dmTryOn('${g.id}', event)">
-          <img src="${g.thumb}" alt="${g.name}" loading="lazy">
-          <span>${g.name}</span>
-        </button>
-      `).join('');
-    }
-
-    function goToClothes() {
-      document.getElementById('dmSliderPanel').style.display = 'none';
-      document.getElementById('dmClothesPanel').style.display = 'flex';
-    }
-
-    function backToMeasure() {
-      document.getElementById('dmClothesPanel').style.display = 'none';
-      document.getElementById('dmSliderPanel').style.display = 'flex';
-    }
-
-    function calcMeasures() {
-      const h = +document.getElementById('dmHeight').value;
-      const w = +document.getElementById('dmWeight').value;
-      const ab = +document.getElementById('dmABust').value;
-      const aw = +document.getElementById('dmAWaist').value;
-      const ah = +document.getElementById('dmAHips').value;
-      const bmi = w / ((h / 100) ** 2);
-      let bust, waist, hips;
-      if (dmGender === 'femme') {
-        bust  = 90  + (h - 165) * 0.30 + (bmi - 22) * 1.5;
-        waist = 72  + (h - 165) * 0.18 + (bmi - 22) * 1.8;
-        hips  = 96  + (h - 165) * 0.35 + (bmi - 22) * 2.0;
-      } else {
-        bust  = 96  + (h - 175) * 0.35 + (bmi - 23) * 1.5;
-        waist = 84  + (h - 175) * 0.20 + (bmi - 23) * 2.0;
-        hips  = 98  + (h - 175) * 0.30 + (bmi - 23) * 1.8;
-      }
-      return { bust: Math.round(bust + ab), waist: Math.round(waist + aw), hips: Math.round(hips + ah) };
-    }
-
-    function updateMeasures() {
-      const h = +document.getElementById('dmHeight').value;
-      const w = +document.getElementById('dmWeight').value;
-      document.getElementById('dmHVal').textContent = h + ' cm';
-      document.getElementById('dmWVal').textContent = w + ' kg';
-      document.getElementById('dmABLbl').textContent = (document.getElementById('dmABust').value > 0 ? '+' : '') + document.getElementById('dmABust').value + ' cm';
-      document.getElementById('dmAWLbl').textContent = (document.getElementById('dmAWaist').value > 0 ? '+' : '') + document.getElementById('dmAWaist').value + ' cm';
-      document.getElementById('dmAHLbl').textContent = (document.getElementById('dmAHips').value > 0 ? '+' : '') + document.getElementById('dmAHips').value + ' cm';
-      const m = calcMeasures();
-      document.getElementById('dmBust').textContent  = m.bust  + ' cm';
-      document.getElementById('dmWaist').textContent = m.waist + ' cm';
-      document.getElementById('dmHips').textContent  = m.hips  + ' cm';
-    }
-
-    function computeSize() {
-      const m = calcMeasures();
-      const SIZING = [
-        {size:'XS',bust:[78,83],waist:[58,63]},{size:'S',bust:[84,89],waist:[64,69]},
-        {size:'M',bust:[90,95],waist:[70,75]},{size:'L',bust:[96,101],waist:[76,81]},
-        {size:'XL',bust:[102,108],waist:[82,88]},
-      ];
-      let iB = SIZING.findIndex(s => m.bust >= s.bust[0] && m.bust <= s.bust[1]);
-      let iW = SIZING.findIndex(s => m.waist >= s.waist[0] && m.waist <= s.waist[1]);
-      if (iB < 0) iB = m.bust > 108 ? 4 : 0;
-      if (iW < 0) iW = m.waist > 88 ? 4 : 0;
-      return SIZING[Math.max(iB, iW)]?.size || 'M';
-    }
-
-    // Image d'essayage : résultat FASHN si dispo, sinon la vignette (placeholder dev)
-    function tryonSrc(gender, g) {
-      return (TRYON[gender] && TRYON[gender][g.id]) || g.thumb;
-    }
-
-    // Essayer un vêtement : il s'envole vers le mannequin puis se révèle dessus
-    window.dmTryOn = function(id, event) {
-      const g = garmentsFor(dmGender).find(x => x.id === id);
-      if (!g) return;
-      const card = event && event.currentTarget;
-      document.querySelectorAll('.dmGarmentCard').forEach(c => c.classList.remove('active'));
-      if (card) card.classList.add('active');
-      flyGarment(g.thumb, card, () => revealTryon(g));
-    };
-
-    function revealTryon(g) {
-      const tryon = document.getElementById('dmModelTryon');
-      const stage = document.getElementById('dmModelStage');
-      tryon.style.opacity = '0';
-      tryon.onload = () => {
-        tryon.style.opacity = '1';
-        document.getElementById('dmModelBase').style.opacity = '0';
-      };
-      tryon.src = tryonSrc(dmGender, g);
-      stage.style.boxShadow = 'inset 0 0 90px rgba(200,169,110,.45)';
-      setTimeout(() => { stage.style.boxShadow = ''; }, 450);
-      document.getElementById('dmTryonName').textContent = g.name;
-      document.getElementById('dmTryonSize').textContent = computeSize();
-      document.getElementById('dmTryonInfo').style.display = 'block';
-      document.getElementById('dmAddCart').style.display = 'block';
-    }
-
-    // Le vêtement vole de la carte jusqu'au mannequin
-    function flyGarment(productImg, fromEl, callback) {
-      const stage = document.getElementById('dmModelStage');
-      const fromRect = (fromEl || stage).getBoundingClientRect();
-      const toRect = stage.getBoundingClientRect();
-      const img = document.createElement('img');
-      img.src = productImg;
-      img.style.cssText = `
-        position:fixed;
-        left:${fromRect.left + fromRect.width/2 - 40}px;
-        top:${fromRect.top + fromRect.height/2 - 50}px;
-        width:80px; height:100px; object-fit:cover; border-radius:10px;
-        box-shadow:0 0 24px rgba(200,169,110,.6);
-        z-index:9999; pointer-events:none; opacity:1;
-        transition:all .7s cubic-bezier(.4,0,.2,1);
-      `;
-      document.body.appendChild(img);
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        img.style.left = (toRect.left + toRect.width/2 - 60) + 'px';
-        img.style.top  = (toRect.top + toRect.height/2 - 80) + 'px';
-        img.style.width = '120px'; img.style.height = '160px';
-        img.style.opacity = '0';
-      }));
-      setTimeout(() => { img.remove(); callback(); }, 720);
-    }
-  </script>
+  </header>
 
   <!-- STATS -->
-  <section style="background:#fff;border-bottom:1px solid var(--border);padding:2.5rem 0;">
-    <div class="container">
-      <div class="stats">
-        <div class="stat-item"><div class="stat-num">−40%</div><div class="stat-label">de retours produits</div></div>
-        <div class="stat-item"><div class="stat-num">+28%</div><div class="stat-label">de taux de conversion</div></div>
-        <div class="stat-item"><div class="stat-num">30s</div><div class="stat-label">pour créer son avatar</div></div>
-        <div class="stat-item"><div class="stat-num">1 ligne</div><div class="stat-label">de code pour intégrer</div></div>
+  <section class="sec" style="padding-top:1rem">
+    <div class="wrap">
+      <div class="stats reveal">
+        <div class="stat"><b>−40%</b><span>de retours produits</span></div>
+        <div class="stat"><b>+28%</b><span>de taux de conversion</span></div>
+        <div class="stat"><b>30s</b><span>pour créer son avatar</span></div>
+        <div class="stat"><b>1 ligne</b><span>de code à intégrer</span></div>
       </div>
     </div>
   </section>
 
-  <section class="hero" style="display:none;">
-    <div class="container">
-    </div>
-  </section>
-
-  <!-- QU'EST-CE QUE DRESSIM -->
-  <section class="section" id="about" style="border-bottom:1px solid var(--border);">
-    <div class="container">
-      <div class="about-grid">
-        <div>
-          <div class="section-tag">Qu'est-ce que Dressim ?</div>
-          <h2 class="section-title">L'essayage virtuel, conçu pour les boutiques</h2>
-          <p class="section-sub">Dressim est un widget que vous intégrez en une ligne de code sur votre boutique. Vos clients créent un avatar, essaient vos vêtements et reçoivent leur taille — sans quitter votre site.</p>
-          <div class="about-points">
-            <div class="about-point">
-              <div class="about-point-icon">⚡</div>
-              <div class="about-point-text">
-                <h4>Intégration en 5 minutes</h4>
-                <p>Un seul script à coller. Compatible Shopify, WooCommerce, PrestaShop ou tout site HTML.</p>
-              </div>
-            </div>
-            <div class="about-point">
-              <div class="about-point-icon">🎨</div>
-              <div class="about-point-text">
-                <h4>Personnalisation totale</h4>
-                <p>Vos couleurs, votre logo, votre typographie. Le widget adopte l'identité de votre boutique.</p>
-              </div>
-            </div>
-            <div class="about-point">
-              <div class="about-point-icon">📉</div>
-              <div class="about-point-text">
-                <h4>Moins de retours, plus de conversions</h4>
-                <p>Le bon choix de taille avant l'achat réduit les retours de 30 à 40% en moyenne.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="about-right">
-          <div class="about-right-header">
-            <h3>Ce que vivent vos clients</h3>
-            <p>Une expérience guidée en 4 étapes</p>
-          </div>
-          <ul class="about-steps">
-            <li class="about-step">
-              <div class="about-step-num">1</div>
-              <span>Ils cliquent sur "Essayer" sur votre fiche produit</span>
-            </li>
-            <li class="about-step">
-              <div class="about-step-num">2</div>
-              <span>Ils créent leur avatar en entrant taille &amp; poids</span>
-            </li>
-            <li class="about-step">
-              <div class="about-step-num">3</div>
-              <span>Ils voient le vêtement sur leur avatar en 3D</span>
-            </li>
-            <li class="about-step">
-              <div class="about-step-num">4</div>
-              <span>Ils reçoivent leur taille recommandée et commandent</span>
-            </li>
-          </ul>
-        </div>
+  <!-- HOW -->
+  <section class="sec" id="how">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="eyebrow">Comment ça marche</span>
+        <h2>Trois étapes, zéro friction.</h2>
+        <p class="lead">Pas de refonte, pas de développeur. Vous collez un script, vos clients essaient, vous vendez plus.</p>
       </div>
-    </div>
-  </section>
-
-  <!-- HOW IT WORKS -->
-  <section class="section" id="how">
-    <div class="container">
-      <div class="section-tag">Comment ça marche</div>
-      <h2 class="section-title">Intégré en 5 minutes, personnalisé à votre image</h2>
-      <p class="section-sub">Pas de développeur nécessaire. Pas de refonte de votre site. Juste un script à coller.</p>
-
       <div class="steps">
-        <div class="step">
-          <div class="step-num">1</div>
-          <h3>Copiez le script</h3>
-          <p>Un seul extrait de code à intégrer dans votre site, n'importe quelle plateforme.</p>
-        </div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <h3>Personnalisez les couleurs</h3>
-          <p>Configurez la couleur principale, la police et votre logo. Dressim adopte votre identité visuelle.</p>
-        </div>
-        <div class="step">
-          <div class="step-num">3</div>
-          <h3>Vos clients essaient</h3>
-          <p>Ils uploadent leur photo et voient vos vêtements sur eux en quelques secondes.</p>
-        </div>
-        <div class="step">
-          <div class="step-num">4</div>
-          <h3>Vous suivez les stats</h3>
-          <p>Dashboard en temps réel : essayages, conversions, articles les plus testés.</p>
-        </div>
-      </div>
-
-      <div class="code-block">
-        <span class="c-comment">&lt;!-- Collez ce script sur votre page produit --&gt;</span><br/>
-        <span class="c-tag">&lt;script</span>
-        <span class="c-attr"> src</span>=<span class="c-val">"https://cdn.dressim.io/widget.js"</span><br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <span class="c-attr"> data-color</span>=<span class="c-val">"#C8A96E"</span>
-        &nbsp;<span class="c-comment">/* votre couleur principale */</span><br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <span class="c-attr"> data-font</span>=<span class="c-val">"Playfair Display"</span>
-        &nbsp;<span class="c-comment">/* votre police */</span><br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <span class="c-attr"> data-logo</span>=<span class="c-val">"https://votre-boutique.com/logo.png"</span><span class="c-tag">&gt;&lt;/script&gt;</span>
+        <div class="step reveal"><span class="n">1</span><div class="ic bg-violet">⚡</div><h3>Intégrez</h3><p>Une seule ligne de code sur votre boutique. Compatible Shopify, WooCommerce, PrestaShop ou tout site.</p></div>
+        <div class="step reveal"><span class="n">2</span><div class="ic bg-pink">🧍</div><h3>Vos clients essaient</h3><p>Ils créent leur avatar, essaient vos vêtements grâce à l'IA et reçoivent leur taille idéale.</p></div>
+        <div class="step reveal"><span class="n">3</span><div class="ic bg-coral">📈</div><h3>Vous vendez plus</h3><p>Plus de confiance à l'achat = moins de retours et un panier moyen qui grimpe.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- CUSTOMIZATION -->
-  <section class="section custom-section" id="custom">
-    <div class="container">
-      <div class="custom-grid">
+  <!-- DEMO -->
+  <section class="sec demo" id="demo">
+    <span class="blob" style="width:380px;height:380px;background:#a855f7;top:-100px;right:-80px;opacity:.25"></span>
+    <div class="wrap">
+      <div class="center reveal" style="margin-bottom:2.5rem">
+        <span class="eyebrow">Démo live</span>
+        <h2>Essaie par toi-même 👇</h2>
+        <p class="lead">Choisis un mannequin et un vêtement : l'IA l'habille en un instant. C'est exactement ce que vivront tes clients.</p>
+      </div>
+      <div class="demo-card reveal">
+        <div class="demo-stage">
+          <img id="demoBase" src="models/femme.jpg" alt="Mannequin">
+          <img id="demoTry" src="" alt="" style="opacity:0">
+          <div class="flash" id="demoFlash"></div>
+        </div>
         <div>
-          <div class="section-tag">Personnalisation</div>
-          <h2 class="section-title">Votre boutique, vos couleurs</h2>
-          <p class="section-sub">Dressim s'efface derrière votre marque. Vos clients ne voient qu'une expérience fluide, cohérente avec votre identité.</p>
-          <p style="font-size:.875rem;color:var(--gray);margin-top:1rem;">Essayez en cliquant sur une couleur →</p>
-          <div class="color-picker">
-            <div class="color-swatch active" data-color="#c8a96e" data-bg="#faf6f0" style="background:#c8a96e;"></div>
-            <div class="color-swatch" data-color="#2563eb" data-bg="#eff6ff" style="background:#2563eb;"></div>
-            <div class="color-swatch" data-color="#16a34a" data-bg="#f0fdf4" style="background:#16a34a;"></div>
-            <div class="color-swatch" data-color="#dc2626" data-bg="#fef2f2" style="background:#dc2626;"></div>
-            <div class="color-swatch" data-color="#7c3aed" data-bg="#f5f3ff" style="background:#7c3aed;"></div>
-            <div class="color-swatch" data-color="#0f172a" data-bg="#f1f5f9" style="background:#0f172a;"></div>
+          <div class="gtoggle">
+            <button id="gF" class="on" onclick="setG('femme')">👩 Femme</button>
+            <button id="gH" onclick="setG('homme')">👨 Homme</button>
           </div>
-        </div>
-        <div class="custom-preview">
-          <div class="preview-bar">
-            <div class="preview-dot"></div>
-            <div class="preview-dot"></div>
-            <div class="preview-dot"></div>
+          <h3 style="font-size:1.3rem;margin-bottom:.3rem">Choisis un vêtement</h3>
+          <p style="color:var(--muted);font-size:.92rem">Clique : il s'enfile sur le mannequin grâce à l'IA.</p>
+          <div class="garments" id="garments"></div>
+          <div class="demo-size" id="demoSizeBox" style="display:none">
+            <span id="demoItemName" style="font-weight:600;color:var(--ink)"></span>
+            <span>·</span> Taille recommandée <span class="v" id="demoSize">M</span>
           </div>
-          <div class="preview-store">
-            <div class="preview-store-header" id="previewHeader">
-              <div class="preview-store-logo" id="previewLogo">Ma Boutique</div>
-              <span style="font-size:.75rem;color:var(--gray)">Collection Été</span>
-            </div>
-            <div style="padding:.75rem 1rem;">
-              <div style="background:var(--border);border-radius:4px;height:120px;margin-bottom:.75rem;display:flex;align-items:center;justify-content:center;color:var(--gray);font-size:.8rem;">📷 Photo produit</div>
-              <div style="font-size:.85rem;font-weight:600;margin-bottom:.25rem;">Robe Midi Florale</div>
-              <div style="font-size:.8rem;color:var(--gray);margin-bottom:.75rem;">89,00 €</div>
-              <div class="preview-widget" id="previewWidget">
-                <div class="widget-icon" id="previewIcon">👗</div>
-                <div class="widget-text">
-                  <strong id="previewAccent">Essayer virtuellement</strong>
-                  <span>Voir sur moi en 30 secondes</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <a href="#pricing" class="btn btn-grad" style="margin-top:1.3rem">Intégrer Dressim sur ma boutique →</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- FEATURES GRID -->
-  <section class="section features-section" id="features">
-    <div class="container">
-      <div class="section-tag">Fonctionnalités</div>
-      <h2 class="section-title">Tout ce dont votre boutique a besoin</h2>
-      <p class="section-sub">Un seul outil, pensé pour les boutiques indépendantes comme pour les grandes enseignes.</p>
-      <div class="features-grid">
-        <div class="feat-card"><div class="fc-icon">⚡</div><h4>Intégration en 5 min</h4><p>Une ligne de code. Fonctionnel sur n'importe quel CMS sans développeur.</p></div>
-        <div class="feat-card"><div class="fc-icon">🧍</div><h4>Avatars 3D réalistes</h4><p>Modèles haute qualité pour morphologies féminines et masculines.</p></div>
-        <div class="feat-card"><div class="fc-icon">📏</div><h4>Guide des tailles IA</h4><p>Recommandation précise basée sur les mensurations du client.</p></div>
-        <div class="feat-card"><div class="fc-icon">🎨</div><h4>Marque blanche</h4><p>Couleurs, police, logo — le widget adopte votre identité visuelle.</p></div>
-        <div class="feat-card"><div class="fc-icon">📊</div><h4>Analytics temps réel</h4><p>Essayages, conversions, articles les plus testés dans votre dashboard.</p></div>
-        <div class="feat-card"><div class="fc-icon">🔒</div><h4>RGPD & confidentialité</h4><p>Aucune donnée conservée. Suppression automatique. 100% conforme.</p></div>
+  <!-- FEATURES -->
+  <section class="sec" id="features">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="eyebrow">Fonctionnalités</span>
+        <h2>Tout ce qu'il faut pour <span class="grad-text">vendre mieux</span>.</h2>
+        <p class="lead">Pensé pour les boutiques indépendantes comme pour les grandes enseignes.</p>
+      </div>
+      <div class="feats">
+        <div class="feat reveal"><div class="ic bg-violet">⚡</div><h3>Intégration en 5 min</h3><p>Une ligne de code, aucun développeur requis, compatible tous CMS.</p></div>
+        <div class="feat reveal"><div class="ic bg-pink">🪄</div><h3>Essayage IA réaliste</h3><p>Vos vêtements s'affichent réellement sur le mannequin, pas une simulation grossière.</p></div>
+        <div class="feat reveal"><div class="ic bg-cyan">📏</div><h3>Guide des tailles</h3><p>Recommandation précise selon les mensurations. Fini le doute avant l'achat.</p></div>
+        <div class="feat reveal"><div class="ic bg-coral">🎨</div><h3>Marque blanche</h3><p>Vos couleurs, votre logo, votre identité. Dressim s'efface derrière votre marque.</p></div>
+        <div class="feat reveal"><div class="ic bg-indigo">📊</div><h3>Analytics temps réel</h3><p>Essayages, conversions, articles les plus testés dans un dashboard clair.</p></div>
+        <div class="feat reveal"><div class="ic bg-lime">🔒</div><h3>RGPD & confidentialité</h3><p>Aucune donnée conservée, suppression automatique. 100% conforme.</p></div>
       </div>
     </div>
   </section>
 
   <!-- PRICING -->
-  <section class="section" id="pricing">
-    <div class="container">
-      <div class="section-tag">Tarifs</div>
-      <h2 class="section-title">Simple et transparent</h2>
-      <p class="section-sub">Commencez gratuitement pendant 14 jours. Aucune carte bancaire requise.</p>
-
-      <div class="pricing-grid">
-        <div class="plan">
-          <div class="plan-name">Starter</div>
-          <div class="plan-price"><sup>€</sup>199<span>/mois</span></div>
-          <div class="plan-desc">Pour les boutiques qui démarrent</div>
-          <hr class="plan-divider" />
-          <ul class="plan-features">
-            <li>1 boutique</li>
-            <li>500 essayages / mois</li>
-            <li>Personnalisation couleurs</li>
-            <li>Dashboard analytics</li>
-            <li class="off">API avancée</li>
-            <li class="off">Support prioritaire</li>
+  <section class="sec" id="pricing">
+    <div class="wrap">
+      <div class="center reveal">
+        <span class="eyebrow">Tarifs</span>
+        <h2>Simple et transparent.</h2>
+        <p class="lead">14 jours d'essai gratuit. Sans carte bancaire.</p>
+      </div>
+      <div class="plans">
+        <div class="plan reveal">
+          <div class="pname">Starter</div>
+          <div class="price">199€<small>/mois</small></div>
+          <ul>
+            <li>1 boutique</li><li>500 essayages / mois</li><li>Personnalisation couleurs</li><li>Dashboard analytics</li>
           </ul>
-          <a href="contact.html" class="btn-plan btn-plan-outline">Essai gratuit 14 jours</a>
+          <a href="contact.html" class="btn btn-ghost">Essai gratuit</a>
         </div>
-
-        <div class="plan featured">
-          <div class="plan-badge">Le plus populaire</div>
-          <div class="plan-name">Growth</div>
-          <div class="plan-price"><sup>€</sup>499<span>/mois</span></div>
-          <div class="plan-desc">Pour les boutiques en croissance</div>
-          <hr class="plan-divider" />
-          <ul class="plan-features">
-            <li>3 boutiques</li>
-            <li>2 000 essayages / mois</li>
-            <li>Personnalisation complète</li>
-            <li>Dashboard analytics avancé</li>
-            <li>API avancée</li>
-            <li class="off">Support prioritaire</li>
+        <div class="plan hot reveal">
+          <span class="ptag">Le plus populaire</span>
+          <div class="pname">Growth</div>
+          <div class="price">499€<small>/mois</small></div>
+          <ul>
+            <li>3 boutiques</li><li>2 000 essayages / mois</li><li>Personnalisation complète</li><li>Analytics avancé</li><li>API & intégrations</li>
           </ul>
-          <a href="contact.html" class="btn-plan btn-plan-dark">Essai gratuit 14 jours</a>
+          <a href="contact.html" class="btn">Essai gratuit</a>
         </div>
-
-        <div class="plan">
-          <div class="plan-name">Enterprise</div>
-          <div class="plan-price" style="font-size:1.8rem;padding-top:.4rem;">Sur mesure</div>
-          <div class="plan-desc">Pour les grandes enseignes et réseaux</div>
-          <hr class="plan-divider" />
-          <ul class="plan-features">
-            <li>Boutiques illimitées</li>
-            <li>Volume personnalisé</li>
-            <li>Personnalisation complète</li>
-            <li>Dashboard analytics avancé</li>
-            <li>API avancée</li>
-            <li>Support prioritaire dédié</li>
+        <div class="plan reveal">
+          <div class="pname">Enterprise</div>
+          <div class="price">Sur mesure</div>
+          <ul>
+            <li>Boutiques illimitées</li><li>Volume personnalisé</li><li>Support prioritaire dédié</li><li>SLA & onboarding</li>
           </ul>
-          <a href="contact.html" class="btn-plan btn-plan-outline">Nous contacter</a>
+          <a href="contact.html" class="btn btn-ghost">Nous contacter</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- FAQ -->
-  <section class="section" style="padding-top:0">
-    <div class="container">
-      <div class="section-tag">FAQ</div>
-      <h2 class="section-title">Questions fréquentes</h2>
-      <div class="faq-list">
-        <details class="faq-item">
-          <summary>Est-ce compatible avec mon site existant ?</summary>
-          <p>Oui. Dressim fonctionne avec tous les CMS et plateformes : Shopify, WooCommerce, PrestaShop, ou tout site HTML. Il suffit d'insérer un script.</p>
-        </details>
-        <details class="faq-item">
-          <summary>Mes clients doivent-ils créer un compte ?</summary>
-          <p>Non. L'essayage est 100% anonyme. Vos clients uploadent simplement une photo et voient le résultat immédiatement, sans inscription.</p>
-        </details>
-        <details class="faq-item">
-          <summary>Que devient la photo uploadée par le client ?</summary>
-          <p>Les photos sont traitées en temps réel et supprimées automatiquement après 15 minutes. Aucune donnée n'est conservée ni partagée.</p>
-        </details>
-        <details class="faq-item">
-          <summary>Comment fonctionne la personnalisation visuelle ?</summary>
-          <p>Vous configurez votre couleur principale, votre police et votre logo via un simple attribut HTML. Le widget Dressim adopte instantanément votre identité visuelle.</p>
-        </details>
-        <details class="faq-item">
-          <summary>Puis-je tester avant de m'engager ?</summary>
-          <p>Oui, 14 jours d'essai gratuit sans carte bancaire. Vous pouvez aussi tester la démo live sur ce site.</p>
-        </details>
-      </div>
-    </div>
+  <!-- CTA -->
+  <section class="cta reveal">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <h2>Prêt à transformer vos visiteurs en clients ?</h2>
+    <p>Rejoignez les boutiques qui réduisent leurs retours et boostent leurs ventes avec l'essayage virtuel IA.</p>
+    <a href="#demo" class="btn btn-lg">✨ Essayer la démo maintenant</a>
   </section>
 
-  <!-- CTA FINAL -->
-  <div class="cta-final">
-    <h2>Prêt à réduire vos retours ?</h2>
-    <p>Rejoignez les boutiques qui ont déjà adopté l'essayage virtuel.</p>
-    <a href="boutique.html" class="btn-white">Voir la démo →</a>
-  </div>
-
-  <!-- FOOTER -->
-  <div class="container">
-    <footer>
-      <a href="/" class="logo">Dress<span style="color:var(--warm)">im</span></a>
+  <footer>
+    <div class="wrap inner">
+      <a href="#" class="logo">Dressim<span class="dot">.</span></a>
       <p>© 2026 Dressim. Tous droits réservés.</p>
-      <a href="contact.html">Contact</a>
-    </footer>
-  </div>
+      <div class="fl"><a href="#how">Comment ça marche</a><a href="#pricing">Tarifs</a><a href="contact.html">Contact</a></div>
+    </div>
+  </footer>
 
   <script>
-    const swatches = document.querySelectorAll('.color-swatch');
-    const previewHeader = document.getElementById('previewHeader');
-    const previewLogo = document.getElementById('previewLogo');
-    const previewWidget = document.getElementById('previewWidget');
-    const previewIcon = document.getElementById('previewIcon');
-    const previewAccent = document.getElementById('previewAccent');
+    // Nav scroll state
+    const nav=document.getElementById('nav');
+    addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20));
 
-    swatches.forEach(s => {
-      s.addEventListener('click', () => {
-        swatches.forEach(x => x.classList.remove('active'));
-        s.classList.add('active');
-        const color = s.dataset.color;
-        const bg = s.dataset.bg;
-        previewHeader.style.background = bg;
-        previewLogo.style.color = color;
-        previewWidget.style.background = bg;
-        previewWidget.style.borderColor = color + '44';
-        previewIcon.style.background = color + '22';
-        previewAccent.style.color = color;
+    // Scroll reveal (robuste : marche partout, jamais de section blanche)
+    function revealVisible(){
+      document.querySelectorAll('.reveal:not(.in)').forEach(el=>{
+        if(el.getBoundingClientRect().top < innerHeight*0.9) el.classList.add('in');
       });
-    });
-  </script>
+    }
+    addEventListener('scroll',revealVisible,{passive:true});
+    addEventListener('resize',revealVisible);
+    addEventListener('load',revealVisible);
+    revealVisible();
+    // Filet de sécurité : tout révéler après 2s quoi qu'il arrive
+    setTimeout(()=>document.querySelectorAll('.reveal').forEach(e=>e.classList.add('in')),2000);
 
+    // Hero auto-cycle outfits
+    const heroA=document.getElementById('heroImgA'), heroB=document.getElementById('heroImgB');
+    const heroSet=['tryon/femme-robe.png','tryon/femme-blouse.png','tryon/femme-veste.png','tryon/femme-tshirt.png'];
+    let hi=0, showA=true;
+    setInterval(()=>{
+      hi=(hi+1)%heroSet.length;
+      const next=showA?heroB:heroA, cur=showA?heroA:heroB;
+      next.src=heroSet[hi];
+      next.onload=()=>{next.style.opacity='1';cur.style.opacity='0';showA=!showA;};
+    },2600);
+
+    // Interactive demo
+    const DEMO={
+      femme:{model:'models/femme.jpg',size:'M',items:[
+        {id:'robe',name:'Robe Rouge',thumb:'garments/robe.jpg',tryon:'tryon/femme-robe.png'},
+        {id:'blouse',name:'Blouse Fleurie',thumb:'garments/blouse.jpg',tryon:'tryon/femme-blouse.png'},
+        {id:'veste',name:'Veste Cuir',thumb:'garments/veste.jpg',tryon:'tryon/femme-veste.png'},
+        {id:'tshirt',name:'T-shirt Imprimé',thumb:'garments/tshirt.jpg',tryon:'tryon/femme-tshirt.png'},
+      ]},
+      homme:{model:'models/homme.jpg',size:'XL',items:[
+        {id:'veste',name:'Veste Cuir',thumb:'garments/veste.jpg',tryon:'tryon/homme-veste.png'},
+        {id:'tshirt',name:'T-shirt Imprimé',thumb:'garments/tshirt.jpg',tryon:'tryon/homme-tshirt.png'},
+      ]},
+    };
+    let G='femme';
+    const base=document.getElementById('demoBase'), tryImg=document.getElementById('demoTry'),
+          flash=document.getElementById('demoFlash'), grid=document.getElementById('garments'),
+          sizeBox=document.getElementById('demoSizeBox'), sizeEl=document.getElementById('demoSize'),
+          nameEl=document.getElementById('demoItemName');
+
+    function setG(g){
+      G=g;
+      document.getElementById('gF').classList.toggle('on',g==='femme');
+      document.getElementById('gH').classList.toggle('on',g==='homme');
+      base.src=DEMO[g].model; base.style.opacity='1'; tryImg.style.opacity='0';
+      sizeBox.style.display='none';
+      buildG();
+    }
+    function buildG(){
+      grid.innerHTML=DEMO[G].items.map(it=>
+        `<button data-id="${it.id}" onclick="tryOn('${it.id}')"><img src="${it.thumb}" alt="${it.name}"></button>`).join('');
+    }
+    window.tryOn=function(id){
+      const it=DEMO[G].items.find(x=>x.id===id);
+      [...grid.children].forEach(b=>b.classList.toggle('on',b.dataset.id===id));
+      tryImg.style.opacity='0';
+      tryImg.onload=()=>{tryImg.style.opacity='1';};
+      tryImg.src=it.tryon;
+      flash.style.boxShadow='inset 0 0 60px rgba(236,72,153,.55)';
+      setTimeout(()=>flash.style.boxShadow='inset 0 0 0 rgba(236,72,153,0)',420);
+      nameEl.textContent=it.name; sizeEl.textContent=DEMO[G].size; sizeBox.style.display='flex';
+    };
+    buildG();
+  </script>
 </body>
 </html>
