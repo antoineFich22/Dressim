@@ -588,8 +588,7 @@
   })();
   </script>
 
-  <!-- ══ AVATAR OVERLAY ══ -->
-  <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
+  <!-- ══ ESSAYAGE OVERLAY ══ -->
   <div id="dmAvatarOverlay" style="position:fixed;inset:0;z-index:100;background:#080810;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .45s;font-family:'Inter',sans-serif;">
 
     <!-- Header -->
@@ -601,13 +600,15 @@
     <!-- Body -->
     <div id="dmAvaBody" style="display:flex;flex:1;overflow:hidden;">
 
-      <!-- Sketchfab viewer -->
-      <div style="flex:1;position:relative;background:#0a0a16;">
-        <iframe id="dmSfFrame" title="Avatar Dressim" allow="autoplay;fullscreen;xr-spatial-tracking" allowfullscreen style="width:100%;height:100%;border:none;display:block;"></iframe>
-        <div id="dmSfLoader" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0a16;z-index:2;transition:opacity .8s;">
+      <!-- Mannequin (photo réaliste) -->
+      <div id="dmModelStage" style="flex:1;position:relative;background:radial-gradient(ellipse at 50% 35%, #1a1430 0%, #0a0a16 75%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+        <img id="dmModelBase" alt="Mannequin Dressim" style="position:absolute;inset:0;margin:auto;max-height:92%;max-width:88%;object-fit:contain;transition:opacity .55s ease;opacity:0;filter:drop-shadow(0 20px 50px rgba(0,0,0,.5));">
+        <img id="dmModelTryon" alt="Essayage" style="position:absolute;inset:0;margin:auto;max-height:92%;max-width:88%;object-fit:contain;transition:opacity .55s ease;opacity:0;filter:drop-shadow(0 20px 50px rgba(0,0,0,.5));">
+        <div id="dmSfLoader" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;transition:opacity .6s;">
           <div style="width:40px;height:40px;border:3px solid rgba(200,169,110,.2);border-top-color:#c8a96e;border-radius:50%;animation:dmSpin .9s linear infinite;margin-bottom:1rem;"></div>
-          <div style="color:rgba(255,255,255,.4);font-size:.8rem;">Chargement de l'avatar…</div>
+          <div style="color:rgba(255,255,255,.4);font-size:.8rem;">Chargement du mannequin…</div>
         </div>
+        <div id="dmModelBadge" style="position:absolute;left:50%;bottom:1.1rem;transform:translateX(-50%);background:rgba(8,8,18,.7);backdrop-filter:blur(8px);border:1px solid rgba(200,169,110,.25);color:#c8a96e;font-size:.72rem;font-weight:600;padding:.35rem .9rem;border-radius:20px;white-space:nowrap;z-index:3;">Mannequin de démonstration</div>
       </div>
 
       <!-- Panneau sliders -->
@@ -686,7 +687,22 @@
         </div>
 
         <!-- Bouton confirmer -->
-        <button onclick="confirmAvatar()" style="margin-top:auto;padding:1rem;border-radius:12px;background:#c8a96e;color:#080810;font-weight:800;font-size:.95rem;border:none;cursor:pointer;font-family:inherit;letter-spacing:-.01em;">Valider mes mensurations →</button>
+        <button onclick="goToClothes()" style="margin-top:auto;padding:1rem;border-radius:12px;background:#c8a96e;color:#080810;font-weight:800;font-size:.95rem;border:none;cursor:pointer;font-family:inherit;letter-spacing:-.01em;">Choisir un vêtement →</button>
+      </div>
+
+      <!-- Panneau vêtements (phase 2) -->
+      <div id="dmClothesPanel" style="width:320px;min-width:320px;padding:1.4rem 1.2rem;overflow-y:auto;border-left:1px solid rgba(255,255,255,.06);background:rgba(8,8,18,.95);display:none;flex-direction:column;gap:1rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);">Garde-robe</div>
+          <button onclick="backToMeasure()" style="background:none;border:none;color:#c8a96e;font-size:.75rem;cursor:pointer;font-family:inherit;padding:0;">← Mensurations</button>
+        </div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.5;">Cliquez sur un article : il s'enfile sur votre mannequin grâce à l'IA.</div>
+        <div id="dmGarmentGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem;"></div>
+        <div id="dmTryonInfo" style="display:none;background:rgba(200,169,110,.07);border:1px solid rgba(200,169,110,.2);border-radius:12px;padding:.9rem;">
+          <div id="dmTryonName" style="font-size:.88rem;font-weight:700;color:#fff;margin-bottom:.35rem;"></div>
+          <div style="font-size:.78rem;color:rgba(255,255,255,.55);">Taille recommandée : <span id="dmTryonSize" style="color:#c8a96e;font-weight:800;"></span></div>
+        </div>
+        <button id="dmAddCart" style="display:none;padding:.9rem;border-radius:12px;background:#c8a96e;color:#080810;font-weight:800;font-size:.9rem;border:none;cursor:pointer;font-family:inherit;">Ajouter au panier</button>
       </div>
     </div>
   </div>
@@ -697,25 +713,46 @@
     .dmGBtn.active { border-color:#c8a96e;background:rgba(200,169,110,.15);color:#c8a96e; }
     #dmAvatarOverlay input[type=range] { -webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:rgba(255,255,255,.12);outline:none; }
     #dmAvatarOverlay input[type=range]::-webkit-slider-thumb { -webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#c8a96e;cursor:pointer;border:2px solid #080810;box-shadow:0 0 8px rgba(200,169,110,.5); }
+    .dmGarmentCard { display:flex;flex-direction:column;gap:.45rem;padding:.5rem;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#fff;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s; }
+    .dmGarmentCard:hover { border-color:rgba(200,169,110,.5);background:rgba(255,255,255,.07); }
+    .dmGarmentCard.active { border-color:#c8a96e;background:rgba(200,169,110,.15); }
+    .dmGarmentCard img { width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px;display:block; }
+    .dmGarmentCard span { font-size:.76rem;font-weight:600;color:rgba(255,255,255,.85);line-height:1.3; }
     @media (max-width: 640px) {
       #dmAvaBody { flex-direction: column; }
-      #dmSliderPanel { width: 100% !important; min-width: unset !important; border-left: none !important; border-top: 1px solid rgba(255,255,255,.06); max-height: 55vh; }
+      #dmSliderPanel, #dmClothesPanel { width: 100% !important; min-width: unset !important; border-left: none !important; border-top: 1px solid rgba(255,255,255,.06); max-height: 55vh; }
+      #dmModelStage { min-height: 40vh; }
     }
   </style>
 
   <script>
-    const DM_MODELS = {
-      femme: '7f9d35c58bd2421598eeed0df9b19f37',
-      homme: 'ecefd207c85845a7b0d116c34da5e7fe',
+    // ── Mannequins préfaits (remplacés par les images FASHN locales à terme) ──
+    const MODELS_IMG = {
+      femme: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=700&q=80',
+      homme: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=700&q=80',
     };
+
+    // ── Garde-robe de démo ──
+    const GARMENTS = [
+      { id:'robe-midi',    name:'Robe Midi Florale', thumb:'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80' },
+      { id:'kimono-lin',   name:'Kimono Lin',        thumb:'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&q=80' },
+      { id:'veste-boheme', name:'Veste Bohème',      thumb:'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80' },
+      { id:'top-dentelle', name:'Top Dentelle',      thumb:'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80' },
+    ];
+
+    // ── Essayages pré-générés par FASHN : TRYON[gender][garmentId] = url ──
+    // (vide pour l'instant → on retombe sur la vignette en attendant la pré-génération)
+    const TRYON = { femme: {}, homme: {} };
+
     let dmGender = 'femme';
-    let dmSfLoaded = false;
+    let dmModelLoaded = {};
 
     function openAvatarOverlay() {
       const ov = document.getElementById('dmAvatarOverlay');
       ov.style.opacity = '1';
       ov.style.pointerEvents = 'all';
-      if (!dmSfLoaded) { loadSketchfab(dmGender); dmSfLoaded = true; }
+      loadModel(dmGender);
+      buildGarments();
       updateMeasures();
     }
 
@@ -731,20 +768,51 @@
       document.getElementById('dmGH').classList.toggle('active', g === 'homme');
       document.getElementById('dmHeight').value = g === 'femme' ? 165 : 175;
       document.getElementById('dmWeight').value = g === 'femme' ? 65 : 78;
-      loadSketchfab(g);
+      loadModel(g);
+      resetTryon();
       updateMeasures();
     }
 
-    function loadSketchfab(gender) {
-      const uid = DM_MODELS[gender];
+    function loadModel(gender) {
+      const base = document.getElementById('dmModelBase');
       const loader = document.getElementById('dmSfLoader');
+      resetTryon();
+      base.style.opacity = '0';
       loader.style.opacity = '1';
-      loader.style.pointerEvents = 'all';
-      const frame = document.getElementById('dmSfFrame');
-      frame.src = `https://sketchfab.com/models/${uid}/embed?autospin=0&autostart=1&ui_theme=dark&ui_controls=0&ui_infos=0&ui_watermark=0`;
-      frame.onload = () => {
-        setTimeout(() => { loader.style.opacity = '0'; loader.style.pointerEvents = 'none'; }, 2000);
-      };
+      base.onload = () => { base.style.opacity = '1'; loader.style.opacity = '0'; dmModelLoaded[gender] = true; };
+      base.onerror = () => { loader.style.opacity = '0'; };
+      base.src = MODELS_IMG[gender];
+    }
+
+    function resetTryon() {
+      const tryon = document.getElementById('dmModelTryon');
+      tryon.style.opacity = '0';
+      document.getElementById('dmModelBase').style.opacity = '1';
+      document.getElementById('dmTryonInfo').style.display = 'none';
+      document.getElementById('dmAddCart').style.display = 'none';
+      document.querySelectorAll('.dmGarmentCard').forEach(c => c.classList.remove('active'));
+    }
+
+    function buildGarments() {
+      const grid = document.getElementById('dmGarmentGrid');
+      if (grid.dataset.built) return;
+      grid.innerHTML = GARMENTS.map(g => `
+        <button class="dmGarmentCard" data-id="${g.id}" onclick="dmTryOn('${g.id}', event)">
+          <img src="${g.thumb}" alt="${g.name}" loading="lazy">
+          <span>${g.name}</span>
+        </button>
+      `).join('');
+      grid.dataset.built = '1';
+    }
+
+    function goToClothes() {
+      document.getElementById('dmSliderPanel').style.display = 'none';
+      document.getElementById('dmClothesPanel').style.display = 'flex';
+    }
+
+    function backToMeasure() {
+      document.getElementById('dmClothesPanel').style.display = 'none';
+      document.getElementById('dmSliderPanel').style.display = 'flex';
     }
 
     function calcMeasures() {
@@ -781,9 +849,7 @@
       document.getElementById('dmHips').textContent  = m.hips  + ' cm';
     }
 
-    function confirmAvatar() {
-      const h = +document.getElementById('dmHeight').value;
-      const w = +document.getElementById('dmWeight').value;
+    function computeSize() {
       const m = calcMeasures();
       const SIZING = [
         {size:'XS',bust:[78,83],waist:[58,63]},{size:'S',bust:[84,89],waist:[64,69]},
@@ -794,13 +860,65 @@
       let iW = SIZING.findIndex(s => m.waist >= s.waist[0] && m.waist <= s.waist[1]);
       if (iB < 0) iB = m.bust > 108 ? 4 : 0;
       if (iW < 0) iW = m.waist > 88 ? 4 : 0;
-      const size = SIZING[Math.max(iB, iW)]?.size || 'M';
-      localStorage.setItem('dressim_avatar', JSON.stringify({
-        gender: dmGender, height: h, weight: w, size,
-        measures: m, sfUid: DM_MODELS[dmGender],
+      return SIZING[Math.max(iB, iW)]?.size || 'M';
+    }
+
+    // Image d'essayage : résultat FASHN si dispo, sinon la vignette (placeholder dev)
+    function tryonSrc(gender, g) {
+      return (TRYON[gender] && TRYON[gender][g.id]) || g.thumb;
+    }
+
+    // Essayer un vêtement : il s'envole vers le mannequin puis se révèle dessus
+    window.dmTryOn = function(id, event) {
+      const g = GARMENTS.find(x => x.id === id);
+      if (!g) return;
+      const card = event && event.currentTarget;
+      document.querySelectorAll('.dmGarmentCard').forEach(c => c.classList.remove('active'));
+      if (card) card.classList.add('active');
+      flyGarment(g.thumb, card, () => revealTryon(g));
+    };
+
+    function revealTryon(g) {
+      const tryon = document.getElementById('dmModelTryon');
+      const stage = document.getElementById('dmModelStage');
+      tryon.style.opacity = '0';
+      tryon.onload = () => {
+        tryon.style.opacity = '1';
+        document.getElementById('dmModelBase').style.opacity = '0';
+      };
+      tryon.src = tryonSrc(dmGender, g);
+      stage.style.boxShadow = 'inset 0 0 90px rgba(200,169,110,.45)';
+      setTimeout(() => { stage.style.boxShadow = ''; }, 450);
+      document.getElementById('dmTryonName').textContent = g.name;
+      document.getElementById('dmTryonSize').textContent = computeSize();
+      document.getElementById('dmTryonInfo').style.display = 'block';
+      document.getElementById('dmAddCart').style.display = 'block';
+    }
+
+    // Le vêtement vole de la carte jusqu'au mannequin
+    function flyGarment(productImg, fromEl, callback) {
+      const stage = document.getElementById('dmModelStage');
+      const fromRect = (fromEl || stage).getBoundingClientRect();
+      const toRect = stage.getBoundingClientRect();
+      const img = document.createElement('img');
+      img.src = productImg;
+      img.style.cssText = `
+        position:fixed;
+        left:${fromRect.left + fromRect.width/2 - 40}px;
+        top:${fromRect.top + fromRect.height/2 - 50}px;
+        width:80px; height:100px; object-fit:cover; border-radius:10px;
+        box-shadow:0 0 24px rgba(200,169,110,.6);
+        z-index:9999; pointer-events:none; opacity:1;
+        transition:all .7s cubic-bezier(.4,0,.2,1);
+      `;
+      document.body.appendChild(img);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        img.style.left = (toRect.left + toRect.width/2 - 60) + 'px';
+        img.style.top  = (toRect.top + toRect.height/2 - 80) + 'px';
+        img.style.width = '120px'; img.style.height = '160px';
+        img.style.opacity = '0';
       }));
-      // Aller vers la boutique démo
-      window.location.href = '/boutique.html';
+      setTimeout(() => { img.remove(); callback(); }, 720);
     }
   </script>
 
