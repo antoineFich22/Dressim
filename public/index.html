@@ -747,9 +747,19 @@
     };
     function garmentsFor(g) { return GARMENTS[g] || []; }
 
-    // ── Essayages pré-générés (Hugging Face) : TRYON[gender][garmentId] = url ──
-    // (vide pour l'instant → on retombe sur la vignette en attendant la pré-génération)
-    const TRYON = { femme: {}, homme: {} };
+    // ── Essayages pré-générés (Hugging Face Kolors Virtual Try-On) ──
+    const TRYON = {
+      femme: {
+        robe:   'tryon/femme-robe.png',
+        blouse: 'tryon/femme-blouse.png',
+        veste:  'tryon/femme-veste.png',
+        tshirt: 'tryon/femme-tshirt.png',
+      },
+      homme: {
+        veste:  'tryon/homme-veste.png',
+        tshirt: 'tryon/homme-tshirt.png',
+      },
+    };
 
     let dmGender = 'femme';
     let dmModelLoaded = {};
