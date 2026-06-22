@@ -267,217 +267,240 @@
     </div>
   </nav>
 
-  <!-- HERO 3D -->
+  <!-- HERO 3D interactif -->
   <section id="heroSection" style="position:relative;height:100vh;overflow:hidden;background:#080810;">
-    <canvas id="heroCanvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+    <canvas id="heroCanvas" style="position:absolute;inset:0;width:100%;height:100%;cursor:pointer;"></canvas>
 
-    <!-- Overlay texte -->
-    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;text-align:center;padding:0 1.5rem;pointer-events:none;">
-      <div style="display:inline-block;background:rgba(200,169,110,.15);border:1px solid rgba(200,169,110,.3);color:#c8a96e;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.4rem 1rem;border-radius:20px;margin-bottom:1.5rem;backdrop-filter:blur(8px);">✦ Essayage virtuel IA</div>
-      <h1 style="font-size:clamp(2rem,5vw,3.5rem);font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1.1;margin-bottom:1rem;">L'essayage virtuel qui<br/><em style="color:#c8a96e;font-style:normal;">s'adapte</em> à votre boutique</h1>
-      <p style="font-size:1rem;color:rgba(255,255,255,.6);margin-bottom:2rem;max-width:480px;">Vos clients essaient vos vêtements sur leur avatar 3D — sans cabine d'essayage.</p>
-      <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;pointer-events:all;">
-        <a href="avatar.html" style="padding:.85rem 2rem;border-radius:10px;background:#c8a96e;color:#080810;font-weight:700;font-size:.95rem;text-decoration:none;transition:opacity .2s;">Essayer maintenant →</a>
-        <a href="#how" style="padding:.85rem 2rem;border-radius:10px;background:rgba(255,255,255,.08);color:#fff;font-weight:600;font-size:.95rem;text-decoration:none;border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(8px);">Comment ça marche</a>
+    <!-- Hint clic -->
+    <div id="dmHint" style="position:absolute;bottom:6rem;left:50%;transform:translateX(-50%);z-index:3;text-align:center;pointer-events:none;transition:opacity .5s;">
+      <div style="color:rgba(200,169,110,.7);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;animation:heroBounce 2s infinite;">Appuyez sur le téléphone</div>
+      <div style="color:rgba(255,255,255,.3);font-size:1.2rem;margin-top:.3rem;animation:heroBounce 2s .3s infinite;">↓</div>
+    </div>
+
+    <!-- Cartes flottantes (cachées au départ) -->
+    <div id="dmCards" style="position:absolute;inset:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;justify-content:center;gap:1rem;padding:2rem 2.5rem;opacity:0;transition:opacity .5s;">
+      <div class="dmCard" style="--d:0ms">
+        <div class="dmCardIcon">📱</div>
+        <div>
+          <div class="dmCardTitle">Intégration en 1 ligne</div>
+          <div class="dmCardText">Un simple script sur votre site e-commerce</div>
+        </div>
+      </div>
+      <div class="dmCard" style="--d:120ms">
+        <div class="dmCardIcon">🧍</div>
+        <div>
+          <div class="dmCardTitle">Avatar personnalisé</div>
+          <div class="dmCardText">Le client crée son avatar en 30 secondes</div>
+        </div>
+      </div>
+      <div class="dmCard" style="--d:240ms">
+        <div class="dmCardIcon">👗</div>
+        <div>
+          <div class="dmCardTitle">Essayage IA</div>
+          <div class="dmCardText">Il essaie vos vêtements avant d'acheter</div>
+        </div>
+      </div>
+      <div class="dmCard" style="--d:360ms">
+        <div class="dmCardIcon">📉</div>
+        <div>
+          <div class="dmCardTitle">-30% de retours</div>
+          <div class="dmCardText">Moins d'incertitude = moins de retours</div>
+        </div>
       </div>
     </div>
 
-    <!-- Flèche -->
-    <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.3);font-size:.8rem;text-align:center;z-index:2;animation:heroBounce 2s infinite;">↓</div>
-    <style>@keyframes heroBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}</style>
+    <!-- Bouton essayer (caché au départ) -->
+    <div id="dmTryBtn" style="position:absolute;right:5%;top:50%;transform:translateY(-50%);z-index:4;opacity:0;pointer-events:none;transition:opacity .6s .4s;text-align:center;">
+      <a href="avatar.html" style="display:block;padding:1rem 1.8rem;border-radius:12px;background:#c8a96e;color:#080810;font-weight:800;font-size:1rem;text-decoration:none;box-shadow:0 0 30px rgba(200,169,110,.4);letter-spacing:-.01em;">Essayer maintenant →</a>
+      <div style="color:rgba(255,255,255,.35);font-size:.75rem;margin-top:.6rem;">Gratuit · Sans inscription</div>
+    </div>
+
+    <!-- Flèche bas -->
+    <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.2);font-size:.75rem;z-index:2;animation:heroBounce 2s infinite;">↓ Découvrir</div>
+    <style>
+      @keyframes heroBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
+      @keyframes dmSlideIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
+      .dmCard{
+        display:flex;align-items:center;gap:.9rem;
+        background:rgba(255,255,255,.06);
+        border:1px solid rgba(200,169,110,.2);
+        backdrop-filter:blur(12px);
+        border-radius:12px;padding:.8rem 1.1rem;
+        opacity:0;transform:translateX(-30px);
+        max-width:280px;
+      }
+      .dmCard.visible{animation:dmSlideIn .4s ease forwards;animation-delay:var(--d);}
+      .dmCardIcon{font-size:1.4rem;flex-shrink:0;}
+      .dmCardTitle{color:#fff;font-weight:700;font-size:.88rem;margin-bottom:.2rem;}
+      .dmCardText{color:rgba(255,255,255,.5);font-size:.78rem;line-height:1.4;}
+    </style>
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
   <script>
   (function() {
     const canvas = document.getElementById('heroCanvas');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x080810, 1);
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 1.2, 6.5);
+    const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0.4, 5.5);
 
     // ── Lumières ──
-    scene.add(new THREE.AmbientLight(0x8899cc, 3));
-    const gold = new THREE.PointLight(0xc8a96e, 150, 15);
-    gold.position.set(2, 3, 2);
-    scene.add(gold);
-    const blue = new THREE.PointLight(0x4488ff, 80, 12);
-    blue.position.set(-2, 1, 1);
-    scene.add(blue);
-    const front = new THREE.DirectionalLight(0xffffff, 1.5);
-    front.position.set(0, 2, 4);
-    scene.add(front);
+    scene.add(new THREE.AmbientLight(0x223355, 3));
+    const goldLight = new THREE.PointLight(0xc8a96e, 120, 14);
+    goldLight.position.set(1.5, 3, 2);
+    scene.add(goldLight);
+    const blueLight = new THREE.PointLight(0x4488ff, 60, 10);
+    blueLight.position.set(-2, 0, 3);
+    scene.add(blueLight);
+    const frontLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    frontLight.position.set(0, 2, 4);
+    scene.add(frontLight);
 
-    // ── Matériau métal ──
-    const mat = new THREE.MeshStandardMaterial({
-      color: 0x3a3a5e,
-      metalness: 0.85,
-      roughness: 0.25,
-      emissive: 0x111128,
-      emissiveIntensity: 1,
+    // ── Matériaux ──
+    const skinMat = new THREE.MeshStandardMaterial({ color: 0x1a1a2e, metalness: .3, roughness: .65 });
+    const phoneMat = new THREE.MeshStandardMaterial({ color: 0x111122, metalness: .95, roughness: .08 });
+    const edgeMat  = new THREE.MeshStandardMaterial({ color: 0x222244, metalness: .99, roughness: .04 });
+
+    // ── Main ──
+    const hand = new THREE.Group();
+    const palm = new THREE.Mesh(new THREE.BoxGeometry(.58, .48, .15), skinMat);
+    hand.add(palm);
+
+    // 4 doigts
+    [-.2, -.065, .07, .2].forEach((x, i) => {
+      const len = [.32, .38, .36, .28][i];
+      const f = new THREE.Mesh(new THREE.CapsuleGeometry(.058, len, 4, 8), skinMat);
+      f.position.set(x, .24 + len / 2, 0);
+      hand.add(f);
     });
-    const matGold = new THREE.MeshStandardMaterial({
-      color: 0xc8a96e,
-      metalness: 1,
-      roughness: 0.08,
-      emissive: 0xc8a96e,
-      emissiveIntensity: 0.4,
-    });
+    // Pouce
+    const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(.062, .25, 4, 8), skinMat);
+    thumb.rotation.z = 1.1;
+    thumb.position.set(-.38, -.04, .02);
+    hand.add(thumb);
 
-    // ── Corps humanoïde ──
-    const body = new THREE.Group();
+    hand.rotation.x = -.2;
+    hand.position.set(.1, -.65, .4);
+    scene.add(hand);
 
-    function addMesh(geo, material, x, y, z, rx, ry, rz) {
-      const m = new THREE.Mesh(geo, material);
-      m.position.set(x, y, z);
-      if (rx) m.rotation.set(rx, ry||0, rz||0);
-      body.add(m);
-      return m;
-    }
-
-    // Tête
-    addMesh(new THREE.SphereGeometry(.28,32,32), mat, 0,2.9,0);
-    // Cou
-    addMesh(new THREE.CylinderGeometry(.1,.12,.22,16), mat, 0,2.57,0);
-    // Torse
-    addMesh(new THREE.CapsuleGeometry(.38,.75,8,16), mat, 0,1.75,0);
-    // Bassin
-    addMesh(new THREE.CapsuleGeometry(.32,.22,8,16), mat, 0,1.12,0);
-
-    // Épaules dorées
-    [-1,1].forEach(s => addMesh(new THREE.SphereGeometry(.15,16,16), matGold, s*.55,2.1,0));
-
-    // Bras
-    [-1,1].forEach(s => {
-      addMesh(new THREE.CapsuleGeometry(.11,.52,8,16), mat, s*.66,1.72,0);
-      addMesh(new THREE.CapsuleGeometry(.09,.48,8,16), mat, s*.72,1.12,0);
-      addMesh(new THREE.SphereGeometry(.1,16,16), mat, s*.76,.78,0);
-    });
-
-    // Jambes
-    [-1,1].forEach(s => {
-      addMesh(new THREE.CapsuleGeometry(.14,.6,8,16), mat, s*.2,.58,0);
-      addMesh(new THREE.SphereGeometry(.1,16,16), matGold, s*.2,.22,0);
-      addMesh(new THREE.CapsuleGeometry(.1,.55,8,16), mat, s*.2,-.22,0);
-      addMesh(new THREE.BoxGeometry(.18,.08,.32), mat, s*.2,-.54,.05);
-    });
-
-    // Panneaux torse dorés
-    addMesh(new THREE.BoxGeometry(.22,.08,.02), matGold, 0,1.9,.39);
-    addMesh(new THREE.BoxGeometry(.22,.08,.02), matGold, 0,1.6,.39);
-
-    body.position.set(.8, -.3, 0);
-    scene.add(body);
+    // ── Texture écran avec Canvas ──
+    const sc = document.createElement('canvas');
+    sc.width = 256; sc.height = 512;
+    const ctx2d = sc.getContext('2d');
+    const grad = ctx2d.createLinearGradient(0, 0, 0, 512);
+    grad.addColorStop(0, '#08081a');
+    grad.addColorStop(1, '#0d1130');
+    ctx2d.fillStyle = grad;
+    ctx2d.fillRect(0, 0, 256, 512);
+    // Logo Dressim
+    ctx2d.fillStyle = '#c8a96e';
+    ctx2d.font = 'bold 46px Arial';
+    ctx2d.textAlign = 'center';
+    ctx2d.fillText('Dressim', 128, 195);
+    // Barre déco
+    ctx2d.fillStyle = 'rgba(200,169,110,.35)';
+    ctx2d.fillRect(68, 210, 120, 2);
+    // Sous-titre
+    ctx2d.fillStyle = 'rgba(255,255,255,.55)';
+    ctx2d.font = '18px Arial';
+    ctx2d.fillText('Essayage virtuel IA', 128, 248);
+    // Hint
+    ctx2d.fillStyle = 'rgba(200,169,110,.5)';
+    ctx2d.font = '14px Arial';
+    ctx2d.fillText('▼ Appuyez ici', 128, 470);
+    const screenTex = new THREE.CanvasTexture(sc);
 
     // ── Téléphone ──
-    const phone = new THREE.Group();
+    const phoneGroup = new THREE.Group();
+    const chassis = new THREE.Mesh(new THREE.BoxGeometry(.5, 1.02, .05), phoneMat);
+    phoneGroup.add(chassis);
 
-    // Chassis
-    const chassisMat = new THREE.MeshStandardMaterial({ color: 0x222233, metalness: .95, roughness: .12 });
-    const chassis = new THREE.Mesh(new THREE.BoxGeometry(.48, .96, .045), chassisMat);
-    phone.add(chassis);
+    // Contours latéraux
+    [[0,.52,0,.5,.04,.055],[0,-.52,0,.5,.04,.055],[.26,0,0,.04,1.02,.055],[-.26,0,0,.04,1.02,.055]]
+      .forEach(([x,y,z,w,h,d]) => {
+        const e = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), edgeMat);
+        e.position.set(x,y,z);
+        phoneGroup.add(e);
+      });
 
-    // Bords arrondis simulés (4 barres latérales)
-    const edgeMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, metalness: .99, roughness: .05 });
-    [
-      [0, .48, 0, .48, .04, .05],
-      [0, -.48, 0, .48, .04, .05],
-      [.24, 0, 0, .04, .96, .05],
-      [-.24, 0, 0, .04, .96, .05],
-    ].forEach(([x,y,z,w,h,d]) => {
-      const e = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), edgeMat);
-      e.position.set(x,y,z);
-      phone.add(e);
-    });
+    // Écran avec texture
+    const screenMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(.44, .94, .002),
+      new THREE.MeshStandardMaterial({ map: screenTex, emissiveMap: screenTex, emissive: 0xffffff, emissiveIntensity: .25 })
+    );
+    screenMesh.position.set(0, 0, .027);
+    phoneGroup.add(screenMesh);
 
-    // Écran
-    const screenMat = new THREE.MeshStandardMaterial({ color: 0x0d1117, metalness: 0, roughness: .3, emissive: 0x0d1117, emissiveIntensity: .5 });
-    const screen = new THREE.Mesh(new THREE.BoxGeometry(.42, .88, .001), screenMat);
-    screen.position.set(0, 0, .024);
-    phone.add(screen);
+    // Encoche
+    const notch = new THREE.Mesh(new THREE.BoxGeometry(.1,.02,.003),
+      new THREE.MeshStandardMaterial({ color: 0x050510 }));
+    notch.position.set(0, .44, .028);
+    phoneGroup.add(notch);
 
-    // Interface app sur l'écran (rectangles colorés simulant l'UI)
-    const uiItems = [
-      { color: 0xc8a96e, x: 0, y: .28, w: .34, h: .06 },   // header doré
-      { color: 0x1e293b, x: 0, y: .1, w: .34, h: .22 },    // zone mannequin
-      { color: 0xc8a96e, x: -.1, y: -.07, w: .13, h: .04 },// chip mesure
-      { color: 0xc8a96e, x: .08, y: -.07, w: .13, h: .04 },
-      { color: 0x22c55e, x: 0, y: -.18, w: .3, h: .055 },  // bouton vert
-      { color: 0x1e293b, x: -.09, y: -.3, w: .13, h: .13 }, // card
-      { color: 0x1e293b, x: .09, y: -.3, w: .13, h: .13 },
-    ];
-    uiItems.forEach(({color,x,y,w,h}) => {
-      const m = new THREE.Mesh(
-        new THREE.BoxGeometry(w, h, .001),
-        new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: .6, roughness: .4 })
-      );
-      m.position.set(x, y, .026);
-      phone.add(m);
-    });
+    // Bouton volume
+    const volBtn = new THREE.Mesh(new THREE.BoxGeometry(.008,.07,.04), edgeMat);
+    volBtn.position.set(-.265, .12, 0);
+    phoneGroup.add(volBtn);
 
-    // Notch (encoche)
-    const notch = new THREE.Mesh(new THREE.BoxGeometry(.12, .022, .002),
-      new THREE.MeshStandardMaterial({ color: 0x0d1117, emissive: 0x000000 }));
-    notch.position.set(0, .41, .026);
-    phone.add(notch);
-
-    // Bouton côté droit
-    const btn = new THREE.Mesh(new THREE.BoxGeometry(.008, .06, .04), edgeMat);
-    btn.position.set(.245, .1, 0);
-    phone.add(btn);
-
-    phone.scale.set(.95, .95, .95);
-    phone.rotation.y = .25;
-    phone.rotation.x = -.05;
-    phone.position.set(-.5, 1.2, 1.5);
-    scene.add(phone);
+    phoneGroup.rotation.x = -.15;
+    phoneGroup.rotation.y = -.1;
+    phoneGroup.position.set(.1, .9, .4);
+    scene.add(phoneGroup);
 
     // Lueur écran
-    const screenGlow = new THREE.PointLight(0x4488ff, 12, 2);
-    screenGlow.position.set(-.6, 1.1, 2.3);
-    scene.add(screenGlow);
+    const phoneGlow = new THREE.PointLight(0x5599ff, 18, 2.5);
+    phoneGlow.position.set(.1, .9, 1.1);
+    scene.add(phoneGlow);
 
-    // ── Ligne de scan holographique ──
-    const scanMat = new THREE.MeshBasicMaterial({ color: 0xc8a96e, transparent: true, opacity: .25 });
-    const scanLine = new THREE.Mesh(new THREE.PlaneGeometry(1.4, .012), scanMat);
-    scanLine.position.set(.8, 0, .1);
-    scene.add(scanLine);
-
-    // ── Particules ──
-    const N = 300;
-    const pos = new Float32Array(N * 3);
-    const pSizes = new Float32Array(N);
+    // ── Particules fond ──
+    const N = 250;
+    const pPos = new Float32Array(N * 3);
     for (let i = 0; i < N; i++) {
-      const r = 1.2 + Math.random() * 2.2;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = (Math.random() - .5) * Math.PI * 1.5;
-      pos[i*3]   = .8 + r * Math.cos(theta) * Math.cos(phi);
-      pos[i*3+1] = -.3 + r * Math.sin(phi) * 1.8;
-      pos[i*3+2] = r * Math.sin(theta) * Math.cos(phi) * .6;
-      pSizes[i] = .5 + Math.random() * 2.5;
+      pPos[i*3]   = (Math.random() - .5) * 10;
+      pPos[i*3+1] = (Math.random() - .5) * 8;
+      pPos[i*3+2] = (Math.random() - .5) * 6 - 2;
     }
-    const pg = new THREE.BufferGeometry();
-    pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    pg.setAttribute('size', new THREE.BufferAttribute(pSizes, 1));
-    const pMat = new THREE.PointsMaterial({ color: 0xc8a96e, size: .022, transparent: true, opacity: .7, sizeAttenuation: true });
-    scene.add(new THREE.Points(pg, pMat));
+    const pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+    scene.add(new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0xc8a96e, size: .018, transparent: true, opacity: .5 })));
 
-    // ── Anneau orbital ──
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(1.15, .008, 8, 80),
-      new THREE.MeshBasicMaterial({ color: 0xc8a96e, transparent: true, opacity: .3 })
-    );
-    ring.rotation.x = Math.PI / 2.4;
-    ring.position.set(.8, 1.2, 0);
-    scene.add(ring);
+    // ── Raycaster clic sur téléphone ──
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let clicked = false;
+
+    canvas.addEventListener('click', e => {
+      const r = canvas.getBoundingClientRect();
+      mouse.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+      mouse.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      if (raycaster.intersectObjects(phoneGroup.children, true).length > 0 && !clicked) {
+        clicked = true;
+        // Afficher les cartes
+        const cards = document.getElementById('dmCards');
+        cards.style.opacity = '1';
+        cards.style.pointerEvents = 'none';
+        cards.querySelectorAll('.dmCard').forEach(c => c.classList.add('visible'));
+        // Afficher bouton
+        const tryBtn = document.getElementById('dmTryBtn');
+        tryBtn.style.opacity = '1';
+        tryBtn.style.pointerEvents = 'all';
+        // Cacher hint
+        document.getElementById('dmHint').style.opacity = '0';
+        // Déplacer téléphone vers la droite
+        phoneTargetX = 1.4;
+      }
+    });
 
     // ── Animation ──
-    let t = 0;
-    let mouseX = 0, mouseY = 0;
+    let t = 0, mouseX = 0, mouseY = 0;
+    let phoneTargetX = .1;
+
     window.addEventListener('mousemove', e => {
       mouseX = (e.clientX / window.innerWidth - .5) * 2;
       mouseY = (e.clientY / window.innerHeight - .5) * 2;
@@ -487,27 +510,24 @@
       requestAnimationFrame(animate);
       t += .012;
 
-      body.rotation.y = Math.sin(t * .4) * .18 + mouseX * .12;
-      body.position.y = -.3 + Math.sin(t * .6) * .06;
+      // Téléphone flotte + glisse vers droite si cliqué
+      phoneGroup.position.x += (phoneTargetX - phoneGroup.position.x) * .04;
+      phoneGroup.position.y = .9 + Math.sin(t * .8) * .06;
+      phoneGroup.rotation.y = -.1 + Math.sin(t * .35) * .12 + mouseX * .06;
+      phoneGlow.position.x = phoneGroup.position.x;
+      phoneGlow.position.y = phoneGroup.position.y;
 
-      phone.rotation.y = .2 + Math.sin(t * .5) * .06;
-      phone.position.y = 1.2 + Math.sin(t * .7 + 1) * .05;
-      screenGlow.position.y = phone.position.y;
-
-      ring.rotation.z = t * .3;
-      ring.rotation.y = t * .15;
-
-      // Scan line monte et descend
-      scanLine.position.y = -.6 + ((t * .4) % 4) * 1.1;
-      scanLine.material.opacity = .15 + Math.sin(t * 2) * .1;
+      // Main suit le téléphone
+      hand.position.x = phoneGroup.position.x + .02;
+      hand.position.y = -.65 + Math.sin(t * .8) * .05;
 
       // Lumière dorée pulse
-      gold.intensity = 60 + Math.sin(t * 1.5) * 20;
+      goldLight.intensity = 80 + Math.sin(t * 1.2) * 18;
 
-      // Camera légère suivant la souris
-      camera.position.x += (mouseX * .3 - camera.position.x) * .05;
-      camera.position.y += (-mouseY * .2 + 1.2 - camera.position.y) * .05;
-      camera.lookAt(.2, 1.2, 0);
+      // Parallaxe caméra
+      camera.position.x += (mouseX * .15 - camera.position.x) * .04;
+      camera.position.y += (-mouseY * .1 + .4 - camera.position.y) * .04;
+      camera.lookAt(phoneGroup.position.x * .5, .55, 0);
 
       renderer.render(scene, camera);
     }
