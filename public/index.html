@@ -298,7 +298,7 @@
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 1.2, 5.5);
+    camera.position.set(0, 1.2, 6.5);
 
     // ── Lumières ──
     scene.add(new THREE.AmbientLight(0x8899cc, 3));
@@ -373,6 +373,74 @@
     body.position.set(.8, -.3, 0);
     scene.add(body);
 
+    // ── Téléphone ──
+    const phone = new THREE.Group();
+
+    // Chassis
+    const chassisMat = new THREE.MeshStandardMaterial({ color: 0x222233, metalness: .95, roughness: .12 });
+    const chassis = new THREE.Mesh(new THREE.BoxGeometry(.48, .96, .045), chassisMat);
+    phone.add(chassis);
+
+    // Bords arrondis simulés (4 barres latérales)
+    const edgeMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, metalness: .99, roughness: .05 });
+    [
+      [0, .48, 0, .48, .04, .05],
+      [0, -.48, 0, .48, .04, .05],
+      [.24, 0, 0, .04, .96, .05],
+      [-.24, 0, 0, .04, .96, .05],
+    ].forEach(([x,y,z,w,h,d]) => {
+      const e = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), edgeMat);
+      e.position.set(x,y,z);
+      phone.add(e);
+    });
+
+    // Écran
+    const screenMat = new THREE.MeshStandardMaterial({ color: 0x0d1117, metalness: 0, roughness: .3, emissive: 0x0d1117, emissiveIntensity: .5 });
+    const screen = new THREE.Mesh(new THREE.BoxGeometry(.42, .88, .001), screenMat);
+    screen.position.set(0, 0, .024);
+    phone.add(screen);
+
+    // Interface app sur l'écran (rectangles colorés simulant l'UI)
+    const uiItems = [
+      { color: 0xc8a96e, x: 0, y: .28, w: .34, h: .06 },   // header doré
+      { color: 0x1e293b, x: 0, y: .1, w: .34, h: .22 },    // zone mannequin
+      { color: 0xc8a96e, x: -.1, y: -.07, w: .13, h: .04 },// chip mesure
+      { color: 0xc8a96e, x: .08, y: -.07, w: .13, h: .04 },
+      { color: 0x22c55e, x: 0, y: -.18, w: .3, h: .055 },  // bouton vert
+      { color: 0x1e293b, x: -.09, y: -.3, w: .13, h: .13 }, // card
+      { color: 0x1e293b, x: .09, y: -.3, w: .13, h: .13 },
+    ];
+    uiItems.forEach(({color,x,y,w,h}) => {
+      const m = new THREE.Mesh(
+        new THREE.BoxGeometry(w, h, .001),
+        new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: .6, roughness: .4 })
+      );
+      m.position.set(x, y, .026);
+      phone.add(m);
+    });
+
+    // Notch (encoche)
+    const notch = new THREE.Mesh(new THREE.BoxGeometry(.12, .022, .002),
+      new THREE.MeshStandardMaterial({ color: 0x0d1117, emissive: 0x000000 }));
+    notch.position.set(0, .41, .026);
+    phone.add(notch);
+
+    // Bouton côté droit
+    const btn = new THREE.Mesh(new THREE.BoxGeometry(.008, .06, .04), edgeMat);
+    btn.position.set(.245, .1, 0);
+    phone.add(btn);
+
+    phone.scale.set(.95, .95, .95);
+    phone.rotation.y = .25;
+    phone.rotation.x = -.05;
+    phone.position.set(-.5, 1.2, 1.5);
+    scene.add(phone);
+
+    // Lueur écran
+    const screenGlow = new THREE.PointLight(0x4488ff, 12, 2);
+    screenGlow.position.set(-.6, 1.1, 2.3);
+    scene.add(screenGlow);
+
     // ── Ligne de scan holographique ──
     const scanMat = new THREE.MeshBasicMaterial({ color: 0xc8a96e, transparent: true, opacity: .25 });
     const scanLine = new THREE.Mesh(new THREE.PlaneGeometry(1.4, .012), scanMat);
@@ -422,6 +490,10 @@
       body.rotation.y = Math.sin(t * .4) * .18 + mouseX * .12;
       body.position.y = -.3 + Math.sin(t * .6) * .06;
 
+      phone.rotation.y = .2 + Math.sin(t * .5) * .06;
+      phone.position.y = 1.2 + Math.sin(t * .7 + 1) * .05;
+      screenGlow.position.y = phone.position.y;
+
       ring.rotation.z = t * .3;
       ring.rotation.y = t * .15;
 
@@ -435,7 +507,7 @@
       // Camera légère suivant la souris
       camera.position.x += (mouseX * .3 - camera.position.x) * .05;
       camera.position.y += (-mouseY * .2 + 1.2 - camera.position.y) * .05;
-      camera.lookAt(.8, 1.2, 0);
+      camera.lookAt(.2, 1.2, 0);
 
       renderer.render(scene, camera);
     }
