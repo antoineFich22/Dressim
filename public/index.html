@@ -267,35 +267,202 @@
     </div>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-badge">✦ Essayage virtuel IA</div>
-      <h1>L'essayage virtuel qui <em>s'adapte</em> à votre boutique</h1>
-      <p>Intégrez Dressim en une ligne de code. Vos clients essaient vos vêtements sur eux — sans cabine d'essayage.</p>
-      <div class="hero-ctas">
-        <a href="avatar.html" class="btn-primary">Voir la démo en live →</a>
-        <a href="#how" class="btn-secondary">Comment ça marche</a>
-      </div>
+  <!-- HERO 3D -->
+  <section id="heroSection" style="position:relative;height:100vh;overflow:hidden;background:#080810;">
+    <canvas id="heroCanvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
 
-      <div class="stats">
-        <div class="stat-item">
-          <div class="stat-num">−40%</div>
-          <div class="stat-label">de retours produits</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num">+28%</div>
-          <div class="stat-label">de taux de conversion</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num">30s</div>
-          <div class="stat-label">pour créer son avatar</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num">1 ligne</div>
-          <div class="stat-label">de code pour intégrer</div>
-        </div>
+    <!-- Overlay texte -->
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;text-align:center;padding:0 1.5rem;pointer-events:none;">
+      <div style="display:inline-block;background:rgba(200,169,110,.15);border:1px solid rgba(200,169,110,.3);color:#c8a96e;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.4rem 1rem;border-radius:20px;margin-bottom:1.5rem;backdrop-filter:blur(8px);">✦ Essayage virtuel IA</div>
+      <h1 style="font-size:clamp(2rem,5vw,3.5rem);font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1.1;margin-bottom:1rem;">L'essayage virtuel qui<br/><em style="color:#c8a96e;font-style:normal;">s'adapte</em> à votre boutique</h1>
+      <p style="font-size:1rem;color:rgba(255,255,255,.6);margin-bottom:2rem;max-width:480px;">Vos clients essaient vos vêtements sur leur avatar 3D — sans cabine d'essayage.</p>
+      <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;pointer-events:all;">
+        <a href="avatar.html" style="padding:.85rem 2rem;border-radius:10px;background:#c8a96e;color:#080810;font-weight:700;font-size:.95rem;text-decoration:none;transition:opacity .2s;">Essayer maintenant →</a>
+        <a href="#how" style="padding:.85rem 2rem;border-radius:10px;background:rgba(255,255,255,.08);color:#fff;font-weight:600;font-size:.95rem;text-decoration:none;border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(8px);">Comment ça marche</a>
       </div>
+    </div>
+
+    <!-- Flèche -->
+    <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.3);font-size:.8rem;text-align:center;z-index:2;animation:heroBounce 2s infinite;">↓</div>
+    <style>@keyframes heroBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}</style>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
+  <script>
+  (function() {
+    const canvas = document.getElementById('heroCanvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x080810, 1);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 1.2, 5.5);
+
+    // ── Lumières ──
+    scene.add(new THREE.AmbientLight(0x8899cc, 3));
+    const gold = new THREE.PointLight(0xc8a96e, 150, 15);
+    gold.position.set(2, 3, 2);
+    scene.add(gold);
+    const blue = new THREE.PointLight(0x4488ff, 80, 12);
+    blue.position.set(-2, 1, 1);
+    scene.add(blue);
+    const front = new THREE.DirectionalLight(0xffffff, 1.5);
+    front.position.set(0, 2, 4);
+    scene.add(front);
+
+    // ── Matériau métal ──
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0x3a3a5e,
+      metalness: 0.85,
+      roughness: 0.25,
+      emissive: 0x111128,
+      emissiveIntensity: 1,
+    });
+    const matGold = new THREE.MeshStandardMaterial({
+      color: 0xc8a96e,
+      metalness: 1,
+      roughness: 0.08,
+      emissive: 0xc8a96e,
+      emissiveIntensity: 0.4,
+    });
+
+    // ── Corps humanoïde ──
+    const body = new THREE.Group();
+
+    function addMesh(geo, material, x, y, z, rx, ry, rz) {
+      const m = new THREE.Mesh(geo, material);
+      m.position.set(x, y, z);
+      if (rx) m.rotation.set(rx, ry||0, rz||0);
+      body.add(m);
+      return m;
+    }
+
+    // Tête
+    addMesh(new THREE.SphereGeometry(.28,32,32), mat, 0,2.9,0);
+    // Cou
+    addMesh(new THREE.CylinderGeometry(.1,.12,.22,16), mat, 0,2.57,0);
+    // Torse
+    addMesh(new THREE.CapsuleGeometry(.38,.75,8,16), mat, 0,1.75,0);
+    // Bassin
+    addMesh(new THREE.CapsuleGeometry(.32,.22,8,16), mat, 0,1.12,0);
+
+    // Épaules dorées
+    [-1,1].forEach(s => addMesh(new THREE.SphereGeometry(.15,16,16), matGold, s*.55,2.1,0));
+
+    // Bras
+    [-1,1].forEach(s => {
+      addMesh(new THREE.CapsuleGeometry(.11,.52,8,16), mat, s*.66,1.72,0);
+      addMesh(new THREE.CapsuleGeometry(.09,.48,8,16), mat, s*.72,1.12,0);
+      addMesh(new THREE.SphereGeometry(.1,16,16), mat, s*.76,.78,0);
+    });
+
+    // Jambes
+    [-1,1].forEach(s => {
+      addMesh(new THREE.CapsuleGeometry(.14,.6,8,16), mat, s*.2,.58,0);
+      addMesh(new THREE.SphereGeometry(.1,16,16), matGold, s*.2,.22,0);
+      addMesh(new THREE.CapsuleGeometry(.1,.55,8,16), mat, s*.2,-.22,0);
+      addMesh(new THREE.BoxGeometry(.18,.08,.32), mat, s*.2,-.54,.05);
+    });
+
+    // Panneaux torse dorés
+    addMesh(new THREE.BoxGeometry(.22,.08,.02), matGold, 0,1.9,.39);
+    addMesh(new THREE.BoxGeometry(.22,.08,.02), matGold, 0,1.6,.39);
+
+    body.position.set(.8, -.3, 0);
+    scene.add(body);
+
+    // ── Ligne de scan holographique ──
+    const scanMat = new THREE.MeshBasicMaterial({ color: 0xc8a96e, transparent: true, opacity: .25 });
+    const scanLine = new THREE.Mesh(new THREE.PlaneGeometry(1.4, .012), scanMat);
+    scanLine.position.set(.8, 0, .1);
+    scene.add(scanLine);
+
+    // ── Particules ──
+    const N = 300;
+    const pos = new Float32Array(N * 3);
+    const pSizes = new Float32Array(N);
+    for (let i = 0; i < N; i++) {
+      const r = 1.2 + Math.random() * 2.2;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = (Math.random() - .5) * Math.PI * 1.5;
+      pos[i*3]   = .8 + r * Math.cos(theta) * Math.cos(phi);
+      pos[i*3+1] = -.3 + r * Math.sin(phi) * 1.8;
+      pos[i*3+2] = r * Math.sin(theta) * Math.cos(phi) * .6;
+      pSizes[i] = .5 + Math.random() * 2.5;
+    }
+    const pg = new THREE.BufferGeometry();
+    pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    pg.setAttribute('size', new THREE.BufferAttribute(pSizes, 1));
+    const pMat = new THREE.PointsMaterial({ color: 0xc8a96e, size: .022, transparent: true, opacity: .7, sizeAttenuation: true });
+    scene.add(new THREE.Points(pg, pMat));
+
+    // ── Anneau orbital ──
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(1.15, .008, 8, 80),
+      new THREE.MeshBasicMaterial({ color: 0xc8a96e, transparent: true, opacity: .3 })
+    );
+    ring.rotation.x = Math.PI / 2.4;
+    ring.position.set(.8, 1.2, 0);
+    scene.add(ring);
+
+    // ── Animation ──
+    let t = 0;
+    let mouseX = 0, mouseY = 0;
+    window.addEventListener('mousemove', e => {
+      mouseX = (e.clientX / window.innerWidth - .5) * 2;
+      mouseY = (e.clientY / window.innerHeight - .5) * 2;
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      t += .012;
+
+      body.rotation.y = Math.sin(t * .4) * .18 + mouseX * .12;
+      body.position.y = -.3 + Math.sin(t * .6) * .06;
+
+      ring.rotation.z = t * .3;
+      ring.rotation.y = t * .15;
+
+      // Scan line monte et descend
+      scanLine.position.y = -.6 + ((t * .4) % 4) * 1.1;
+      scanLine.material.opacity = .15 + Math.sin(t * 2) * .1;
+
+      // Lumière dorée pulse
+      gold.intensity = 60 + Math.sin(t * 1.5) * 20;
+
+      // Camera légère suivant la souris
+      camera.position.x += (mouseX * .3 - camera.position.x) * .05;
+      camera.position.y += (-mouseY * .2 + 1.2 - camera.position.y) * .05;
+      camera.lookAt(.8, 1.2, 0);
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  })();
+  </script>
+
+  <!-- STATS -->
+  <section style="background:#fff;border-bottom:1px solid #e5e7eb;padding:2rem 0;">
+    <div class="container">
+      <div class="stats">
+        <div class="stat-item"><div class="stat-num">−40%</div><div class="stat-label">de retours produits</div></div>
+        <div class="stat-item"><div class="stat-num">+28%</div><div class="stat-label">de taux de conversion</div></div>
+        <div class="stat-item"><div class="stat-num">30s</div><div class="stat-label">pour créer son avatar</div></div>
+        <div class="stat-item"><div class="stat-num">1 ligne</div><div class="stat-label">de code pour intégrer</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero" style="display:none;">
+    <div class="container">
     </div>
   </section>
 
