@@ -726,21 +726,28 @@
   </style>
 
   <script>
-    // ── Mannequins préfaits (remplacés par les images FASHN locales à terme) ──
+    // ── Mannequins préfaits (photos locales auto-hébergées) ──
     const MODELS_IMG = {
-      femme: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=700&q=80',
-      homme: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=700&q=80',
+      femme: 'models/femme.jpg',
+      homme: 'models/homme.jpg',
     };
 
-    // ── Garde-robe de démo ──
-    const GARMENTS = [
-      { id:'robe-midi',    name:'Robe Midi Florale', thumb:'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80' },
-      { id:'kimono-lin',   name:'Kimono Lin',        thumb:'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&q=80' },
-      { id:'veste-boheme', name:'Veste Bohème',      thumb:'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80' },
-      { id:'top-dentelle', name:'Top Dentelle',      thumb:'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80' },
-    ];
+    // ── Garde-robe de démo (adaptée au genre) ──
+    const GARMENTS = {
+      femme: [
+        { id:'robe',   name:'Robe Rouge',      thumb:'garments/robe.jpg' },
+        { id:'blouse', name:'Blouse Fleurie',  thumb:'garments/blouse.jpg' },
+        { id:'veste',  name:'Veste Cuir',      thumb:'garments/veste.jpg' },
+        { id:'tshirt', name:'T-shirt Imprimé', thumb:'garments/tshirt.jpg' },
+      ],
+      homme: [
+        { id:'veste',  name:'Veste Cuir',      thumb:'garments/veste.jpg' },
+        { id:'tshirt', name:'T-shirt Imprimé', thumb:'garments/tshirt.jpg' },
+      ],
+    };
+    function garmentsFor(g) { return GARMENTS[g] || []; }
 
-    // ── Essayages pré-générés par FASHN : TRYON[gender][garmentId] = url ──
+    // ── Essayages pré-générés (Hugging Face) : TRYON[gender][garmentId] = url ──
     // (vide pour l'instant → on retombe sur la vignette en attendant la pré-génération)
     const TRYON = { femme: {}, homme: {} };
 
@@ -770,6 +777,7 @@
       document.getElementById('dmWeight').value = g === 'femme' ? 65 : 78;
       loadModel(g);
       resetTryon();
+      buildGarments();
       updateMeasures();
     }
 
@@ -795,14 +803,12 @@
 
     function buildGarments() {
       const grid = document.getElementById('dmGarmentGrid');
-      if (grid.dataset.built) return;
-      grid.innerHTML = GARMENTS.map(g => `
+      grid.innerHTML = garmentsFor(dmGender).map(g => `
         <button class="dmGarmentCard" data-id="${g.id}" onclick="dmTryOn('${g.id}', event)">
           <img src="${g.thumb}" alt="${g.name}" loading="lazy">
           <span>${g.name}</span>
         </button>
       `).join('');
-      grid.dataset.built = '1';
     }
 
     function goToClothes() {
@@ -870,7 +876,7 @@
 
     // Essayer un vêtement : il s'envole vers le mannequin puis se révèle dessus
     window.dmTryOn = function(id, event) {
-      const g = GARMENTS.find(x => x.id === id);
+      const g = garmentsFor(dmGender).find(x => x.id === id);
       if (!g) return;
       const card = event && event.currentTarget;
       document.querySelectorAll('.dmGarmentCard').forEach(c => c.classList.remove('active'));
