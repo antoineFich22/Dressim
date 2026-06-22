@@ -14,14 +14,17 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --black:   #0f0f0f;
-      --dark:    #1a1a1a;
-      --gray:    #6b7280;
-      --border:  #e5e7eb;
-      --bg:      #fafaf9;
+      --black:   #1a1220;
+      --dark:    #2d2438;
+      --gray:    #7a6f82;
+      --border:  #e8e0eb;
+      --bg:      #fdf8f4;
       --white:   #ffffff;
       --warm:    #c8a96e;
-      --warm-l:  #f5f0e8;
+      --warm-l:  #f7f0e6;
+      --plum:    #3d2b5e;
+      --rose:    #f5ece8;
+      --sage:    #eaf2ed;
     }
 
     html { scroll-behavior: smooth; }
@@ -42,7 +45,7 @@
     .nav-links { display: flex; align-items: center; gap: 2rem; }
     .nav-links a { font-size: .875rem; color: var(--gray); text-decoration: none; transition: color .2s; }
     .nav-links a:hover { color: var(--black); }
-    .btn-nav { background: var(--black); color: var(--white); padding: .5rem 1.1rem; border-radius: 6px; font-size: .875rem; font-weight: 500; text-decoration: none; transition: opacity .2s; }
+    .btn-nav { background: var(--plum); color: var(--white); padding: .5rem 1.1rem; border-radius: 6px; font-size: .875rem; font-weight: 500; text-decoration: none; transition: opacity .2s; }
     .btn-nav:hover { opacity: .85; color: var(--white); }
 
     /* ── HERO ── */
@@ -70,7 +73,7 @@
     }
     .hero-ctas { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
     .btn-primary {
-      background: var(--black); color: var(--white);
+      background: var(--plum); color: var(--white);
       padding: .85rem 2rem; border-radius: 8px;
       font-size: 1rem; font-weight: 600;
       text-decoration: none; transition: opacity .2s;
@@ -187,10 +190,10 @@
       border-radius: 14px; padding: 2rem;
       position: relative;
     }
-    .plan.featured { border-color: var(--black); }
+    .plan.featured { border-color: var(--plum); }
     .plan-badge {
       position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-      background: var(--black); color: var(--white);
+      background: var(--plum); color: var(--white);
       font-size: .65rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
       padding: .25rem .8rem; border-radius: 20px;
     }
@@ -213,7 +216,7 @@
     }
     .btn-plan-outline { border: 1.5px solid var(--border); color: var(--black); }
     .btn-plan-outline:hover { border-color: var(--black); }
-    .btn-plan-dark { background: var(--black); color: var(--white); }
+    .btn-plan-dark { background: var(--plum); color: var(--white); }
     .btn-plan-dark:hover { opacity: .85; }
 
     /* ── FAQ ── */
@@ -228,15 +231,51 @@
     .faq-item[open] summary::after { transform: rotate(45deg); }
     .faq-item p { font-size: .9rem; color: var(--gray); margin-top: .75rem; line-height: 1.6; }
 
+    /* ── WHAT IS ── */
+    .what-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+    @media (max-width: 700px) { .what-grid { grid-template-columns: 1fr; } }
+    .what-visual {
+      background: linear-gradient(135deg, #2d1f4e 0%, #1a1228 100%);
+      border-radius: 20px; padding: 2.5rem; position: relative; overflow: hidden;
+    }
+    .what-visual::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 70% 30%, rgba(200,169,110,.15) 0%, transparent 65%); }
+    .feat-list { list-style: none; display: flex; flex-direction: column; gap: .9rem; margin-top: 1.8rem; }
+    .feat-list li { display: flex; align-items: flex-start; gap: .75rem; font-size: .9rem; }
+    .feat-list li .fi { width: 30px; height: 30px; border-radius: 8px; background: var(--warm-l); display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; }
+
+    /* ── PROBLEMS ── */
+    .prob-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+    .prob-card { border-radius: 14px; padding: 2rem; position: relative; overflow: hidden; }
+    .prob-card.prob { background: var(--rose); border: 1px solid #e8d0cc; }
+    .prob-card.sol { background: var(--sage); border: 1px solid #c8e0d0; }
+    .prob-card .pc-icon { font-size: 1.6rem; margin-bottom: .8rem; display: block; }
+    .prob-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; }
+    .prob-card p { font-size: .85rem; color: var(--gray); line-height: 1.55; }
+    .prob-arrow { display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--warm); }
+
+    /* ── FEATURES ── */
+    .features-section { background: var(--plum); color: #fff; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+    .feat-card { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 1.75rem; }
+    .feat-card .fc-icon { font-size: 1.8rem; margin-bottom: .9rem; }
+    .feat-card h4 { font-size: .95rem; font-weight: 700; margin-bottom: .4rem; }
+    .feat-card p { font-size: .82rem; color: rgba(255,255,255,.55); line-height: 1.5; }
+    .features-section .section-tag { background: rgba(200,169,110,.2); color: #c8a96e; }
+    .features-section .section-title { color: #fff; }
+    .features-section .section-sub { color: rgba(255,255,255,.55); }
+
     /* ── CTA FINAL ── */
     .cta-final {
-      background: var(--black); color: var(--white);
+      background: linear-gradient(135deg, #2d1f4e 0%, #1a1228 100%);
+      color: var(--white);
       text-align: center; padding: 5rem 1.5rem;
-      border-radius: 16px; margin: 0 1.5rem 5rem;
+      border-radius: 20px; margin: 0 1.5rem 5rem;
+      position: relative; overflow: hidden;
     }
-    .cta-final h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -.03em; margin-bottom: 1rem; }
-    .cta-final p { color: rgba(255,255,255,.6); margin-bottom: 2rem; }
-    .btn-white { background: var(--white); color: var(--black); padding: .9rem 2rem; border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 1rem; display: inline-block; transition: opacity .2s; }
+    .cta-final::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%, rgba(200,169,110,.18) 0%, transparent 60%); pointer-events:none; }
+    .cta-final h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -.03em; margin-bottom: 1rem; position:relative; }
+    .cta-final p { color: rgba(255,255,255,.6); margin-bottom: 2rem; position:relative; }
+    .btn-white { background: var(--white); color: var(--plum); padding: .9rem 2rem; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 1rem; display: inline-block; transition: opacity .2s; }
     .btn-white:hover { opacity: .9; }
 
     /* ── FOOTER ── */
@@ -268,7 +307,7 @@
   </nav>
 
   <!-- HERO 3D interactif -->
-  <section id="heroSection" style="position:relative;height:100vh;overflow:hidden;background:#080810;">
+  <section id="heroSection" style="position:relative;height:100vh;overflow:hidden;background:#0d0820;">
     <canvas id="heroCanvas" style="position:absolute;inset:0;width:100%;height:100%;cursor:pointer;"></canvas>
 
     <!-- Hint clic -->
@@ -343,7 +382,7 @@
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x080810, 1);
+    renderer.setClearColor(0x0d0820, 1);
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 100);
@@ -774,6 +813,68 @@
     </div>
   </section>
 
+  <!-- QU'EST-CE QUE DRESSIM -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="what-grid">
+        <div class="what-visual">
+          <div style="color:#fff;font-weight:800;font-size:1.1rem;position:relative;z-index:1;margin-bottom:.25rem;">Ce que voient vos clients</div>
+          <div style="color:rgba(255,255,255,.45);font-size:.82rem;position:relative;z-index:1;margin-bottom:1.4rem;">Une expérience immersive, directement sur votre boutique</div>
+          <ul class="feat-list" style="position:relative;z-index:1;color:#fff;">
+            <li><span class="fi">🧍</span><span>Ils créent leur avatar en 30 secondes</span></li>
+            <li><span class="fi">👗</span><span>Ils essaient vos vêtements virtuellement</span></li>
+            <li><span class="fi">📏</span><span>Ils reçoivent leur taille recommandée</span></li>
+            <li><span class="fi">✅</span><span>Ils commandent avec confiance</span></li>
+          </ul>
+        </div>
+        <div>
+          <div class="section-tag">Qu'est-ce que Dressim ?</div>
+          <h2 class="section-title">L'essayage virtuel, conçu pour les boutiques</h2>
+          <p class="section-sub">Dressim est un widget SaaS que vous intégrez en une ligne de code. Vos clients créent un avatar à leur image, essaient vos vêtements et reçoivent une recommandation de taille — le tout sans quitter votre boutique.</p>
+          <div style="margin-top:1.75rem;display:flex;flex-direction:column;gap:.9rem;">
+            <div style="display:flex;align-items:flex-start;gap:.75rem;">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--warm);margin-top:.45rem;flex-shrink:0;"></div>
+              <p style="font-size:.9rem;color:var(--gray);">Aucun développement complexe — une seule ligne de code HTML</p>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:.75rem;">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--warm);margin-top:.45rem;flex-shrink:0;"></div>
+              <p style="font-size:.9rem;color:var(--gray);">Compatible avec tous les CMS : Shopify, WooCommerce, PrestaShop…</p>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:.75rem;">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--warm);margin-top:.45rem;flex-shrink:0;"></div>
+              <p style="font-size:.9rem;color:var(--gray);">Design 100% personnalisable : vos couleurs, votre logo, votre identité</p>
+            </div>
+          </div>
+          <div style="margin-top:2rem;">
+            <a href="boutique.html" style="display:inline-flex;align-items:center;gap:.4rem;background:var(--plum);color:#fff;padding:.75rem 1.5rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem;transition:opacity .2s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Voir la démo live →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEME / SOLUTION -->
+  <section class="section" style="background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4rem 0;">
+    <div class="container">
+      <div class="section-tag">Le problème</div>
+      <h2 class="section-title">Le doute sur la taille coûte cher</h2>
+      <p class="section-sub">En moyenne, 30% des achats en ligne sont retournés — principalement à cause du mauvais choix de taille. Dressim résout ce problème avant l'achat.</p>
+      <div class="prob-grid">
+        <div class="prob-card prob">
+          <span class="pc-icon">😰</span>
+          <h4>Sans Dressim</h4>
+          <p>Le client doute de sa taille, commande deux tailles "pour voir", garde une, retourne l'autre. Ça coûte cher à votre boutique en frais logistiques et en perte de temps.</p>
+        </div>
+        <div class="prob-arrow">→</div>
+        <div class="prob-card sol">
+          <span class="pc-icon">🎯</span>
+          <h4>Avec Dressim</h4>
+          <p>L'avatar guide le client vers la bonne taille avant l'achat. Moins de doute, moins de retours, plus de confiance dans votre marque — et une meilleure expérience client.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- HOW IT WORKS -->
   <section class="section" id="how">
     <div class="container">
@@ -862,6 +963,47 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES GRID -->
+  <section class="section features-section" id="features">
+    <div class="container">
+      <div class="section-tag">Fonctionnalités</div>
+      <h2 class="section-title">Tout ce dont votre boutique a besoin</h2>
+      <p class="section-sub">Un seul outil, pensé pour les boutiques indépendantes comme pour les grandes enseignes.</p>
+      <div class="features-grid">
+        <div class="feat-card">
+          <div class="fc-icon">🏃</div>
+          <h4>Intégration en 5 min</h4>
+          <p>Une ligne de code. Fonctionnel immédiatement sur n'importe quel site ou CMS.</p>
+        </div>
+        <div class="feat-card">
+          <div class="fc-icon">🧍‍♀️</div>
+          <h4>Avatars réalistes</h4>
+          <p>Modèles 3D haute qualité adaptés aux morphologies féminines et masculines.</p>
+        </div>
+        <div class="feat-card">
+          <div class="fc-icon">📏</div>
+          <h4>Guide des tailles IA</h4>
+          <p>Recommandation précise basée sur la taille, le poids et les mensurations du client.</p>
+        </div>
+        <div class="feat-card">
+          <div class="fc-icon">🎨</div>
+          <h4>Personnalisation totale</h4>
+          <p>Couleurs, typographie, logo. Le widget adopte l'identité de votre boutique.</p>
+        </div>
+        <div class="feat-card">
+          <div class="fc-icon">📊</div>
+          <h4>Analytics en temps réel</h4>
+          <p>Suivez les essayages, conversions et articles les plus testés dans votre dashboard.</p>
+        </div>
+        <div class="feat-card">
+          <div class="fc-icon">🔒</div>
+          <h4>RGPD & vie privée</h4>
+          <p>Aucune donnée stockée. Photos supprimées après 15 minutes. Conformité totale.</p>
         </div>
       </div>
     </div>
