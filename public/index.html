@@ -311,7 +311,7 @@
 
     <!-- Bouton essayer (caché au départ) -->
     <div id="dmTryBtn" style="position:absolute;right:5%;top:50%;transform:translateY(-50%);z-index:4;opacity:0;pointer-events:none;transition:opacity .6s .4s;text-align:center;">
-      <a href="avatar.html" style="display:block;padding:1rem 1.8rem;border-radius:12px;background:#c8a96e;color:#080810;font-weight:800;font-size:1rem;text-decoration:none;box-shadow:0 0 30px rgba(200,169,110,.4);letter-spacing:-.01em;">Essayer maintenant →</a>
+      <button onclick="openAvatarOverlay()" style="display:block;padding:1rem 1.8rem;border-radius:12px;background:#c8a96e;color:#080810;font-weight:800;font-size:1rem;border:none;cursor:pointer;box-shadow:0 0 30px rgba(200,169,110,.4);letter-spacing:-.01em;font-family:inherit;">Essayer maintenant →</button>
       <div style="color:rgba(255,255,255,.35);font-size:.75rem;margin-top:.6rem;">Gratuit · Sans inscription</div>
     </div>
 
@@ -539,6 +539,222 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
   })();
+  </script>
+
+  <!-- ══ AVATAR OVERLAY ══ -->
+  <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
+  <div id="dmAvatarOverlay" style="position:fixed;inset:0;z-index:100;background:#080810;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .45s;font-family:'Inter',sans-serif;">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;">
+      <div style="font-size:1rem;font-weight:700;color:#fff;">Mon avatar <span style="color:#c8a96e;">Dressim</span></div>
+      <button onclick="closeAvatarOverlay()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:.85rem;padding:.4rem .9rem;border-radius:8px;cursor:pointer;font-family:inherit;">✕ Fermer</button>
+    </div>
+
+    <!-- Body -->
+    <div id="dmAvaBody" style="display:flex;flex:1;overflow:hidden;">
+
+      <!-- Sketchfab viewer -->
+      <div style="flex:1;position:relative;background:#0a0a16;">
+        <iframe id="dmSfFrame" title="Avatar Dressim" allow="autoplay;fullscreen;xr-spatial-tracking" allowfullscreen style="width:100%;height:100%;border:none;display:block;"></iframe>
+        <div id="dmSfLoader" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0a16;z-index:2;transition:opacity .8s;">
+          <div style="width:40px;height:40px;border:3px solid rgba(200,169,110,.2);border-top-color:#c8a96e;border-radius:50%;animation:dmSpin .9s linear infinite;margin-bottom:1rem;"></div>
+          <div style="color:rgba(255,255,255,.4);font-size:.8rem;">Chargement de l'avatar…</div>
+        </div>
+      </div>
+
+      <!-- Panneau sliders -->
+      <div id="dmSliderPanel" style="width:300px;min-width:300px;padding:1.4rem 1.2rem;overflow-y:auto;border-left:1px solid rgba(255,255,255,.06);background:rgba(8,8,18,.95);display:flex;flex-direction:column;gap:1.1rem;">
+
+        <!-- Genre -->
+        <div>
+          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);margin-bottom:.6rem;">Genre</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+            <button id="dmGF" onclick="setGender('femme')" class="dmGBtn active">👩 Femme</button>
+            <button id="dmGH" onclick="setGender('homme')" class="dmGBtn">👨 Homme</button>
+          </div>
+        </div>
+
+        <!-- Taille -->
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;">
+            <span style="font-size:.78rem;color:rgba(255,255,255,.6);">Taille</span>
+            <span id="dmHVal" style="font-size:.78rem;font-weight:700;color:#c8a96e;">165 cm</span>
+          </div>
+          <input id="dmHeight" type="range" min="145" max="210" value="165" oninput="updateMeasures()" style="width:100%;">
+        </div>
+
+        <!-- Poids -->
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;">
+            <span style="font-size:.78rem;color:rgba(255,255,255,.6);">Poids</span>
+            <span id="dmWVal" style="font-size:.78rem;font-weight:700;color:#c8a96e;">65 kg</span>
+          </div>
+          <input id="dmWeight" type="range" min="40" max="140" value="65" oninput="updateMeasures()" style="width:100%;">
+        </div>
+
+        <!-- Mesures calculées -->
+        <div style="background:rgba(200,169,110,.07);border:1px solid rgba(200,169,110,.2);border-radius:12px;padding:.9rem;display:flex;flex-direction:column;gap:.5rem;">
+          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#c8a96e;margin-bottom:.2rem;">Mensurations estimées</div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:.78rem;color:rgba(255,255,255,.5);">👙 Poitrine</span>
+            <span id="dmBust" style="font-size:.78rem;font-weight:700;color:#fff;">90 cm</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:.78rem;color:rgba(255,255,255,.5);">⌛ Taille</span>
+            <span id="dmWaist" style="font-size:.78rem;font-weight:700;color:#fff;">72 cm</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:.78rem;color:rgba(255,255,255,.5);">🍑 Hanches</span>
+            <span id="dmHips" style="font-size:.78rem;font-weight:700;color:#fff;">96 cm</span>
+          </div>
+        </div>
+
+        <!-- Affiner -->
+        <div>
+          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);margin-bottom:.8rem;">Affiner</div>
+          <div style="display:flex;flex-direction:column;gap:.8rem;">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:.3rem;">
+                <span style="font-size:.75rem;color:rgba(255,255,255,.5);">Poitrine ±</span>
+                <span id="dmABLbl" style="font-size:.75rem;color:#c8a96e;">0 cm</span>
+              </div>
+              <input id="dmABust" type="range" min="-10" max="10" value="0" oninput="updateMeasures()" style="width:100%;">
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:.3rem;">
+                <span style="font-size:.75rem;color:rgba(255,255,255,.5);">Taille ±</span>
+                <span id="dmAWLbl" style="font-size:.75rem;color:#c8a96e;">0 cm</span>
+              </div>
+              <input id="dmAWaist" type="range" min="-10" max="10" value="0" oninput="updateMeasures()" style="width:100%;">
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:.3rem;">
+                <span style="font-size:.75rem;color:rgba(255,255,255,.5);">Hanches ±</span>
+                <span id="dmAHLbl" style="font-size:.75rem;color:#c8a96e;">0 cm</span>
+              </div>
+              <input id="dmAHips" type="range" min="-10" max="10" value="0" oninput="updateMeasures()" style="width:100%;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Bouton confirmer -->
+        <button onclick="confirmAvatar()" style="margin-top:auto;padding:1rem;border-radius:12px;background:#c8a96e;color:#080810;font-weight:800;font-size:.95rem;border:none;cursor:pointer;font-family:inherit;letter-spacing:-.01em;">Valider mes mensurations →</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes dmSpin { to { transform: rotate(360deg); } }
+    .dmGBtn { padding:.65rem .5rem;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-size:.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s; }
+    .dmGBtn.active { border-color:#c8a96e;background:rgba(200,169,110,.15);color:#c8a96e; }
+    #dmAvatarOverlay input[type=range] { -webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:rgba(255,255,255,.12);outline:none; }
+    #dmAvatarOverlay input[type=range]::-webkit-slider-thumb { -webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#c8a96e;cursor:pointer;border:2px solid #080810;box-shadow:0 0 8px rgba(200,169,110,.5); }
+    @media (max-width: 640px) {
+      #dmAvaBody { flex-direction: column; }
+      #dmSliderPanel { width: 100% !important; min-width: unset !important; border-left: none !important; border-top: 1px solid rgba(255,255,255,.06); max-height: 55vh; }
+    }
+  </style>
+
+  <script>
+    const DM_MODELS = {
+      femme: '7f9d35c58bd2421598eeed0df9b19f37',
+      homme: 'ecefd207c85845a7b0d116c34da5e7fe',
+    };
+    let dmGender = 'femme';
+    let dmSfLoaded = false;
+
+    function openAvatarOverlay() {
+      const ov = document.getElementById('dmAvatarOverlay');
+      ov.style.opacity = '1';
+      ov.style.pointerEvents = 'all';
+      if (!dmSfLoaded) { loadSketchfab(dmGender); dmSfLoaded = true; }
+      updateMeasures();
+    }
+
+    function closeAvatarOverlay() {
+      const ov = document.getElementById('dmAvatarOverlay');
+      ov.style.opacity = '0';
+      ov.style.pointerEvents = 'none';
+    }
+
+    function setGender(g) {
+      dmGender = g;
+      document.getElementById('dmGF').classList.toggle('active', g === 'femme');
+      document.getElementById('dmGH').classList.toggle('active', g === 'homme');
+      document.getElementById('dmHeight').value = g === 'femme' ? 165 : 175;
+      document.getElementById('dmWeight').value = g === 'femme' ? 65 : 78;
+      loadSketchfab(g);
+      updateMeasures();
+    }
+
+    function loadSketchfab(gender) {
+      const uid = DM_MODELS[gender];
+      const loader = document.getElementById('dmSfLoader');
+      loader.style.opacity = '1';
+      loader.style.pointerEvents = 'all';
+      const frame = document.getElementById('dmSfFrame');
+      frame.src = `https://sketchfab.com/models/${uid}/embed?autospin=0&autostart=1&ui_theme=dark&ui_controls=0&ui_infos=0&ui_watermark=0`;
+      frame.onload = () => {
+        setTimeout(() => { loader.style.opacity = '0'; loader.style.pointerEvents = 'none'; }, 2000);
+      };
+    }
+
+    function calcMeasures() {
+      const h = +document.getElementById('dmHeight').value;
+      const w = +document.getElementById('dmWeight').value;
+      const ab = +document.getElementById('dmABust').value;
+      const aw = +document.getElementById('dmAWaist').value;
+      const ah = +document.getElementById('dmAHips').value;
+      const bmi = w / ((h / 100) ** 2);
+      let bust, waist, hips;
+      if (dmGender === 'femme') {
+        bust  = 90  + (h - 165) * 0.30 + (bmi - 22) * 1.5;
+        waist = 72  + (h - 165) * 0.18 + (bmi - 22) * 1.8;
+        hips  = 96  + (h - 165) * 0.35 + (bmi - 22) * 2.0;
+      } else {
+        bust  = 96  + (h - 175) * 0.35 + (bmi - 23) * 1.5;
+        waist = 84  + (h - 175) * 0.20 + (bmi - 23) * 2.0;
+        hips  = 98  + (h - 175) * 0.30 + (bmi - 23) * 1.8;
+      }
+      return { bust: Math.round(bust + ab), waist: Math.round(waist + aw), hips: Math.round(hips + ah) };
+    }
+
+    function updateMeasures() {
+      const h = +document.getElementById('dmHeight').value;
+      const w = +document.getElementById('dmWeight').value;
+      document.getElementById('dmHVal').textContent = h + ' cm';
+      document.getElementById('dmWVal').textContent = w + ' kg';
+      document.getElementById('dmABLbl').textContent = (document.getElementById('dmABust').value > 0 ? '+' : '') + document.getElementById('dmABust').value + ' cm';
+      document.getElementById('dmAWLbl').textContent = (document.getElementById('dmAWaist').value > 0 ? '+' : '') + document.getElementById('dmAWaist').value + ' cm';
+      document.getElementById('dmAHLbl').textContent = (document.getElementById('dmAHips').value > 0 ? '+' : '') + document.getElementById('dmAHips').value + ' cm';
+      const m = calcMeasures();
+      document.getElementById('dmBust').textContent  = m.bust  + ' cm';
+      document.getElementById('dmWaist').textContent = m.waist + ' cm';
+      document.getElementById('dmHips').textContent  = m.hips  + ' cm';
+    }
+
+    function confirmAvatar() {
+      const h = +document.getElementById('dmHeight').value;
+      const w = +document.getElementById('dmWeight').value;
+      const m = calcMeasures();
+      const SIZING = [
+        {size:'XS',bust:[78,83],waist:[58,63]},{size:'S',bust:[84,89],waist:[64,69]},
+        {size:'M',bust:[90,95],waist:[70,75]},{size:'L',bust:[96,101],waist:[76,81]},
+        {size:'XL',bust:[102,108],waist:[82,88]},
+      ];
+      let iB = SIZING.findIndex(s => m.bust >= s.bust[0] && m.bust <= s.bust[1]);
+      let iW = SIZING.findIndex(s => m.waist >= s.waist[0] && m.waist <= s.waist[1]);
+      if (iB < 0) iB = m.bust > 108 ? 4 : 0;
+      if (iW < 0) iW = m.waist > 88 ? 4 : 0;
+      const size = SIZING[Math.max(iB, iW)]?.size || 'M';
+      localStorage.setItem('dressim_avatar', JSON.stringify({
+        gender: dmGender, height: h, weight: w, size,
+        measures: m, sfUid: DM_MODELS[dmGender],
+      }));
+      // Aller vers la boutique démo
+      window.location.href = '/boutique.html';
+    }
   </script>
 
   <!-- STATS -->
